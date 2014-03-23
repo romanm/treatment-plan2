@@ -1,0 +1,70 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<!-- 
+	<h2><fmt:message key="ui_title_folders" /></h2>
+ -->
+	<owsui:dojoDataStore name="explorerDataStore"/>
+
+<c:choose>
+	<c:when test="${explorerMtl.isPatientFolder}">
+		<c:if test="${'patient'==explorerMtl.folderO.folder }">
+			<div class="b red"><fmt:message key="ui_subdir_select"/></div>
+		</c:if>
+		<owsui:titlePane id="patient_folders" mtitle="ui_title_folders" isOpened="true">
+			<div style="background-color:#fafafa; overflow:auto; height:400px;">
+				<owsui:dojoTree name="patient" query="patient" />
+			</div>
+		</owsui:titlePane>
+	</c:when>
+
+	<c:when test="${explorerMtl.isConceptFolder || formUtil.mode == 'newProtocol' || formUtil.mode == 'importProtocol'}">
+		<c:if test="${'protocol'==explorerMtl.folderO.folder}">
+			<div class="b red"><fmt:message key="ui_subdir_select"/></div>
+		</c:if>
+		<owsui:titlePane id="concept_folders" mtitle="ui_title_folders" isOpened="true">
+			<div style="background-color:#fafafa; overflow:auto; height:400px;">
+				<owsui:dojoTree name="concept" query="protocol" />
+			</div>
+		</owsui:titlePane>
+	</c:when>
+
+	<c:otherwise>
+		<!-- 300px for Jannet small display	-->
+		<owsui:accordion id="explorerAccordion" height="300px" width="100%">
+			<owsui:accordionPane id="diagnose"  selected="${explorerMtl.isDiagnoseFolder}">
+				 <owsui:dojoTree name="diagnose" query="diagnose" />
+			</owsui:accordionPane>
+			<owsui:accordionPane id="finding"  selected="${explorerMtl.isFindingFolder}" >
+				<owsui:dojoTree name="finding" query="finding" />
+			</owsui:accordionPane>
+			<owsui:accordionPane id="labor" selected="${explorerMtl.isLaborFolder}">
+				<owsui:dojoTree name="labor" query="labor" />
+			</owsui:accordionPane>
+			<owsui:accordionPane id="drug"  selected="${explorerMtl.isDrugFolder}">
+				<owsui:dojoTree name="drug" query="drug" />
+			</owsui:accordionPane>
+			<owsui:accordionPane id="schema" selected="${explorerMtl.isSchemaFolder}">
+				<owsui:dojoTree name="schema" query="task" />
+			</owsui:accordionPane>
+		</owsui:accordion>
+	</c:otherwise>
+</c:choose>
+
+<spring:url var="href" value="explorer=${docMtl.folderO.id}">
+	<spring:param name="subdir"	value="${owsSession.subDir?'off':'on'}"/>
+</spring:url>
+<c:choose>
+	<c:when test="${owsSession.subDir }">
+<input id="subdir" type="checkbox" checked="checked" onclick="self.location.href='${href}'" />
+	</c:when>
+	<c:otherwise>
+<input id="subdir" type="checkbox" onclick="self.location.href='${href}'" />
+	</c:otherwise>
+</c:choose>
+<label for="subdir" ><fmt:message key="ui_withSubdir" /></label>
+
+</jsp:root>

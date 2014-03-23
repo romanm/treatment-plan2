@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+
+	<form:errors path="*" cssClass="note" />
+	<c:if test="${not empty flowObjCreator.oldProtocolT }">
+		<a href="#" onclick="window.open('concept=${flowObjCreator.oldProtocolT.mtlO.id}'
+		, 'Zweitfenster', 'width=900,height=300,scrollbars=yes')">
+			${flowObjCreator.oldProtocolT.mtlO.protocol}
+		</a>
+	</c:if>
+
+		<fieldset><legend class="b" ><fmt:message key="ui_therapieProtocol" /></legend>
+
+		<form:input path="newProtocol.protocol" cssStyle="width:160px" onchange="protocol2schemaName(this)" />
+		<div>
+			<b><fmt:message key="ui_therapieProtocolVar" />:</b>
+			<form:input path="newProtocol.protocolvar" cssStyle="width:130px" />
+		</div>
+	
+		<fieldset><legend class="b" ><fmt:message key="mtl_protocol_intention" /></legend>
+			<table>
+				<tr><td>
+			<fieldset><legend class="b" >1</legend>
+				<fmt:message var="peop" key="mtl_protocol_intention_peop" />
+				<form:checkbox path="newProtocol.intentionRests" value="PEOP" label="${peop}" />
+				<br />
+				<fmt:message var="neo" key="mtl_protocol_intention_neo" />
+				<form:checkbox path="newProtocol.intentionRests"  value="NEO" label="${neo}" />
+				<br />
+				<fmt:message var="adj" key="mtl_protocol_intention_adj" />
+				<form:checkbox path="newProtocol.intentionRests" value="ADJ" label="${adj}" />
+				<br />
+				<fmt:message var="pal" key="mtl_protocol_intention_pal" />
+				<form:checkbox path="newProtocol.intentionRests" value="PAL" label="${pal}" />
+				<br />
+			</fieldset>
+				</td>
+				<td>
+			<fieldset><legend class="b" >2</legend>
+				<fmt:message var="kur" key="mtl_protocol_intention_kur" />
+				<form:checkbox path="newProtocol.intentionRests" value="KUR" label="${kur}" />
+				<br />
+				<fmt:message var="ind" key="mtl_protocol_intention_ind" />
+				<form:checkbox path="newProtocol.intentionRests" value="IND" label="${ind}" />
+				<br />
+				<fmt:message var="conservation" key="mtl_protocol_intention_conservation" />
+				<form:checkbox path="newProtocol.intentionRests" value="CONSERVATION" label="${conservation}" />
+				<br />
+				<fmt:message var="sal" key="mtl_protocol_intention_sal" />
+				<form:checkbox path="newProtocol.intentionRests" value="SAL" label="${sal}" />
+			</fieldset>
+				</td></tr>
+			</table>
+			<fieldset><legend class="b" >line</legend>
+				<fmt:message var="l1" key="mtl_protocol_intention_l1" />
+				<form:checkbox path="newProtocol.intentionRests" value="L1" label="${l1}" />
+				<br/>
+				<fmt:message var="l2" key="mtl_protocol_intention_l2" />
+				<form:checkbox path="newProtocol.intentionRests" value="L2" label="${l2}" />
+				<br/>
+				<fmt:message var="l2" key="mtl_protocol_intention_l3" />
+				<form:checkbox path="newProtocol.intentionRests" value="L3" label="${l2}" />
+			</fieldset>
+	
+	<c:if test="${empty conceptMtl }">
+		<fieldset><legend class="b" ><fmt:message key="uiTherapySchema" /></legend>
+			<form:input path="newProtocol.schemaName" cssStyle="width:160px" />
+			<div class="b">
+				<fmt:message key="ui_cycleDauer" />
+			</div>
+			<form:input path="newProtocol.duration" cssStyle="width:60px" />
+		</fieldset>
+	</c:if>
+	<!-- 
+		<input type="submit" name="_eventId_saveSchema"	value="${ui_button_save}"/>
+	 -->
+		<button type="submit" name="_eventId_saveSchema" ><img src="${Save16gif}" alt="Save"/> ${ui_button_save}</button>
+		<input type="button" onclick="cancelReload();" value="${ui_button_cancel}" />
+			
+		</fieldset>
+	</fieldset>
+</jsp:root>

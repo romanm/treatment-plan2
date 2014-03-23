@@ -1,0 +1,36 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<c:forEach var="gcsfTid" items="${patientSchema.gcsfBlockList}">
+	<c:set var="gcsfT" value="${docMtl.tree[gcsfTid.id] }" />
+	<c:forEach var="drugT" items="${gcsfT.childTs}">
+		<div>
+			<owsui:a editT="${gcsfT}" event="save">
+				<spring:eval var="doseT" expression="jxp.getDose(drugT)"/>
+				<mtl:drug drugT="${drugT}"/>
+				<c:out value=" "/>
+				<mtl:doseValue doseT="${doseT}" />
+				<c:out value=" "/>
+				<mtl:doseUnit doseT="${doseT}" />
+				<c:forEach var="dayT" items="${drugT.childTs}">
+					<c:if test="${'day'==dayT.tabName }">
+						<c:out value=" Tag:"/>
+						<mtl:day dayT="${dayT}"/>
+						<c:forEach var="timesT" items="${dayT.childTs}">
+							<mtl:times timesT="${timeT}" />
+						</c:forEach>
+					</c:if>
+				</c:forEach>
+			</owsui:a>
+		</div>
+	</c:forEach>
+</c:forEach>
+</jsp:root>

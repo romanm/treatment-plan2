@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+
+<tiles-definitions>
+	<definition name="layoutx1"			template="/WEB-INF/layouts/layoutx1.jspx" />
+	<definition name="framesetlayout"	template="/WEB-INF/layouts/framesetlayout.jspx" />
+	<definition name="fs2patientLayout"	template="/WEB-INF/layouts/fs2patient.jspx" />
+	<definition name="printLayout"		template="/WEB-INF/layouts/print.jspx" />
+	<definition name="xml=*"			template="/WEB-INF/layouts/xml.jspx" />
+	<definition name="xml-*"			template="/WEB-INF/layouts/xml.jspx" />
+	<definition name="standardLayout"	template="/WEB-INF/layouts/standard.jsp" />
+</tiles-definitions>

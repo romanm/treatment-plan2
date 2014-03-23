@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+
+	<!-- Configure Spring Security -->
+	<security:http auto-config="true">
+			<!-- 
+			default-target-url="/hotels/search" authentication-failure-url="/login?login_error=1" />
+		<security:logout logout-url="/logout" logout-success-url="/logoutSuccess" />
+			 -->
+		<security:form-login login-page="/login" login-processing-url="/loginProcess" 
+			default-target-url="/home" authentication-failure-url="/login?login_error=1" />
+		<security:remember-me/>
+		<security:logout logout-url="/logout" logout-success-url="/home" />
+	</security:http>
+	
+	<!--
+		Define local authentication provider, a real app would use an external provider (JDBC, LDAP, CAS, etc)
+		usernames/passwords are:
+			keith/melbourne
+			erwin/leuven
+			jeremy/atlanta
+			scott/rochester
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:password-encoder hash="md5" />
+			<security:user-service>
+				<security:user name="keith" password="417c7382b16c395bc25b5da1398cf076" authorities="ROLE_USER, ROLE_SUPERVISOR" />
+				<security:user name="erwin" password="12430911a8af075c6f41c6976af22b09" authorities="ROLE_USER, ROLE_SUPERVISOR" />
+				<security:user name="jeremy" password="57c6cbff0d421449be820763f03139eb" authorities="ROLE_USER" />
+				<security:user name="scott" password="942f2339bf50796de535a384f0d1af3e" authorities="ROLE_USER" />
+			</security:user-service>
+		</security:authentication-provider>
+	</security:authentication-manager>
+	-->
+	
+	<security:authentication-manager>
+		<security:authentication-provider  user-service-ref="loginService">
+			<!-- CODE:01347 dieser abschnittfunktioniert, fügt password-salt support hinzu. salt-source system-wide muss mit dem encryptionService.passwordSalt identischsein-->
+			 <!-- 
+			<security:password-encoder ref="encryptionService">
+				<security:salt-source system-wide="Wkql!9B{Y7?"/>
+			</security:password-encoder>
+			  -->
+			<security:password-encoder  hash="md5">
+			</security:password-encoder>
+		</security:authentication-provider>
+	</security:authentication-manager>
+
+	<bean id="loginService" class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+</beans>

@@ -1,0 +1,22 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+
+<jsp:directive.attribute name="doseT" type="com.qwit.domain.Tree" required="true" />
+<jsp:useBean id="dosePvL" class="java.util.ArrayList" />
+<spring:eval var="modS" expression="schemaMtl.patientDoseProcentT(doseT.getParentT(),dosePvL)" />
+
+<c:forEach items="${modS}" var="pvT">
+	<mtl:doseModView1 patientDoseProcentT="${pvT }" doseT="${doseT}" />
+</c:forEach>
+<c:if test="${fn:length(modS)==0 }">
+	<spring:eval var="patientDoseProcentT" expression="jxp.pDoseProcentT(schemaMtl,doseT.parentT,0)" />
+	<c:if test="${not empty patientDoseProcentT}">
+		<mtl:doseModView1 patientDoseProcentT="${patientDoseProcentT}" doseT="${doseT}" />
+	</c:if>
+</c:if>
+
+</jsp:root>

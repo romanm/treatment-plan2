@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="checkitem"	required="true"/>
+<jsp:directive.attribute name="msgKey"		required="true"/>
+	<spring:eval var="checkitemT" expression="jxp.var('checkitem',checkitem)
+		.jxp(tuboT).getPointer('childTs[mtlO/checkitem=$checkitem]').getValue()" />
+	<li>
+		<c:choose>
+			<c:when test="${empty checkitemT }">
+			<owsui:a editT="${tuboT}" action="${msgKey}" >
+				<fmt:message key="${msgKey}"/>
+			</owsui:a>
+			</c:when>
+			<c:when test="${empty checkitemT.childTs[0] }">
+			<owsui:a editT="${checkitemT}" action="newNotice" >
+				<fmt:message key="${msgKey}"/>
+			</owsui:a>
+			</c:when>
+			<c:otherwise>
+				<fmt:message key="${msgKey}"/>
+			</c:otherwise>
+		</c:choose>
+	</li>
+	<c:if test="${not empty checkitemT}">
+		<spring:eval var="noticeIP" expression="jxp.var('notice').jxpip(checkitemT,
+			'childTs[tabName=$notice]')" />
+		<spring:eval var="hasNext" expression="noticeIP.hasNext()" />
+	<c:if test="${hasNext}">
+		<ul>
+			<c:forEach var="noticeP" items="${noticeIP}">
+				<qhtm:tag name="li" prefix="n_" tree="${noticeP.value}">
+				<!-- 
+					<owsui:editHtmlNotice noticeT="${noticeP.value}"/>
+				 -->
+					<owsui:editNotice noticeT="${noticeP.value}"/>
+				</qhtm:tag>
+			</c:forEach>
+		</ul>
+	</c:if>
+	</c:if>
+
+</jsp:root>

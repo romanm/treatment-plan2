@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+
+<c:choose>
+	<c:when test="${part=='use'}" />
+	<c:when test="${part=='ht'}" />
+	<c:when test="${empty docMtl}" />
+	<c:otherwise>
+		<div id="contextMenu">
+			<c:if test="${not empty explorerMtl or docMtl==patientMtl or docMtl==conceptMtl}">
+				<div id="cm1tab"	><fmt:message key="cpTab"/></div>
+				<owsui:menuSeparator id="cm1s01"/>
+				<script type="text/javascript">
+					menuItem("cm1tab",	"",	tab);
+				</script>
+			</c:if>
+			<div id="cm1cut"	><fmt:message key="cpCut"/></div>
+			<div id="cm1copy"	><fmt:message key="cpCopy"/></div>
+			<div id="cm1paste"	><fmt:message key="cpPaste"/></div>
+			<div id="cm1delete"	><fmt:message key="cpDelete"/></div>
+			<owsui:menuSeparator id="cm1s1"/>
+			<c:if test="${'luisa'==pageContext.request.userPrincipal.name}">
+				<div id="cm1edit"	><fmt:message key="ui_edit"/></div>
+			</c:if>
+			<!-- 
+				<div id="cm1edit"	><fmt:message key="ui_edit"/></div>
+			 -->
+			<c:if test="${'tuboflow'!=flow}">
+				<div id="cm1up"		>Nach oben</div>
+				<div id="cm1down"	>Nach unten</div>
+			</c:if>
+		</div>
+		<script type="text/javascript">
+			menuItem("cm1cut",		"dijitEditorIcon dijitEditorIconCut",	cut);
+			menuItem("cm1copy",		"dijitEditorIcon dijitEditorIconCopy",	copy);
+			menuItem("cm1paste",	"dijitEditorIcon dijitEditorIconPaste",	paste);
+			menuItem("cm1delete",	"dijitEditorIcon dijitEditorIconDelete",del);
+			<c:if test="${'luisa'==pageContext.request.userPrincipal.name}">
+				menuItem("cm1edit",		"editIcon",		edit);
+			</c:if>
+			<c:if test="${'tuboflow'!=flow}">
+				menuItem("cm1up",		"dijitEditorIcon dijitEditorIconCopy",	nodeUp);
+				menuItem("cm1down",		"dijitEditorIcon dijitEditorIconCopy",	nodeDown);
+			</c:if>
+			Spring.addDecoration(new Spring.ElementDecoration(
+			{elementId:"contextMenu", widgetType:"dijit.Menu"
+				, widgetAttrs : { style: "display: none;",	targetNodeIds:["f1"]}
+			}));
+		</script>
+		<div id="ctxMenuUpdate">
+			<c:choose>
+				<c:when test="${not empty conceptMtl }">
+					<div id="cmArmName"	><fmt:message key="mtl_studyarm_name"/></div>
+					<script type="text/javascript">
+						menuItem("cmArmName",		"noteIcon",	armName);
+					</script>
+				</c:when>
+				<c:when test="${docMtl==patientMtl }">
+					<div id="mi_editCycle"	><fmt:message key="uiEditCycle"/></div>
+					<script type="text/javascript">
+						menuItemInnerTask("editCycle");
+					</script>
+				</c:when>
+				<c:when test="${not empty drugMtl }">
+					<div id="cmNewAdditionalDrug"	><fmt:message key="uiDrugDrug"/></div>
+					<div id="cmNewDDNotice"	><fmt:message key="mtl_notice_type_notice"/></div>
+					<div id="cmNewRule"	><fmt:message key="mtl_expr_expr_if"/></div>
+					<owsui:menuSeparator id="cmus1"/>
+					<owsui:popupMenuItem id="innerTask">
+						<div id="mi_taskSupport"		><fmt:message key="ui_menuItem_support"/></div>
+						<div id="mi_taskPremedication"	><fmt:message key="ui_menuItem_taskPremedication"/></div>
+						<div id="mi_taskHomeTablet"		><fmt:message key="ui_menuItem_taskHomeTablet"/></div>
+						<script type="text/javascript">
+							menuItemInnerTask("taskSupport"	);
+							menuItemInnerTask("taskPremedication");
+							menuItemInnerTask("taskHomeTablet");
+						</script>
+					</owsui:popupMenuItem>
+					<script type="text/javascript">
+						menuItem("cmNewAdditionalDrug",	"dijitEditorIcon dijitEditorIconCopy",	newAdditionalDrug);
+						menuItem("cmNewDDNotice",		"noteIcon",	newDDNotice);
+						menuItem("cmNewRule",			"noteIcon",	newRule);
+					</script>
+				</c:when>
+				<c:when test="${not empty schemaMtl }">
+					<div id="cmDayDelay"	><fmt:message key="ui_cmDayDelay"/></div>
+					<div id="cmNewAdditionalDrug"	><fmt:message key="uiDrugDrug"/></div>
+					<div id="cmNewDDNotice"	><fmt:message key="mtl_notice_type_notice"/></div>
+					<div id="cmNewRule"	><fmt:message key="mtl_expr_expr_if"/></div>
+					<owsui:menuSeparator id="cmus1"/>
+					<owsui:popupMenuItem id="innerTask">
+						<div id="mi_taskSupport"		><fmt:message key="ui_menuItem_support"/></div>
+						<div id="mi_taskPremedication"	><fmt:message key="ui_menuItem_taskPremedication"/></div>
+						<div id="mi_taskHomeTablet"		><fmt:message key="ui_menuItem_taskHomeTablet"/></div>
+						<script type="text/javascript">
+							menuItemInnerTask("taskSupport"	);
+							menuItemInnerTask("taskPremedication");
+							menuItemInnerTask("taskHomeTablet");
+						</script>
+					</owsui:popupMenuItem>
+					<script type="text/javascript">
+						menuItem("cmNewAdditionalDrug",	"dijitEditorIcon dijitEditorIconCopy",	newAdditionalDrug);
+						menuItem("cmNewDDNotice",		"noteIcon",	newDDNotice);
+						menuItem("cmNewRule",			"noteIcon",	newRule);
+						menuItem("cmDayDelay",			"noteIcon",	cmDayDelay);
+					</script>
+				</c:when>
+			</c:choose>
+		</div>
+		<script type="text/javascript">
+			Spring.addDecoration(new Spring.ElementDecoration(
+			{elementId:"ctxMenuUpdate", widgetType:"dijit.Menu"
+				, widgetAttrs : { style: "display: none;"}
+			}));
+		</script>
+	</c:otherwise>
+</c:choose>
+
+<!-- TCM == tree context menu -->
+<c:if test="${not empty explorerMtl}">
+	<div id="treeMenu" style="display:none">
+		<div class="treeMenuItem" id="newNode"> New </div>
+		<div class="treeMenuItem" id="renameNode"> Rename </div>
+		<div class="treeMenuItem" id="deleteTreeNode"> Delete </div>
+		<c:if test="${explorerMtl.isConceptFolder}">
+			<owsui:menuSeparator id="TCMSseparator1"/>
+			<div class="treeMenuItem" id="newProtocolTCM"> New Protocol</div>
+			<script type="text/javascript">
+				createConceeptContextMenu();
+			</script>
+		</c:if>
+		<div class="treeMenuItem" id="moveUp"	> Nach oben</div>
+		<div class="treeMenuItem" id="moveDown"	> Nach unten</div>
+	</div>
+	<script type="text/javascript">
+		createTreeContextMenu();
+	</script>
+</c:if>
+
+</jsp:root>

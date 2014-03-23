@@ -1,0 +1,45 @@
+<jsp:root version="2.0"
+	xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:security="http://www.springframework.org/security/tags"
+>
+<jsp:directive.attribute name="type"/>
+<jsp:directive.attribute name="key"/>
+<jsp:directive.attribute name="param1"/>
+<jsp:directive.attribute name="springAuth"/>
+
+ <!-- 
+type=error|notice|success
+  -->
+<c:set var="prefix" value="ui_message_" />
+
+<c:choose>
+	<c:when test="${not empty springAuth}">
+		<security:authorize ifAllGranted="ROLE_ANONYMOUS">
+			<c:if test="${not empty param.login_error}">
+				<div class="error">
+					<fmt:message key="${prefix}incorrectlogin"> </fmt:message>
+				</div>
+			</c:if>
+		</security:authorize>
+	</c:when>
+	<c:when test="${not empty actionExecutionException}">
+		<div class="${type}">
+			<fmt:message key="${prefix}${key}"/>
+		</div>
+	</c:when>
+	<c:when test="${not empty param1}">
+		<div class="${type}">
+			<fmt:message key="${prefix}${key}"><fmt:param value="${param1}" /></fmt:message>
+		</div>
+	</c:when>
+	<c:otherwise>	
+		<div class="${type}">
+			<fmt:message key="${prefix}${key}"> </fmt:message>
+		</div>
+	</c:otherwise>
+	
+</c:choose>
+
+</jsp:root>

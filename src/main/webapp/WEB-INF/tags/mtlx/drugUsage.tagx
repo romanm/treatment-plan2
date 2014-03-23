@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+
+<c:forEach var="dose" items="${drugMtl.drugUsedDose}">
+	<c:set var="unit" value=" ${dose.unit} " />
+	<c:if test="${!fn:contains(units,unit)}">
+		<c:set var="units" value="${units}${unit} " />
+	</c:if>
+	<c:set var="app" value=" ${dose.app} " />
+	<c:if test="${!fn:contains(apps,app)}">
+		<c:set var="apps" value="${apps}${app} " />
+	</c:if>
+</c:forEach>
+
+<form:form id="f1" modelAttribute="userMtl">
+
+
+
+<table>
+<tr><th><fmt:message key="ui_massMaintenance_rewrite" />:</th>
+	<td class="select" id="idClass_1">
+		<mtl:mtlObject tree="${owsSession.targetT}" withType="${true}" />
+	</td>
+	<td rowspan="2">
+		<p>
+			<c:if test="${'rewriteOK'==formUtil.mode}">
+				<spring:eval var="idt" expression="owsSession.getTargetT().getId()" />
+				<c:choose>
+					<c:when test="${'times'==owsSession.targetT.tabName }">
+						<spring:eval var="targetRow" expression="jxp.var('idt',idt).getJxp()
+							.getPointer('drugUsedTimes[@idtimes=$idt]')" />
+					</c:when>
+					<c:when test="${'day'==owsSession.targetT.tabName }">
+						<spring:eval var="targetRow" expression="jxp.var('idt',idt).getJxp()
+							.getPointer('drugUsedDay[@idday=$idt]')" />
+					</c:when>
+					<c:when test="${'dose'==owsSession.targetT.tabName }">
+						${owsSession.targetT.mtlO.id}
+						<spring:eval var="targetRow" expression="jxp.var('idt',idt).getJxp()
+							.getPointer('drugUsedDose[@iddose=$idt]')" />
+					</c:when>
+					<c:otherwise>
+						<spring:eval var="targetRow" expression="jxp.var('idt',idt).getJxp()
+							.getPointer('drugUsedNotice[@idnotice=$idt]')" />
+					</c:otherwise>
+				</c:choose>
+				<fmt:message key="ui_message_confirm">
+					<fmt:param value="${targetRow.value.cnt}"/>
+				</fmt:message>
+			</c:if>
+		</p>
+		<c:choose>
+			<c:when test="${empty owsSession.sourceT or empty owsSession.targetT }"/>
+			<c:when test="${'rewriteOK'==formUtil.mode}">
+				<qhtm:button name="confirm" event="rewriteConfirm"/>
+				<qhtm:button name="cancel" event="cancel"/>
+			</c:when>
+			<c:otherwise>
+				<qhtm:button name="OK" event="rewriteOK"/>
+				<qhtm:button name="cancel" event="cancel"/>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+<tr><th><fmt:message key="ui_massMaintenance_by" />:</th>
+	<td class="select" id="idClass_2">
+		<mtl:mtlObject tree="${owsSession.sourceT}" withType="${true}" />
+	</td>
+</tr>
+</table>
+
+<div style="float: left;">
+<table><tr><th><fmt:message key="ui_dose" /></th>
+	<c:forEach var="unit" items="${fn:split(units,' ')}"><th>${unit}</th></c:forEach>
+	<c:set var="cnt" value="0" />
+	<c:forEach var="app" items="${fn:split(apps,' ')}">
+		<tr><th>${app}</th>
+			<spring:eval var="nl" expression="jxp.getJxp().getVariables().declareVariable('app', app)" />
+			<c:forEach var="unit" items="${fn:split(units,' ')}">
+				<spring:eval var="nl" expression="jxp.getJxp().getVariables().declareVariable('unit', unit)" />
+				<td>
+					<spring:eval var="doses" expression="jxp.getJxp().iteratePointers('drugUsedDose[@unit=$unit][@app=$app]')" />
+					<c:forEach var="dose" items="${doses}">
+						<span id="d_${dose.value.iddose}" title="${dose.value.cnt}" 
+								class="select ${owsSession.idDose==dose.value.iddose?'b':''}" >
+							<a href="?id=${drugMtl.docT.id}&amp;part=${part}&amp;iddose=${dose.value.iddose}">
+								<fmt:formatNumber pattern="##.###">${dose.value.value}</fmt:formatNumber>
+								<fmt:message key="mtl_dose_pro_${dose.value.pro}"/>
+								<c:set var="cnt" value="${cnt+dose.value.cnt}" />
+							</a>
+							<c:out value=" | " />
+						</span>
+					</c:forEach>
+				</td>
+			</c:forEach>
+		</tr>
+	</c:forEach>
+	</tr>
+	<tr><td>
+		<a href="?id=${drugMtl.docT.id}&amp;part=${part}&amp;iddose=0">
+			<span title="${cnt}" class="${param.iddose==0?'b':''}" >
+				<fmt:message key="ui_All" />
+			</span>
+		</a>
+	</td></tr>
+</table>
+</div>
+<div style="float: left;">
+	<table>
+		<tr><th><fmt:message key="ui_day" /></th></tr>
+		<c:set var="cnt" value="0" />
+		<c:forEach var="row" items="${drugMtl.drugUsedDay}">
+			<c:set var="cnt" value="${cnt+row.cnt }" />
+			<tr>
+				<c:set var="b" value="${((not empty owsSession.idDay and owsSession.idDay==row.idday) 
+					or (0==owsSession.idDay and empty row.idday))?'b':''}"/>
+				<td id="d_${(empty row.idday)?0:row.idday}" class="select" title="${row.cnt }">
+					<a href="?id=${drugMtl.docT.id}&amp;idday=${(empty row.idday)?0:row.idday}" class="${b}">
+						${row.abs }
+						<c:if test="${empty row.idday }"><fmt:message key="ui_empty" /></c:if>
+					</a>
+				</td>
+			</tr>
+		</c:forEach>
+		<tr>
+			<td title="${cnt}" class="${(empty owsSession.idDay )?'b':''}" >
+				<a href="?id=${drugMtl.docT.id}&amp;idday="><fmt:message key="ui_All" /></a>
+			</td>
+		</tr>
+	</table>
+</div>
+<div style="float: left;">
+	<table>
+		<tr><th><fmt:message key="ui_times" /></th></tr>
+		<c:set var="cnt" value="0" />
+		<c:forEach var="row" items="${drugMtl.drugUsedTimes}">
+			<c:set var="cnt" value="${cnt+row.cnt }" />
+			<tr>
+				<c:set var="b" value="${((not empty owsSession.idTimes and owsSession.idTimes==row.idtimes) 
+					or (0==owsSession.idTimes and empty row.idtimes))?'b':''}"/>
+				<td id="d_${(empty row.idtimes)?0:row.idtimes}" class="select" title="${row.cnt }">
+					<a href="?id=${drugMtl.docT.id}&amp;idtimes=${(empty row.idtimes)?0:row.idtimes}" class="${b}">
+						${row.abs }
+						<c:if test="${empty row.idtimes }"><fmt:message key="ui_empty" /></c:if>
+					</a>
+				</td>
+			</tr>
+		</c:forEach>
+		<tr>
+			<td title="${cnt}" class="${(empty owsSession.idTimes )?'b':''}" >
+				<a href="?id=${drugMtl.docT.id}&amp;idtimes="><fmt:message key="ui_All" /></a>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<div style="float: left;">
+	<table>
+		<tr><th>Notice (${fn:length(drugMtl.drugUsedNotice)})</th><th>#</th></tr>
+		<c:forEach var="row" items="${drugMtl.drugUsedNotice}">
+			<tr>
+				<td class="select" id="n_${row.idnotice}">
+					<mtl:notice noticeM="${row}" withType="true"/>
+				</td>
+				<td>${row.cnt }</td>
+				<!-- 
+				<td>${row.idnotice }</td>
+				 -->
+			</tr>
+		</c:forEach>
+	</table>
+</div>
+<div style="clear:left"/>
+
+<c:if test="${not empty drugMtl.drugTask}">
+	<hr/>
+	<table>
+		<thead>
+			<tr><th><fmt:message key="uiTherapySchema" />
+			(${fn:length(drugMtl.drugTask) })
+			</th><th>Folder</th></tr>
+		</thead>
+		<tbody>
+			<c:forEach var="task" items="${drugMtl.drugTask}">
+				<tr>
+					<td><a href="${schema_url}=${task.idtask}">
+						<qhtm:spanSchemaName rowMap="${task}"/>
+					</a></td>
+					<td>
+						<c:if test="${folderId!=task.idfolder}">
+							<a href="explorer?folder=protocol&amp;id=${task.idfolder}">${task.folder }</a>
+						</c:if>
+					</td>
+				</tr>
+				<c:set var="folderId" value="${task.idfolder}"></c:set>
+			</c:forEach>
+		</tbody>
+	</table>
+</c:if>
+</form:form>
+<!--
+<hr/>
+<mtl:drugUsedDose withoutLink="true"/>
+ -->
+
+ </jsp:root>

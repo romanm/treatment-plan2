@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="drugT"	type="com.qwit.domain.Tree"	required="true"/>
+<jsp:directive.attribute name="dddM"	type="java.util.Map"		required="true"/>
+<jsp:directive.attribute name="drugDose"	required="true"/>
+<jsp:directive.attribute name="ts"	type="com.qwit.domain.Ts"/>
+<jsp:directive.attribute name="dayNr"/>
+
+<c:set var="appNr" value="${schemaMtl.appNr}" />
+
+<spring:eval var="supNoticeP" expression="jxp.var('sup').var('rqm')
+	.jxp(drugT).getPointer('childTs/childTs[mtlO/type=$sup or mtlO/type=$rqm]')" />
+<c:if test="${'drug'==drugT.tabName and empty supNoticeP.value}">
+<tr class="group">
+	<qhtm:tdWeekDrug drugT="${drugT}" ts="${ts}"/>
+	<c:set var="ddDaysS" value="${dddM[drugDose]}" />
+	<c:set var="appTd" />
+	<c:forEach items="${schemaMtl.weekDayS}" var="d">
+		<c:set var="ds" value="${d}," />
+		<c:set var="isMyDay" value="${fn:contains(ddDaysS,ds)}" />
+		<c:set var="appTd" >${appTd}
+		<td style="${not isMyDay?'background-color: #CCCCCC;':''}" >
+			<c:if test="${isMyDay}">
+				<spring:eval var="ts4day" expression="schemaMtl.getTs4day(drugT, d)" />
+				<mtl:doseModValue drugT="${drugT}" day="${d}" ts="${ts4day}"/>
+			</c:if>
+		</td>
+		</c:set>
+	</c:forEach>
+	${appTd}<c:forEach begin="2" end="${appNr}" var="subTaskNr" >${appTd}</c:forEach>
+	<c:if test="${dayNr==2 and schemaMtl.hasPeriod}"><td style="background-color: #CCCCCC;" ></td></c:if>
+	<spring:eval var="doseT" expression="jxp.getDose(drugT)"/>
+	<qhtm:tdWeekDose doseT="${doseT}" ts="${ts}"/>
+	<qhtm:tdWeekDay drugT="${drugT}" ts="${ts}"/>
+</tr>
+<spring:eval var="neForPS" expression="jxp.var('notice').var('expr').jxpip(drugT,
+	'childTs[childTs/tabName=$notice or childTs/tabName=$expr]')" />
+<spring:eval var="hasNextForNE" expression="neForPS.hasNext()" />
+<!-- 
+c:if test="${not empty schemaMtl.ddNE[doseT]}">
+ -->
+<c:if test="${not empty hasNextForNE}">
+	<tr>
+		<td colspan="${appNr * fn:length(schemaMtl.weekDayS) +4}" class="taLeft">
+			<c:forEach items="${neForPS}" var="neForP">
+				<mtl:ne forT="${neForP.value}"/>
+			</c:forEach>
+		<!-- 
+			<spring:eval var="doseT" expression="jxp.getDose(drugT)" />
+			<mtl:ne forT="${doseT}" noNr="true"/>
+		 -->
+		</td>
+	</tr>
+</c:if>
+</c:if>
+</jsp:root>

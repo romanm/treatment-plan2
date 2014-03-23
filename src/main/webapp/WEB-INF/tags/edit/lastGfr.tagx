@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+	<c:if test="${not empty docMtl.patientMtl }">
+		<spring:eval var="gfrLaborP" expression="jxp.var('labor').var('GFR').var('Creatinine')
+			.jxp(docMtl.patientMtl.docT).getPointer('childTs[tabName=$labor][mtlO/labor=$GFR or mtlO/labor=$Creatinine]')" />
+		<c:if test="${not empty gfrLaborP.value }">
+			<div class="red">
+				<c:out value="Letztes " />
+				<mtl:message prefix="mtl_labor_" key="${gfrLaborP.value.mtlO.labor}" />
+				<mtl:pvalue varT="${gfrLaborP.value}" unit="${gfrLaborP.value.mtlO.unit}" />
+				<span class="small">
+					<c:if test="${'µmol/l'==gfrLaborP.value.mtlO.unit}">
+						<fmt:formatNumber var="mgdl" pattern="##.##"
+							value="${gfrLaborValueT.mtlO.nvalue*docMtl.ck}"/>
+						<c:out value="(=${mgdl} mg/dl) " />
+					</c:if>
+					<fmt:formatDate value="${gfrLaborP.value.history.mdate}"
+						type="both" dateStyle="short" timeStyle="short" />
+				</span>
+			</div>
+			<c:if test="${'Creatinine'==gfrLaborP.value.mtlO.labor}">
+				<div>
+					<spring:eval var="creatinine2gfr" expression="docMtl.creatinine2gfr(gfrLaborValueT)"/>
+					<fmt:formatNumber var="gfr" pattern="##.##" value="${creatinine2gfr}"/>
+					<c:out value="GFR (Jelliffe) = ${gfr} ml/min" />
+				</div>
+			</c:if>
+	</c:if>
+	</c:if>
+</jsp:root>

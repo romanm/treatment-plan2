@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0"
+	xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:expr="urn:jsptagdir:/WEB-INF/tags/expr"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+	xmlns:spring="http://www.springframework.org/tags"
+>
+
+<sql:query var="result" dataSource="${owsDbSource}" scope="session" >
+SELECT id FROM tree,history, owuser WHERE id=idhistory AND idauthor=idowuser 
+AND ? <sql:param value="${schemaMtl.docT.id}"/> in (id, iddoc)  ORDER BY mdate DESC
+</sql:query>
+ 
+<c:forEach var="r" items="${result.rows}">
+	<c:set var="changedT" value="${docMtl.tree[r.id] }" />
+
+	<div style="float:left;margin-right:30px">
+		<fmt:formatDate value="${changedT.history.mdate}" type="both"	dateStyle="short" timeStyle="short" />
+	</div>
+	
+	 <div style="float:left;width:50px;">
+	 	<font color="#aaaaaa">${changedT.tabName}:</font>
+	 </div>
+		 
+	 <div style="float:left;width:400px;height:20px;">
+	 	<c:if test="${changedT.tabName ne 'drug' and changedT.tabName ne 'times' and changedT.tabName ne 'task' and changedT.tabName ne 'expr'}">
+	 		<div style="float:left;width:auto;margin-right:10px;">
+	 			<mtl:drug drugT="${changedT.parentT}" />
+	 		</div>
+	 	</c:if>
+		 <c:choose>
+		 	<c:when test="${changedT.tabName eq 'dose'}">
+		 		<div style="float:left;width:auto;">
+ 					<a href="schema-ed-${schemaMtl.docT.id}?idt=${changedT.id}">
+			 			<mtl:doseValue doseT="${changedT}" /> <c:out value=" " /> 
+			 			<mtl:doseUnit doseT="${changedT}" /> <c:out value=" " />
+			 			<mtl:doseApp doseT="${changedT}" /> 
+		 			</a>
+		 		</div>
+		 	</c:when>
+		 	<c:when test="${changedT.tabName eq 'app'}">
+		 		<div style="float:left;width:auto;">
+		 			<a href="schema-ed-${schemaMtl.docT.id}?idt=${changedT.id}">
+		 				<mtl:appAppTempo appT="${changedT}" />
+	 				</a>
+		 		</div>
+		 	</c:when>
+		 	<c:when test="${changedT.tabName eq 'day'}">
+		 		<div style="float:left;">
+		 			<a href="schema-ed-${schemaMtl.docT.id}?idt=${changedT.id}">
+		 				<mtl:day dayT="${changedT}" />
+		 			</a>
+		 		</div>
+		 	</c:when>
+		 	<c:when test="${changedT.tabName eq 'drug'}">
+		 		<div style="float:left;width:auto;">
+	 				<a href="schema-ed-${schemaMtl.docT.id}?idt=${changedT.id}">
+		 				<mtl:drug drugT="${changedT}" />
+		 			</a>
+		 		</div>
+		 	</c:when>
+	 		<c:when test="${changedT.tabName eq 'times'}">
+	 			<div style="float:left;width:auto;margin-right:10px;">
+	 				<mtl:drug drugT="${changedT.parentT.parentT}" /><c:out value=" " />
+	 			</div>
+	 			<div style="float:left;width:auto;">
+	 				<a href="schema-ed-${schemaMtl.docT.id}?idt=${changedT.id}">
+			 			day: 
+			 			<mtl:day dayT="${changedT.parentT}" />
+			 			<c:out value=" " />
+			 			<mtl:times timesT="${changedT}" />
+			 		</a>
+	 			</div>
+	 		</c:when>
+	 		<c:when test="${changedT.tabName eq 'expr'}">
+	 			<div style="float:left;width:auto;margin-right:10px;">
+	 				<spring:eval var="parentT" expression="jxp.getParentT(changedT, 'drug')" />
+	 				<mtl:drug drugT="${parentT}" /><c:out value=" " />
+	 			</div>
+	 			<div style="float:left;width:auto;">
+	 				<a href="schema-ed-${schemaMtl.docT.id}?idt=${changedT.id}">
+	 					<expr:ifView ifT="${changedT}" />
+			 		</a>
+			 	</div>
+	 		</c:when>
+	 		<c:when test="${changedT.tabName eq 'task'}">
+	 			<div style="float:left;width:auto;">
+		 			${docMtl.schemaC.task}
+		 			${docMtl.schemaC.infostatus}
+	 			</div>
+	 		</c:when>
+		 	<c:otherwise>
+		 		
+		 	</c:otherwise>
+		 </c:choose>		 	
+	</div>
+	<div style="float:right;width:200;">
+		${docMtl.historyM[changedT.history.idauthor].title}
+	 	${docMtl.historyM[changedT.history.idauthor]['forename']}
+	 	${docMtl.historyM[changedT.history.idauthor].contactperson}
+	</div>
+	<div class="clearfix"> <!-- - --> </div>	
+</c:forEach>
+
+
+</jsp:root>

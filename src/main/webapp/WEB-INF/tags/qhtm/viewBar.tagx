@@ -1,0 +1,145 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:security="http://www.springframework.org/security/tags"
+>
+<div>
+<h2><fmt:message key="ui_title_views"/></h2>
+
+<ul>
+	<li><qhtm:aView part="ed"	level="schema"><fmt:message key="uiTherapySchema"/></qhtm:aView></li>
+	<li><qhtm:aView part="plan"	level="schema"><fmt:message key="uiChemoTherapyPlan"/></qhtm:aView></li>
+	<c:if test="${'plan'==owsSession.schemaPart}">
+	<li>
+	<!-- 
+		Zeigen 
+	 -->
+		<ul>
+			<li>
+			<c:choose>
+				<c:when test="${not owsSession.withInfo}"><input type="checkbox" id="infoCheck" /></c:when>
+				<c:otherwise><input type="checkbox" checked="checked" id="infoCheck" /></c:otherwise>
+			</c:choose>
+			<!-- 
+			<c:if test="${'on'==owsSession.withInfo}">
+				<img alt="x" src="resources/images/icon_checked.gif"/>
+			</c:if>
+			 -->
+		<a href="schema-${owsSession.schemaPart}-${docMtl.docT.id}-withInfo=${owsSession.withInfo?'off':'on'}">
+			<fmt:message key="uiChemoTherapyPlan_infoCheck"/>
+		</a>
+			</li>
+			<li>
+			<c:choose>
+				<c:when test="${not owsSession.drugNotice}"><input type="checkbox" id="drugNoteCheck" /></c:when>
+				<c:otherwise><input type="checkbox" checked="checked" id="drugNoteCheck" /></c:otherwise>
+			</c:choose>
+			<!-- 
+			<c:if test="${'on'==owsSession.drugNotice}">
+				<img alt="x" src="resources/images/icon_checked.gif"/>
+			</c:if>
+			 -->
+		<a href="schema-${owsSession.schemaPart}-${docMtl.docT.id}-drugNotice=${owsSession.drugNotice?'off':'on'}">
+			<fmt:message key="uiChemoTherapyPlan_drugNoteCheck"/>
+		</a>
+			</li>
+			<li><hr/></li>
+			<li>
+				<a href="xls-${docMtl.docT.id }">
+					<img alt="xls" src="resources/images/Excel-16.gif"/>
+				xls
+				</a>
+			</li>
+		</ul>
+	</li>
+	</c:if>
+	<li><qhtm:aView part="week"	level="schema"><fmt:message key="uiChemoTherapyPlanFuchs"/></qhtm:aView></li>
+	<li><qhtm:aView part="hour"	level="schema" noFlow="true"><fmt:message key="uiChemoTherapyPlanHour"/></qhtm:aView></li>
+	<li><qhtm:aView part="info"	level="schema" noFlow="true"><fmt:message key="uiChemoTherapyManagmentInfo"/></qhtm:aView></li>
+	<li><qhtm:aView part="prescription"	level="schema" noFlow="true"><fmt:message key="uiChemoPrescription"/></qhtm:aView></li>
+	<li><qhtm:aView part="month"	level="schema"><fmt:message key="uiChemoTherapyPlanMonth"/></qhtm:aView></li>
+	<li><qhtm:aView part="changelog"	level="schema" noFlow="true"><fmt:message key="uiChangeLog"/></qhtm:aView></li>
+	
+	<!-- 
+	<c:if test="${not empty schemaMtl.taskHomeTabletT}">
+		<li><qhtm:aView part="ht"		level="../the/schema" noFlow="true"><fmt:message key="uiHomeTablet"/></qhtm:aView></li>
+	</c:if>
+	 -->
+	<c:if test="${empty schemaMtl.patientMtl}">
+		<li><qhtm:aView part="use"	level="schema" noFlow="true">Verwendung</qhtm:aView></li>
+	</c:if>
+	<security:authorize ifAllGranted="ROLE_USER">
+		<c:set var="user_name" value="${pageContext.request.userPrincipal.name}" />
+		<c:set var="userXml" value="${pageContext.request.userPrincipal != null }" />
+		<c:set var="userXml" value="${userXml and ('admin'==user_name or 'roman'==user_name) }" />
+	</security:authorize>
+	<!-- 
+	<c:if test="${userXml}">
+		<li>
+			<a href="xml=${schemaMtl.docT.id}">XML</a>
+		</li>
+	</c:if>
+	 -->
+		<li>
+			<fmt:message var="ui_print" key="ui_print" />
+			<input type="button" onclick="window.print()" value="${ui_print}"/>
+			<!-- 
+			<a href="schema/print?id=${schemaMtl.docT.id}&amp;part=${part}"><fmt:message key="ui_print" /></a>
+			|
+			<a href="schema/printAll?id=${schemaMtl.docT.id}&amp;part=all"><fmt:message key="ui_printAll" /></a>
+			 -->
+		</li>
+		<li>
+			<a href="pdf-schema-${owsSession.schemaPart}-${docMtl.docT.id }">
+				<img alt="pdf" src="resources/images/pdf.gif"/>
+			pdf
+			</a>
+		</li>
+	<security:authorize ifAllGranted="ROLE_SUPERVISOR">
+		<li>
+			<a href="xml=${schemaMtl.docT.id}" target="_blank">
+				<img src="resources/images/xml.gif"/>
+				xml
+			</a>
+		</li>
+	</security:authorize>
+	<c:if test="${'drug'==schemaMtl.editNodeT.tabName}">
+		<li>
+			<hr/>
+		</li>
+		<li>
+		<a href="drug?id=${schemaMtl.editNodeT.idClass}" target="_blank">
+			<c:url var="linkExternal" value="/resources/images/link-external.gif" />
+			<img alt="link-external" src="${linkExternal}"/>
+			<c:out value=" " />
+			<mtl:drug drugT="${schemaMtl.editNodeT}"/>
+			<!-- 
+			<mtl:drug drugT="${schemaMtl.editNodeT}"/> Seite
+			 -->
+		</a>
+		</li>
+	</c:if>
+	<c:if test="${'dose'==schemaMtl.editNodeT.tabName and 'drug'==schemaMtl.editNodeT.parentT.tabName}">
+		<li>
+		<a href="drug?id=${schemaMtl.editNodeT.parentT.idClass}" target="_blank">
+			<mtl:drug drugT="${schemaMtl.editNodeT.parentT}"/> Seite
+		</a>
+		</li>
+	</c:if>
+	<c:if test="${schemaMtl.docT.idClass!=schemaMtl.docT.id}">
+		<br/><br/>
+		<a href="schema-${owsSession.schemaPart}-${schemaMtl.docT.idClass }" target="_blank" >
+			<c:url var="linkExternal" value="/resources/images/link-external.gif" />
+			<img alt="link-external" src="${linkExternal}"/>
+			<c:out value=" " />
+			<fmt:message key="ui_muster" />
+		</a>
+	</c:if>
+</ul>
+
+</div>
+
+</jsp:root>

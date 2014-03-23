@@ -1,0 +1,52 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="doseT" type="com.qwit.domain.Tree" required="true" description="The dose tree object"/>
+
+<c:set var="doseUnit">
+	<mtl:doseValue	doseT="${doseT}"/>
+	<mtl:doseUnit	doseT="${doseT}"/>
+</c:set>
+
+(${fn:trim(doseUnit)})
+<c:set var="procent1" value="false" />
+<c:set var="procent" value="100" />
+<c:set var="doseUnit2" value="?" />
+<c:forEach items="${doseT.childTs}" var="procentT">
+	<c:if test="${not procent1 and procentT.tabName=='pvariable'}">
+		<c:set var="procentC" value="${procentT.mtlO}" />
+		<c:if test="${procentC.unit=='%'}">
+			<c:set var="procent1" value="true" />
+			<c:set var="procent" value="${procentC.pvalue}" />
+			<c:forEach items="${procentT.childTs}" var="dose2T">
+				<c:if test="${dose2T.tabName=='dose'}">
+					<c:set var="doseUnit2">
+						<mtl:doseValue	doseT="${dose2T}" />
+						<mtl:doseUnit	doseT="${dose2T}"/>
+					</c:set>
+				</c:if>
+			</c:forEach>
+		</c:if>
+	</c:if>
+</c:forEach>
+<c:choose>
+	<c:when test="${doseUnit2!='?'}">
+		<fmt:message key="ui_doseModeDose">
+			<fmt:param>${fn:trim(doseUnit)}</fmt:param>
+			<fmt:param>${fn:trim(doseUnit2)}</fmt:param>
+		</fmt:message>
+	</c:when>
+	<c:otherwise>
+		<fmt:message key="ui_doseModeProcent">
+			<fmt:param>${procent}</fmt:param>
+		</fmt:message>
+	</c:otherwise>
+</c:choose>
+</jsp:root>

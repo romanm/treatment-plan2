@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<c:choose>
+	<c:when test="${'tuboflow'==flow }"/>
+	<c:otherwise>
+		<div id="session">
+			<div class="small"><u><fmt:message key="ui_lastEdited" /> </u></div>
+			<c:if test="${not empty owsSession.patientO and empty patientMtl}">
+				<div>Patient:
+					<c:choose>
+						<c:when test="${not empty urlFlow}">
+							<spring:url var="addPatient" value="" >
+								<spring:param name="execution" value="${fn:split(urlFlow,'=')[1]}" />
+								<spring:param name="idt" value="${owsSession.patientO.id}" />
+								<spring:param name="_eventId" value="use" />
+							</spring:url>
+							<a href="${addPatient}"><mtl:patient patientO="${owsSession.patientO}"/></a>
+						</c:when>
+						<c:otherwise>
+							<mtl:patient patientO="${owsSession.patientO}"/>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</c:if>
+			<c:if test="${not empty owsSession.taskO and empty schemaMtl}">
+				<div>Schema:
+					<c:choose>
+						<c:when test="${empty owsSession.patientO}">
+							${owsSession.taskO.task}
+						</c:when>
+						<c:otherwise>
+							<spring:url var="task2patient" value="schemaflow" >
+								<spring:param name="id" value="${owsSession.taskO.id}" />
+								<spring:param name="idt" value="${owsSession.patientO.id}" />
+								<spring:param name="a" value="beginDate" />
+							</spring:url>
+							<a href="${task2patient}">${owsSession.taskO.task}</a>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</c:if>
+		</div>
+	</c:otherwise>
+</c:choose>
+</jsp:root>

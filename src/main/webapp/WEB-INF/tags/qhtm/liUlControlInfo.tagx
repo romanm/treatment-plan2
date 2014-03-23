@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+	<jsp:directive.attribute name="tagName" required="true" />
+	<jsp:directive.attribute name="noticeType" required="true" />
+
+<spring:eval var="scriteriaNoticeIP" expression="jxp.var('type',noticeType).jxpip(docMtl.getDocT(), 
+	'childTs[mtlO/type=$type]')" />
+<spring:eval var="hasNext" expression="scriteriaNoticeIP.hasNext()" />
+<spring:eval var="laFinSys" expression="jxp.childs(docMtl.docT, tagName)" />
+<spring:eval var="laFinSys_hasNext" expression="laFinSys.hasNext()" />
+<c:set var="mapDrug" value="${schemaMtl.nTypeDrugNoticeMObjMObjM[noticeType]}" />
+<c:if test="${hasNext or laFinSys_hasNext or not empty mapDrug}">
+	<spring:eval var="noticeP" expression="jxp
+		.jxp(docMtl.getDocT()).getPointer('childTs[mtlO/type=$type]')" />
+	<c:set var="firstT" value="${noticeP.value}" />
+	<c:if test="${empty firstT}">
+		<spring:eval var="firstT" expression="jxp.child(docMtl.docT, tagName,1)" />
+	</c:if>
+	<!-- 
+	<c:if test="${empty firstT}">
+		<spring:eval var="mapDrugKS" expression="mapDrug.keySet()"/>
+	</c:if>
+	 -->
+	<c:choose>
+		<c:when test="${not empty firstT}">
+			<qhtm:liNoticeType noticeType="${noticeType}" firstT="${firstT}" />
+		</c:when>
+		<c:otherwise>
+			<li class="b select taskNotice" id="dv_5">
+				<fmt:message key="mtl_notice_type_${noticeType}"/>
+			</li>
+		</c:otherwise>
+	</c:choose>
+	<ul>
+		<c:forEach var="laFinSyP" items="${laFinSys}">
+			<li id="li_${laFinSyP.value.id}" class="select taskNotice">
+				${laFinSyP.value.mtlO[tagName]}
+				<spring:eval var="dayIP" expression="jxp.var('day').jxpip(laFinSyP.getValue(),
+					'childTs[tabName=$day]')" />
+				<spring:eval var="hasNext" expression="dayIP.hasNext()" />
+				<c:if test="${hasNext}">
+					<fmt:message key="ui_day" />
+					<c:forEach var="dayP" items="${dayIP}">
+						${dayP.value.mtlO.abs}
+					</c:forEach>
+				</c:if>
+			</li>
+		</c:forEach>
+		<c:forEach var="supNoticeP" items="${scriteriaNoticeIP}">
+			<li id="li_${supNoticeP.value.id}" class="select taskNotice">
+				<spring:eval var="dayNoticeP" expression="jxp.var('notice').jxp(supNoticeP.getValue())
+					.getPointer('childTs/childTs[tabName=$notice]')" />
+				<owsui:editNotice noticeT="${supNoticeP.value}" editWithType="${true}"/>
+				<c:if test="${not empty dayNoticeP.value}">
+					<qhtm:tag name="span" prefix="da_" tree="${dayNoticeP.value}">
+						<owsui:editNotice noticeT="${dayNoticeP.value}"/>
+					</qhtm:tag>
+				</c:if>
+			</li>
+		</c:forEach>
+		<mtl:noticeFromDrug mapDrug="${mapDrug}"/>
+	</ul>
+</c:if>
+
+</jsp:root>

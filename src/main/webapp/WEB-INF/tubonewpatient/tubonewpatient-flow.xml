@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<secured attributes="ROLE_USER" />
+	<persistence-context />
+
+	<var name="formUtil"	class="com.qwit.util.FormUtil" />
+	<var name="list"		class="java.util.ArrayList" />
+	<input name="id"		type="int" required="true" />
+	<input name="idt"		type="int" />
+	<input name="idc"		type="int" />
+	<input name="part"		type="string" />
+	<input name="search"	type="string" />
+
+	<on-start>
+		<evaluate	expression="documentService.setFlushModeCommit()" />
+		<evaluate	expression="explorerService.makeExplorerMtl(id, search)"	result="flowScope.explorerMtl" />
+		<evaluate expression="explorerMtl.openEditPatient()" />
+	</on-start>
+
+	<view-state id="patientDataSeekTbh" model="explorerMtl">
+		<binder>
+			<!-- Patient -->
+			<binding property="editPatientC.patient" />
+			<binding property="editPatientC.forename" />
+			<binding property="editPatientC.sex" />
+			<binding property="bdate" required="true"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------patientDataSeekx-----patientData----')" />
+		</on-entry>
+		<on-render>
+			<evaluate expression="documentService.seekPatient(explorerMtl)" />
+		</on-render>
+		<transition on="newPatient" to="beginDateTbh">
+			<evaluate expression="explorerMtl.setNewPatient(documentService.getFolder('patient'))" />
+			<set name="formUtil.mode"	value="'beginDate'" />
+		</transition>
+		<transition on="use" to="beginDateTbh">
+			<evaluate expression="documentService.addIdtPatient(requestParameters.idt,explorerMtl)" />
+			<!-- 
+			<set name="explorerMtl.idt"	value="requestParameters.idt" />
+			<evaluate expression="documentService.addSessionPatient(explorerMtl)" />
+			 -->
+			<set name="formUtil.mode"	value="'beginDate'" />
+		</transition>
+		<transition on="seek">
+			<evaluate expression="formUtil.logline('--------patientDataSeekx-----seek----')" />
+		</transition>
+		<transition on="cancel" to="cancel"/>
+	</view-state>
+	<!-- Schema from template replace -->
+	<view-state id="patientDataEditTbh" model="explorerMtl">
+		<binder>
+			<!-- Patient -->
+			<binding property="editPatientC.patient" />
+			<binding property="editPatientC.forename" />
+			<binding property="editPatientC.sex" />
+			<binding property="bdate" required="true"/>
+		</binder>
+		<transition on="save" to="save">
+			<evaluate expression="documentService.saveChangePatient(explorerMtl)" />
+		</transition>
+		<transition on="cancel" to="cancel"/>
+	</view-state>
+	
+	<view-state id="beginDateTbh" model="explorerMtl">
+		<binder>
+			<binding property="bdate" required="true"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------beginDateTbh-----on-entry----')" />
+			<evaluate expression="explorerMtl.editStepPatient()" />
+		</on-entry>
+		<transition on="save" to="save2patient">
+			<evaluate expression="formUtil.logline('--------save2patient----------1'+explorerMtl.getBdate())" />
+			<evaluate expression="formUtil.logline('--------save2patient----------1')" />
+			<evaluate expression="documentService.saveTubo2Patient(explorerMtl)" />
+			<evaluate expression="formUtil.logline('--------save2patient----------2')" />
+		</transition>
+		<transition on="cancel" to="cancel"/>
+	</view-state>
+
+	<!-- Schema from template replace -->
+	
+	<end-state id="save"			commit="true" view="externalRedirect:/schema?id=#{id}&amp;part=#{formUtil.part}" />
+	<end-state id="saveNewDoc"		commit="true" view="externalRedirect:/schema?id=#{formUtil.newTaskT.id}" />
+	<end-state id="save2patient"	commit="true" view="externalRedirect:/tumorboardhome" />
+	<end-state id="cancel"			view="externalRedirect:/tumorboardhome" />
+
+</flow>

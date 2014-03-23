@@ -1,0 +1,177 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<table>
+	<caption>
+		Station Verzeichnise für eigene:
+	</caption>
+	<tr>
+		<th id="patient_4" class="select">
+		patient
+		</th>
+		<th id="protocol_4" class="select">
+		protocol
+		</th>
+	</tr>
+	<tr>
+		<td>
+			<spring:eval var="patientFolderP" expression="jxp.var('patient').var('folder')
+				.jxp(docMtl.docT).getPointer('childTs[mtlO/folder=$patient]/childTs[1]')" />
+			<div class="folderPadding dijitTreeIcon dijitFolderOpened">
+				<c:if test="${not empty patientFolderP.value}">
+					<a href="explorer=${patientFolderP.value.mtlO.id}">
+						${patientFolderP.value.mtlO.folder }
+					</a>
+				</c:if>
+			</div>
+		</td>
+		<td>
+			<spring:eval var="patientFolderP" expression="jxp.var('protocol').var('folder')
+				.jxp(docMtl.docT).getPointer('childTs[mtlO/folder=$protocol]/childTs[1]')" />
+			<div class="folderPadding dijitTreeIcon dijitFolderOpened">
+				<c:if test="${not empty patientFolderP.value}">
+					<a href="explorer=${patientFolderP.value.mtlO.id}">
+						${patientFolderP.value.mtlO.folder }
+					</a>
+				</c:if>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<hr/>
+
+<c:choose>
+	<c:when test="${'stationFax'==currentSWFState}">
+		<edit:stationFax />
+	</c:when>
+	<c:otherwise>
+<div>
+	<qhtm:a idt="${docMtl.docT.id}" action="stationName">
+		<spring:message code="ui_editStationName" />
+	</qhtm:a>
+</div>
+<div>
+Phone
+	<c:choose>
+		<c:when test="${empty docMtl.docT.mtlO.phone }">
+			<qhtm:a idt="${docMtl.docT.id}" action="stationFax">
+				?________________
+			</qhtm:a>
+		</c:when>
+		<c:otherwise>
+			<qhtm:a idt="${docMtl.docT.id}" action="stationFax">
+				${docMtl.docT.mtlO.phone}
+			</qhtm:a>
+		</c:otherwise>
+	</c:choose>
+</div>
+<div>
+Fax
+	<c:choose>
+		<c:when test="${empty docMtl.docT.mtlO.fax }">
+			<qhtm:a idt="${docMtl.docT.id}" action="stationFax">
+				?________________
+			</qhtm:a>
+		</c:when>
+		<c:otherwise>
+			<qhtm:a idt="${docMtl.docT.id}" action="stationFax">
+				${docMtl.docT.mtlO.fax}
+			</qhtm:a>
+		</c:otherwise>
+	</c:choose>
+</div>
+	</c:otherwise>
+</c:choose>
+
+<c:if test="${isAdmin}">
+	<div>
+	<!-- 
+		<form action="setBsaFormul" method="post">
+			<input type="hidden" name="iddoc" value="${docMtl.docT.id }" />
+		</form>
+	 -->
+			Station KOF Formul 
+			<owsui:ajs editT="${doseT}"  action="bsaFormula">
+				<fmt:message key="ui_bsa_${docMtl.docT.mtlO.bsaformula }" />
+				<c:if test="${empty docMtl.docT.mtlO.bsaformula }">
+					?_________________
+				</c:if>
+			</owsui:ajs>
+			<br/>
+			<c:if test="${'bsaFormula'==currentSWFState}">
+				Ändere KOF Formul:
+				<form:select path="docT.mtlO.bsaformula">
+					<form:option value="" ></form:option>
+					<form:option value="mosteller" ><fmt:message key="ui_bsa_mosteller" /></form:option>
+					<form:option value="haycock" ><fmt:message key="ui_bsa_haycock" /></form:option>
+					<form:option value="dubois" ><fmt:message key="ui_bsa_dubois" /></form:option>
+					<form:option value="gehan" ><fmt:message key="ui_bsa_gehanGeorge" /></form:option>
+					<form:option value="boyd" ><fmt:message key="ui_bsa_boyd" /></form:option>
+					<!-- 
+					<option></option>
+					<option value="mosteller"><fmt:message key="ui_bsaMosteller" /></option>
+					<option value="haycock"><fmt:message key="ui_bsaHaycock" /></option>
+					<option value="dubois"><fmt:message key="ui_bsaDubois" /></option>
+					<option value="gehan"><fmt:message key="ui_bsaGehanGeorge" /></option>
+					<option value="boyd"><fmt:message key="ui_bsaBoyd" /></option>
+					 -->
+				</form:select>
+				<input type="submit" name="_eventId_save"	value="${ui_button_save}" id="bdSave2"/>
+			</c:if>
+	</div>
+</c:if>
+<div style="float: left;">
+	<span class="select" id="idClassC_3" >
+		<c:choose>
+			<c:when test="${not empty userMtl.targetF}">
+				${userMtl.targetF}
+			</c:when>
+			<c:otherwise>
+			Neue Contactperson
+			</c:otherwise>
+		</c:choose>
+	</span>
+	<spring:eval var="doctorsIP" expression="jxp.var('contactperson').jxpip(instituteMtl.docT,
+		'childTs[tabName=$contactperson]')" />
+		<table>
+			<tr><th>Name</th><th>Role</th></tr>
+	<c:forEach var="doctor" items="${doctorsIP}">
+		<tr><td id="d_${doctor.value.id }" class="select">
+		<a href="user?id=${doctor.value.mtlO.id}">
+			${doctor.value.mtlO.title}
+			${doctor.value.mtlO.forename}
+			${doctor.value.mtlO.contactperson}
+		</a>
+		</td>
+		<td>
+		${doctor.value.idClass}
+			<sql:query var="userRole" dataSource="${owsDbSource}" >
+				SELECT authorities.* FROM owuser,tree,authorities 
+				WHERE id=idowuser AND owuser=username AND did=?<sql:param value="${doctor.value.idClass}"/> 
+				ORDER BY authority DESC
+			</sql:query>
+			<c:forEach var="row" items="${userRole.rows}" varStatus="stat">
+				<c:out value="${stat.first?'':'|' }"/>
+				<spring:message code="ui_role_${row.authority }" />
+			</c:forEach>
+		</td>
+		</tr>
+	</c:forEach>
+		</table>
+</div>
+<!-- 
+<div style="float: left;"><mtl:usedFolder /></div>
+ -->
+<div style="clear:left"/>
+
+</jsp:root>

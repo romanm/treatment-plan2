@@ -1,0 +1,28 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+>
+<form:form id="f2" modelAttribute="flowObjCreator">
+	<form:errors path="*"/>
+		
+	<table>
+		<tr>
+			<th>
+				<fmt:message key="dialog_protocolIdForImport" />:
+			</th> 
+			<td>
+				<form:input id="newProtocol" path="idimport" cssStyle="width:130px"/>
+				<form:hidden id="idf" path="idf" />
+				<form:hidden id="folder" path="folder" />
+			</td>
+		</tr>		
+		<tr><th></th>
+			<td>
+				<input type="submit" name="_eventId_save"		value="${ui_button_save}"/>
+			</td>
+		</tr>
+	</table>
+</form:form>
+
+</jsp:root>

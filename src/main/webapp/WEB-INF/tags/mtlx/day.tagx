@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="dayT" type="com.qwit.domain.Tree" required="true" description="The day tree object"/>
+
+<c:choose>
+	<c:when test="${empty dayT.idClass}">${inputSymbol}</c:when>
+	<c:when test="${fn:contains(dayT.mtlO.newtype,'forRule')}">
+		<c:set var="forRuleT" value="${fn:split(dayT.mtlO.newtype,'_')}" />
+		<c:set var="forRuleN" value="${fn:split(dayT.mtlO.abs,',')}" />
+		<span title="qq">
+			${forRuleN[0]}${forRuleT[1]=='g'?'↑':''}
+			<c:out value="&#119046;" />
+			<c:out value="&#119046;" />
+			<c:out value="${forRuleN[1]}${forRuleT[2]}"/>
+		</span>
+	</c:when>
+	<c:when test="${dayT.mtlO.newtype=='timesRelativ'}">
+	<!-- 
+		<c:out value="Übernomen von #" />
+	 -->
+		<c:out value="Verknüpft mit #" />
+		<c:forEach var="timesT" items="${dayT.childTs }" >
+			<c:set var="refTimesT" value="${docMtl.tree[timesT.ref]}" />
+			<c:out value="${docMtl.timesNr[refTimesT]}" />
+			<c:if test="${2==dayT.mtlO.abs and not empty refTimesT.ref }">
+				<c:set var="refTimesT" value="${docMtl.tree[refTimesT.ref]}" />
+				<c:out value=" und/oder #" />
+				<c:out value="${docMtl.timesNr[refTimesT]}" />
+			</c:if>
+		</c:forEach>
+	</c:when>
+	<c:when test="${dayT.mtlO.newtype=='w'}">
+		<c:set var="first" value="true" />
+		<c:forEach items="${fn:split(dayT.mtlO.abs,',')}" var="abs1"
+			><c:if test="${not first}">, </c:if>
+			<spring:eval var="weekDayDate" expression="jxp.weekDayDate(abs1)" />
+			<fmt:formatDate value="${weekDayDate}" pattern="EE" />
+			<c:set var="first" value="false" />
+		</c:forEach>
+	</c:when>
+	<c:when test="${empty dayT.mtlO.abs}">${inputSymbol}</c:when>
+	<c:otherwise>
+		${fn:replace(dayT.mtlO.abs,',',', ')}
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

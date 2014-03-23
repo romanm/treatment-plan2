@@ -1,0 +1,35 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+
+<form:form id="f3" modelAttribute="drugMtl">
+	<spring:message code="mtl_expr_value_maxDose"/>:
+	<form:input path="maxDose" cssStyle="width:80px" />
+	<form:select path="maxDoseUnit">
+		<form:option value="mg" />
+		<form:option value="mg/m²" />
+		<form:option value="ml" />
+	</form:select>
+	<br/>
+
+	<spring:message code="mtl_expr_value_maxDoseCumulative"/>:
+	<form:input path="maxDoseCumulative" cssStyle="width:80px" />
+	<form:select path="maxDoseCumulativeUnit">
+		<form:option value="mg" />
+		<form:option value="mg/m²" />
+		<form:option value="ml" />
+	</form:select>
+	<br/>
+	
+	<input type="submit" name="_eventId_save"	value="${ui_button_save}"/>
+	<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}"/>
+	
+</form:form>
+<a href="?${urlFlow}&amp;_eventId=summeDoseNotice">
+notice
+</a>
+</jsp:root>

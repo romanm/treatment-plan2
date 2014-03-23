@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<!-- 
+<edit:linkBoard />
+ -->
+<div>
+<c:set var="doseT" value="${docMtl.editNodeT}" />
+<!--form:form id="pdf" modelAttribute="schemaMtl"-->
+<form:form id="pdf" modelAttribute="docMtl">
+<form:input id="doseValue" path="editDoseC.value" cssStyle="width:75px" />
+		
+		<fmt:message var="uiDoseInvalid"		key="uiDoseInvalid" scope="application"/>
+		<fmt:message var="uiDoseInvalidFloat"	key="uiDoseInvalidFloat"/>
+		<script	type="text/javascript"><![CDATA[
+		Spring.addDecoration(new Spring.ElementDecoration({
+			elementId : "doseValue", widgetType : "dijit.form.ValidationTextBox",
+			widgetAttrs : { required : true
+				//, regExp : '\\d{1,5}'
+				,regExpGen: function(constraints)
+							{
+								if(dojo.attr( "chooseFloatInt", "checked"))
+								{
+									console.log(this.invalidMessage);
+									this.invalidMessage = "${uiDoseInvalidFloat}";
+									return '[-+]?[0-9]*\.?[0-9]+';
+								}
+								else
+								{
+									this.invalidMessage = "${uiDoseInvalid}";
+									return "\\d{1,5}";
+								}
+							}
+				, invalidMessage : "${uiDoseInvalid}"}
+				,onFocus:function(){}
+		}));
+		dojo.addOnLoad(function()
+		{
+			setupChooseFloatIntCheckbox();
+			dijitFocus("doseValue");
+		});
+		]]></script>
+
+		<form:input id="doseUnit" path="editDoseC.unit" cssStyle="width:70px"/>
+		<c:if test="${doseT.parentT.parentT.tabName=='task'}">
+			<form:checkbox path="editDoseC.pro" value="day" label="/d"/>
+		</c:if>
+		
+		<script	type="text/javascript">
+			Spring.addDecoration(new Spring.ElementDecoration( {
+				 elementId : "doseUnit",
+				 widgetType : "dijit.form.ComboBox",
+				 widgetAttrs : {
+				 store : new dojo.data.ItemFileReadStore( {data :doseUnitsListe}),
+				 onChange : function(){setDoseModType('unit');},
+				 regExp : "I.E.|Mio I.E.|AUC|Gy|[µ]{0,1}[a-z]{1,5}[/]{0,1}[2]{0,1}[a-z]{0,5}[²]{0,1}",
+				 searchAttr : "name",
+				 autocomplete : true,
+				 required : true,
+				 trim : true,
+				 invalidMessage : "type in a valid unit"
+				}
+				}));
+		</script>
+	
+		<form:input id="doseApp" path="editDoseC.app" cssStyle="width:70px"/>
+		<script	type="text/javascript">
+			Spring.addDecoration(new Spring.ElementDecoration( {
+				 elementId : "doseApp",
+				 widgetType : "dijit.form.ComboBox",
+				 widgetAttrs : {
+				 store : new dojo.data.ItemFileReadStore( {data :doseAppListe}),
+				regExp : "lokal|i.th.|i.v.|p.o.|s.c.|i.m.", 
+				 searchAttr : "name",
+				 autocomplete : true,
+				 required : true,
+				 trim : true,
+				invalidMessage : "i.v.,  p.o., s.c., i.m. ..."
+				}
+				}));
+		</script>
+		<input type="checkbox" id="chooseFloatInt" value="" onclick="validateElement('doseValue');" />
+		<label for="chooseFloatInt" ><fmt:message key="uiChooseFloatInt"/></label>
+		<br />
+		<input id="saved"  type="submit" name="_eventId_editStep"	value="${ui_button_OK}"/>
+		<input type="submit" name="_eventId_cancel"		value="${ui_button_cancel}"/>
+		<script type="text/javascript"><![CDATA[
+			Spring.addDecoration(new Spring.ValidateAllDecoration({elementId:'saved', event:'onclick'}));
+			Spring.addDecoration(new Spring.AjaxEventDecoration({elementId:'saved',event:'onclick',formId:'pdf'}));
+		]]></script>
+</form:form>
+</div>
+
+<c:choose>
+	<c:when test="${false and not empty schemaMtl.patientMtl and docMtl.idt==docMtl.editNodeT.id}">
+		${docMtl.editNodeT.parentT.mtlO.drug}
+		Dose Modifikation
+	<c:choose>
+			<c:when test="${'week'==owsSession.schemaPart or 'plan'==owsSession.schemaPart}">
+				<c:set var="doseT" value="${docMtl.editNodeT}" />
+					<c:set var="modDay" value="am ${schemaMtl.modDoseTs.cday} Tag" />
+					<br/>
+					<c:choose>
+						<c:when test="${0==schemaMtl.modDay }">
+							<qhtm:a editStep="f2editStep" idt="${doseT.id}" modDay="${day}" action="modDay">
+								${modDay}
+							</qhtm:a>
+						</c:when>
+						<c:otherwise><b>${modDay}</b></c:otherwise>
+					</c:choose>
+					oder 
+					<c:set var="allDay" value="am Alle Tage" />
+					<c:choose>
+						<c:when test="${0==schemaMtl.modDay }"><b>${allDay}</b></c:when>
+						<c:otherwise>
+							<qhtm:a editStep="f2editStep" idt="${doseT.id}" action="chemoDoseMod">
+								${allDay}
+							</qhtm:a>
+						</c:otherwise>
+					</c:choose>
+					<table>
+						<tr align="center"><th>
+						<mtl:doseUnit doseT="${doseT}"/>
+						</th><th>%</th><th>
+						<mtl:doseUnit doseT="${doseT}" calculated="true"/>
+						</th></tr>
+						<tr>
+							<qhtm:tag name="td" prefix="dv_" tree="${doseT}" style="white-space: nowrap">
+								<owsui:editDoseValue doseT="${doseT}" /><sup>${docMtl.neNr[doseT]}</sup>
+								<form:hidden id="doseUnit" path="editDoseC.unit" />222
+							</qhtm:tag>
+							<qhtm:tag name="td" prefix="dp_" tree="${doseT}">
+								<mtl:doseModProcent doseT="${doseT}"/>
+							</qhtm:tag>
+							<qhtm:tag name="td" prefix="dc_" tree="${doseT}">
+								<mtl:calcDoseValue doseT="${doseT}"/>
+							</qhtm:tag>
+						</tr>
+					</table>
+					<fmt:message key="uiNecessaryJustification" />
+					<owsui:htmlEditor notice="${docMtl.editNoticeC.notice}"/>
+					
+					<form:hidden path="action" id="f2action"/>
+					<form:hidden path="idt" id="f2idt"/>
+					<form:hidden path="tsNr" />
+					<form:hidden path="modDay"/>
+					
+					<input type="submit" id="f2editStep" name="_eventId_editStep" value="editStep" style="visibility:hidden;"/>
+					<fmt:message key="ui_ok" var="ui_ok"/>
+					<fmt:message key="apply" var="apply"/>
+					<input type="button" id="reviseNode" value="${ui_ok}" title="${apply}" class="small"
+						onclick="setNotice();dojo.byId('f2action').value='modDay';dojo.byId('f2editStep').click()"
+						/>
+			</c:when>
+			<c:otherwise>
+				<owsui:htmlEditor notice="${docMtl.editNoticeC.notice}"/>
+			</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:when test="${'expr'==docMtl.editNodeT.parentT.tabName and 'dose'==docMtl.editNodeT.tabName and docMtl.idt==docMtl.editNodeT.id}">
+		<edit:drugUsedDose />
+	</c:when>
+	<c:when test="${empty schemaMtl.patientMtl and docMtl.idt==docMtl.editNodeT.id and 'week'==formUtil.part}">
+		<c:set var="drugT" value="${docMtl.editNodeT.parentT}" />
+		<c:set var="doseT" value="${docMtl.editNodeT}" />
+		<spring:eval var="appT" expression="jxp.getApp(drugT)"/>
+		<table>
+			<tr>
+				<qhtm:tag name="td" prefix="dv_" tree="${doseT}" style="white-space: nowrap">
+					<owsui:editDoseValue doseT="${doseT}" /> 
+				</qhtm:tag>
+				<qhtm:tag name="td" prefix="du_" tree="${doseT}">
+					<owsui:editDoseUnit doseT="${doseT}"/>
+				</qhtm:tag>
+			</tr>
+			<tr>
+				<td><qhtm:tag name="span" prefix="da_" tree="${doseT}"><owsui:editDoseApp doseT="${doseT}"/></qhtm:tag></td>
+				<qhtm:tag name="td" prefix="du_" tree="${doseT}">
+					<c:if test="${not empty appT}"><owsui:editAppApp appT="${appT}" /></c:if>
+				</qhtm:tag>
+			</tr>
+		</table>
+		<br />
+		<edit:usedDose/>
+	</c:when>
+	<c:otherwise>
+		<br />
+		<edit:usedDose/>
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

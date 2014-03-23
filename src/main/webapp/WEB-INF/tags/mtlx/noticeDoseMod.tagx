@@ -1,0 +1,45 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="noticeT" type="com.qwit.domain.Tree" required="true" description="The notice tree object"/>
+
+<c:forEach items="${noticeT.childTs}" var="taskT">
+	<c:if test="${taskT.tabName=='task'}">
+		<c:forEach items="${taskT.childTs}" var="drugT">
+			<c:if test="${drugT.tabName=='drug'}">
+				<b>
+					<qhtm:tag name="span" prefix="dr_" tree="${drugT}">
+						<mtl:drugName drugT="${drugT}" />
+					</qhtm:tag>
+				</b>
+				<c:forEach items="${drugT.childTs}" var="doseT"  varStatus="stat">
+					<qhtm:tag name="span" prefix="da_" tree="${doseT}">
+						<c:choose>
+							<c:when test="${doseT.tabName=='day'}">
+									<c:if test="${stat.count>1}">, </c:if>
+									<fmt:message key="ui_onDay"/>
+									${doseT.mtlO.abs}
+									<c:forEach items="${doseT.childTs}" var="dose2T">
+										<c:if test="${dose2T.tabName=='dose'}">
+											<mtl:noticeDoseModDose doseT="${dose2T}"/>
+										</c:if>
+									</c:forEach>
+							</c:when>
+							<c:when test="${doseT.tabName=='dose'}">
+								<mtl:noticeDoseModDose doseT="${doseT}"/>
+							</c:when>
+						</c:choose>
+					</qhtm:tag>
+				</c:forEach>
+			</c:if>
+		</c:forEach>
+	</c:if>
+</c:forEach>
+</jsp:root>

@@ -1,0 +1,856 @@
+/* * html,* body for IE */
+* html {
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+* body {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	height: 100%;
+	overflow-y: auto;
+}
+
+body {
+	font: 80%/1.4em Verdana, Arial, Tahoma, "Trebuchet MS", sans-serif;
+	margin: 0;
+	position: relative;
+	padding: 0em 23em 3em 2em;
+	color: #555555;
+}
+
+.homefieldset {
+	margin: 10px 0px 20px 0px;
+}
+.homefieldset legend
+{
+	font-size:11px;
+}
+
+#top {
+	font-size: 0.9em;
+	text-align: right;
+}
+
+#sitetitle {
+	width: 440px;
+	margin-top:-20px;
+}
+
+#sitetitle h1 {
+	font-weight: 700;
+	letter-spacing: -2px;
+	font-size: 2.2em;
+	line-height: 0.9em;
+	margin: 10px 0 10px 10px;
+	padding: 0;
+	/*border:1px solid #000000;*/
+}
+
+#sitetitle h1 span {
+	background-color: #555555;
+	color: #FDFDFD;
+}
+
+#sitetitle h1 a {
+	font-weight: 700;
+	letter-spacing: -1px;
+}
+
+#sitetitle p {
+	margin: 0px 0 20px 10px;
+	padding: 0;
+	letter-spacing: -1px;
+	color: #777;
+}
+
+#headline {
+	background-color: #F0F0F0;
+	border: 1px solid #CCCCCC;
+	color: #777777;
+	height: 1.6em;
+	font-size: 0.9em;
+	-moz-border-radius: 5px;
+	-moz-box-shadow: 5px 5px 5px #888888;
+	padding-left: 5px;
+	margin-bottom: 15px;
+}
+
+#headline p {
+	margin: 0;
+}
+
+#mainmenu {
+	float: right;
+	margin-top:30px;
+}
+#mainmenu a{
+	color: #4d699d;
+	display: block;
+}
+
+#mainmenu a:hover {
+	color: #222;
+	background: #f4f4f4;
+}
+#mainmenu div
+{
+	float:left;
+	border-bottom: 1px solid #AAAAAA;
+	margin-left:10px;
+}
+
+dl.nav {
+	float: left;
+	margin: 0 0 5px 10px;
+}
+
+dl.nav dt {
+	border-bottom: 1px solid #AAAAAA;
+}
+
+dl.nav dd {
+	border-bottom: 1px solid #CCCCCC;
+	margin: 0;
+}
+
+dl.nav dd a {
+	color: #4d699d;
+	display: block;
+}
+
+dl.nav dd a:hover {
+	color: #222;
+	background: #f4f4f4;
+}
+/*
+#sidebar	{bottom:1em;height:auto;left:auto;position:fixed;right:1em;top:1em;
+*/
+/*no delete
+#sidebar	{height:auto;left:auto;position:fixed;
+right:0.1em;top:1em;bottom:0.1em;
+background:none repeat scroll 0 0 #F0F0F0;border:1px solid #CCCCCC;
+width:21em;
+padding:1px;
+}
+*/
+
+/* * html #sidebar ...for IE */
+/*
+* html #sidebar { position:absolute;bottom:0px; height:1000px; right:15px; display:block;}
+* html #sidebar {display:block; position:absolute;bottom:0px; height:1000px; right:15px; }
+#netbooknewsDe
+			{width: 65px; margin-left: -95px; display: block; position: fixed; top: 10px;}
+#sidebar
+			{display: block; position: fixed; width:22em; top: 1em;border: 1px solid #CCCCCC;}
+#sidebar	{height:auto;position:fixed;
+right:0.1em;top:0.1em;bottom:0.1em;
+background:none repeat scroll 0 0 #F0F0F0;border:1px solid #CCCCCC;
+width:21em;
+padding:1px;
+overflow:hidden; 
+}
+.feedback
+	{left: 0; margin-top: -90px; position: fixed; top: 50%; z-index: 99;}
+*/
+#sidebar {
+	position: fixed;
+	right: 0.1em;
+	top: 0.1em;
+	bottom: 0.1em;
+	width: 21em;
+	border: 1px solid #CCCCCC;
+	/*
+background:none repeat scroll 0 0 #F0F0F0;
+padding:1px;
+overflow:hidden; 
+*/
+}
+
+#sidebar h2 {
+	border-bottom: 1px solid #ccc;
+	padding: 1px;
+	margin: 1em 0 0.1em;
+}
+
+#sidebar h3 {
+	font-size: 1em;
+	padding: 0 0 2px 0;
+	margin: 0 0 1px 0;
+	border-bottom: 2px solid #ccc;
+}
+
+#sidebar input {
+	margin: 0;
+}
+
+#sidebar div.dijitTitlePaneContentInner {
+	padding: 0 0 0 1px;
+}
+
+#sidebar table td {
+	padding: 0;
+	white-space: nowrap;
+}
+
+#sidebar table.wraptext td {
+	padding: 0;
+	white-space: normal;
+}
+
+#sidebar table.wrap td {
+	padding: 0;
+	white-space: normal;
+}
+
+#sidebar table.usedDose td {
+	padding: 0;
+	white-space: normal;
+	border: 1px dotted;
+}
+
+#sidebar table.usedDose td.used {
+	border: 2px double green;
+}
+
+tbody.scroll {
+	height: 400px;
+	overflow: scroll;
+}
+
+tbody.scroll3 {
+	height: 300px;
+	overflow: scroll;
+}
+
+div.scroll {
+	height: 400px;
+	overflow: scroll;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+#sidebar p,#sidebar ul,#sidebar ol {
+	margin: 0;
+	padding: 0;
+}
+/*
+			{margin:0 0 5px 0; padding:0;}
+			*/
+#sidebar ul li {
+	list-style: none;
+	margin: 0 0 2px 0;
+}
+
+#sidebar ul ul li {
+	margin: 0 0 0 1em;
+}
+/*
+			{margin:2px 0;}
+			*/
+#sidebar ul.sidemenu li {
+	list-style: none;
+	padding: 0;
+}
+
+#sidebar a {
+	font-size: 1.1em;
+	padding: 2px 0 2px 5px;
+}
+
+#sidebar ul.sidemenu li a {
+	display: block;
+	overflow: visible;
+	background-color: #f4f4f4;
+	border: 1px solid #ddd;
+}
+
+#sidebar ul.sidemenu li a:hover,#sidebar ul li.current a {
+	border: 1px solid #555;
+	color: #444;
+	background-color: #fff;
+}
+
+#sidebar ul.numol li {
+	list-style-type: square;
+	list-style-position: inside;
+}
+
+/*******************************************
+*	
+*	COLORS OF CONTENTS
+*
+*********************************************/
+.explorerContent {background-color:rgb(240,255,240);}
+
+.schemaContent {background-color: #FFFFF0;}
+.schemaContent h2 {	background-color: rgb(240,240,220);}
+
+.conceptContent {	background-color:rgb(240,240,255);}
+.conceptContent h2{	background-color:rgb(220,220,240);}
+
+.patientContent  {	background-color: rgb(240,255,255);}
+.patientContent h2 {	background-color: rgb(220,240,240);}
+
+
+
+
+a {
+	color: #4d699d;
+	font-weight: 400;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #444;
+	text-decoration: none;
+}
+
+a img {
+	border: 0 none;
+}
+
+#content h2 {
+	/*border-bottom: 2px solid #CCCCCC;
+	*/
+	line-height: 1.1em;
+}
+/*
+	font-weight: 700;
+	font-size: 1.5em;
+	line-height:1.3em;
+	letter-spacing: 0.1em;
+	letter-spacing: -1px;
+*/
+.bcGrey {
+	background-color: #CCCCCC;
+}
+
+ul {
+	padding: 0 0 0 20px;
+}
+
+* html ul.metalinks {
+	position: absolute;
+	display: block;
+}
+
+ul.metalinks {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	list-style: none;
+	font-size: 82%;
+	margin: 0;
+	padding: 0 10px .9em 0;
+}
+
+ul.metalinks li a {
+	width: 36px;
+	height: 1.5em;
+	display: block;
+	background: transparent url(../images/top2.png) no-repeat top center;
+}
+
+ul.metalinks li a span {
+	display: none;
+}
+
+table {
+	text-align: left;
+}
+
+table td,table th {
+	vertical-align: top;
+	padding: 0 0.3em;
+}
+
+table.header1 thead tr th {
+	border-spacing: 0;
+	background-color: #eee;
+}
+
+thead.boardHead tr td {
+	border: 1px solid #000000;
+	padding: 3px;
+}
+
+table.aligncenter tr td,table.aligncenter tr th {
+	vertical-align: middle;
+	text-align: center;
+}
+
+tr.dotted th,tr.dotted td {
+	border-right: 1px dotted;
+}
+
+tr.planday th,tr.planday td {
+	border-top: 3px double;
+}
+
+tr.boboDo th,tr.boboDo td {
+	border-bottom: 3px double;
+}
+
+tr.bottomlinie th,tr.bottomlinie td {
+	border-bottom: 2px solid #CCCCCC;
+}
+
+tr.careweek th {
+	border-bottom: 2px solid #CCCCCC;
+}
+/*
+			{border-bottom: 2px solid #CCCCCC;text-align: center;}
+			*/
+th a {
+	font-weight: bold;
+}
+
+table.tumorboard td.tubo_recomm {
+	border-color: black;
+	border-style: solid;
+	border-width: 1px 10pt;
+	font-size: 16pt;
+	border-left: 10pt solid black;
+	border-right: 10pt solid black;
+	padding-left: 10pt;
+	padding-right: 10pt;
+}
+
+.edited {
+	border: 1px dashed black;
+	background-color: appworkspace;
+}
+
+.childOfedited {
+	border: 1px dashed black;
+}
+
+.parentOfedited {
+	background-color: appworkspace;
+}
+
+.big {
+	font-size: 1.2em;
+}
+
+.small {
+	font-size: 0.8em;
+}
+
+.rightNormal {
+	float: right;
+	font-weight: normal;
+}
+
+div.floatRight {
+	float: right;
+}
+
+.n,*.n a {
+	font-weight: normal;
+}
+
+.b,*.b a {
+	font-weight: bold;
+}
+
+ul.noticeInfo li.b a {
+	font-weight: bold;
+	font-size: 1.1em
+}
+
+.notb {
+	font-weight: normal;
+}
+
+.taCenter {
+	text-align: center;
+}
+
+.taLeft {
+	text-align: left;
+}
+
+.red,.warning,.test {
+	background-color: #E8A1A1;
+	/*border: 1px solid red;*/
+}
+
+
+
+.yellow {
+	background-color: yellow;
+}
+
+.green {
+	background-color: #C5D5A9;
+}
+
+.blue {
+	background-color: blue;
+}
+
+.dosemodtype {
+	background: transparent url(../images/btn.bg.gif)
+}
+/*
+	background: transparent url(../images/th.bg.gif)
+	*/
+/*
+.green		{background-color: LightGreen ;}
+.green		{background-color: GreenYellow;}
+.green		{background-color: green;}
+*/
+
+/* EXPLORER TABLE*/
+table.explorer {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+table.explorer tbody tr {
+	border-spacing: 11;
+	border-top: 1px dashed #dddddd;
+}
+
+.table-caption {
+	border-bottom: 1px solid #bbbbbb;
+	background-color: rgb(220, 240, 220);
+	font-weight: bold;
+	padding: 4px;
+}
+
+.table-headline {
+	
+}
+
+.table-header {
+	border-bottom: 1px solid #dddddd;
+	background-color: rgb(220, 240, 220);
+	padding: 4px;
+}
+
+.explorer-table-th {
+	padding: 4px;
+	border-top: 2px solid #dddddd;
+}
+/*
+table.explorer tr:nth-child(2n+1)
+{
+	background-color:#f9f9f9;
+}
+
+table.explorer tr th 
+{
+	background-color:#f0f0f0;
+}
+*/
+table.explorer tr td {
+	width: 200px;
+	padding: 5px;
+}
+/*formular tables*/
+table.formular tr td,table.formular tr th {
+	padding: 0;
+	padding-bottom: 15px;
+}
+
+.gender
+{
+	width:150px;
+}
+
+/* Homepage Boxes*/
+.boxHeadeer {
+	width: 270px;
+	color: #777;
+	font-size: 1.2em;
+	font-weight: bold;
+	/*
+	border: 1px solid #ccc;
+	background-color: #f0f0f0;
+	text-align:left; 
+	padding-left:5px;
+	padding-top:0px;
+*/
+}
+
+.boxBody {/* 
+	width:250px; 
+	background-color:#f6f6f6; 
+	text-align:left; 
+	margin:5px 0 15px 0; 
+	border:0px; 
+	font-size:0.9em;
+	*/
+	color: #777;
+}
+
+
+/**********************************************
+*
+*	HOME PAGE CLASSES
+*
+************************************************/
+.module
+{
+	background-color:#f1f1f1;
+	margin-bottom:20px;
+}
+.appModule
+{
+	background-color:rgb(255,240,240);
+	margin-right:40px;	
+	display:inline-block;
+}
+.defModule
+{
+	background-color:rgb(240,240,255);
+	display:inline-block;
+	
+}
+.moduleHeader
+{
+	margin:10px 0;
+	text-align:center;
+}
+.homeBox {margin:0 10px 10px 10px; }
+.patients-boxHeader{ background-color: rgb(220, 240, 220); } 
+.patients-boxBody{ background-color:rgb(240,255,240);} 
+.conceptsTemplate-boxHeader{ background-color: rgb(240,240,220); } 
+.conceptsTemplate-boxBody{ 	background-color: rgb(255,255,240);} 
+.tumorboard-boxHeader{ background-color: rgb(220,220,220); } 
+.tumorboard-boxBody{ 	background-color: rgb(240,240,240);} 
+.more-boxHeader{ background-color: rgb(220,220,220); } 
+.more-boxBody{ 	background-color: rgb(240,240,240);} 
+
+
+
+
+.select:hover {
+	background: #DDDDBB;
+}
+
+.select:hover a {
+	background: #FFF;
+}
+
+.selected {
+	border: 1px solid blue;
+}
+
+span.select {
+	padding: 0.5em 0;
+}
+
+#toolbar {
+	border-bottom: 3px double #ccc;
+	padding: 0;
+	/*
+	background:url("../images/titleBar.png") repeat-x scroll left bottom #FFFFFF;
+	border:1px solid #BFBFBF;
+	padding:3px 4px;
+	*/
+}
+
+#toolbar a {
+	background-color: #f4f4f4;
+	border: 1px solid #ddd;
+	padding: 0 0.2em;
+}
+
+#toolbar a:hover {
+	background-color: #fff;
+	border-color: #555;
+}
+
+input.next,a.next {
+	float: left;
+	font-size: 0.8em;
+	border: 0;
+	border: 1px solid #ddd;
+	background-color: #F4F4F4;
+}
+
+a.next:hover,a.next:hover {
+	background-color: #fff;
+	border-color: #555;
+}
+
+#toolbar input.next {
+	float: right;
+	margin-top: 3px;
+}
+
+.toolbar-icon {
+	position: relative;
+	width: 17px;
+	height: 20px;
+	display: block;
+	padding: 0 0.3em;
+	font-size: 0.9em;
+	float: right;
+}
+.folderPadding5px{
+	display:inline;margin-left:5px;
+}
+.folderPadding{
+	display:inline;padding-left: 1.5em
+}
+#schemaToolbar input.save[disabled="disabled"] { /*
+	background:url("../images/save.gif") no-repeat top center;
+	background-position:1px 0px;
+	background-color:red;	
+	*/
+	background: url("../images/save.png") no-repeat top center;
+	background-position: -15px 2px;
+	background-width: 16px;
+	border: 0;
+}
+
+#schemaToolbar input.save[disabled="disabled"]:hover {
+	border: 0;
+	background-color: #F0F0F0;
+}
+
+button img,a img 
+	{vertical-align: middle;}
+
+#schemaToolbar input.save {
+	background: url("../images/save.png") no-repeat top center;
+	background-position: 0px 2px;
+	border: 0;
+
+	/*
+	background:url("../images/save.gif") no-repeat top center;
+	background-position:-15px 0px;
+	background:url("../images/Save16.gif") no-repeat top center;
+	width: 20px;
+	border:1px solid;
+	padding:0 0.3em;
+	font-size:0.9em;
+	border-bottom: 0;
+	border-top: 0;
+	border:0px 1px solid;
+	*/
+}
+
+#schemaToolbar input.save:hover {
+	color: #222;
+	background-color: white;
+	border-left: 0;
+	border-top: 0;
+	border-bottom: 1px solid gray;
+	border-right: 1px solid gray;
+}
+
+/*depricated*/
+#toolbar input.save2 {
+	background: url("../images/editor.gif");
+	background-position: -558px;
+	/*
+	background-image:url("../images/editor.gif");
+	background-position:-558px 50%;
+	background-repeat:no-repeat;
+	height:18px;
+	text-align:center;
+	width:18px;
+	*/
+	width: 20px;
+	border: 1px solid;
+	font-size: 0.8em;
+}
+
+#session {
+	margin-bottom: 10px;
+}
+
+.noteIcon {
+	background-image: url("../images/note.gif");
+}
+
+.editIcon {
+	background: url("../images/edit.png") no-repeat top center;
+	background-position: 0px 0px;
+	border: 0;
+}
+
+.note {
+	background: none repeat scroll 0 0 #FFF6BF;
+	border-color: #FFD324;
+	color: #514721;
+}
+
+.dijitToolbar {
+	margin: auto auto;
+	height: 20px;
+}
+
+.dijitToolbar,.dijitToolbar span,.dijitToolbar span span,.dijitToolbar span span span
+	{
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.dijitMenuTable {
+}
+
+.center
+{
+	text-align:center;
+}
+
+/******************************************
+*	colors for the BMI (BsaDialog)
+******************************************/
+.bmi-farbe-1{color:steelblue;}
+.bmi-farbe-2{color:steelblue;}
+.bmi-farbe-3{color:steelblue;}
+.bmi-farbe-4{color:darkgreen;}
+.bmi-farbe-5{color:gold;}
+.bmi-farbe-6{color:orange;}
+.bmi-farbe-7{color:red;}
+.bmi-farbe-8{color:darkred;}
+
+
+
+/******************************************
+*	Dialog Section
+******************************************/
+div.dialog-header
+{
+	font-weight:bold;
+	margin-top:10px;
+	margin-bottom:3px;
+}
+tr.dialog-header th
+{
+	padding-top:10px;
+}
+.footspace
+{
+	margin-top:10px;
+}
+.new-patient, .new-patient tbody tr, .new-patient tbody tr td, .new-patient tbody tr th 
+{
+	padding:0px;
+}
+
+
+/******************************************
+*
+*	DOJO THEME - Tundra - OVERWRITE
+*
+******************************************/
+.tundra .dijitError {
+	background-color:#E8A1A1;
+	background-image:none;
+}
+.tundra .dijitErrorFocused {
+	background-color:#E8A1A1;
+	background-image:none;
+}

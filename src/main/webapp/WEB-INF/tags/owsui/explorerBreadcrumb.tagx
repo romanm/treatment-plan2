@@ -1,0 +1,64 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui">
+
+<jsp:directive.attribute name="folder" />
+
+<!-- Breadcrumb navigation of Explorer -->
+<fmt:message key="ui_breadcrumbIndex" />&#160;
+<!-- 
+<strong style="color: black;">&#160;&#8250;&#160;</strong>
+<fmt:message key="ui_explorer" />
+<strong style="color: black;">&#160;&#8250;&#160;</strong>
+
+<spring:url var="urlFolder" value="/the/explorer/explorer" >
+	<spring:param name="folder" value="${folder}" />
+	<spring:param name="id" value="9932" />
+	<spring:param name="search" />
+</spring:url>
+<c:set var="folderName">
+	<fmt:message>ui_${folder}Folder</fmt:message>
+</c:set>
+<a href="${urlFolder}">${folderName}</a>
+<strong style="color: black;">&#160;&#8250;&#160;</strong>
+ -->
+<c:choose>
+	<!-- Explorer Dialogs-->
+	<c:when test="${not empty flowExecutionUrl}">
+		<strong style="color: black;">&#8250;&#160;</strong>
+		<c:choose>
+			<c:when test="${formUtil.mode=='newProtocol'}">
+				<fmt:message key="ui_protocolNew" />
+			</c:when>
+			<c:when test="${formUtil.mode=='importProtocol'}">
+				<fmt:message key="ui_protocolImport" />
+			</c:when>
+			<c:when test="${formUtil.mode=='newPatient'}">
+				<fmt:message key="ui_patientNew" />
+			</c:when>
+		</c:choose>
+	</c:when>
+</c:choose>
+
+<c:forEach var="item" items="${explorerMtl.treeBreadcrumb}">
+	<strong style="color: black;">&#x0203A;</strong>
+	<!-- 
+	<spring:url var="urlFolder2" value="${explorer_url1}" >
+		<spring:param name="id" value="${item.id}" />
+		<spring:param name="search" />
+	</spring:url>
+		<a style="margin-left:20px;" href="${urlFolder2}">${fName} </a>
+	 -->
+	<div class="folderPadding5px dijitTreeIcon dijitFolderOpened">
+		<c:set var="fName" value="${item.folder}" />
+		<c:if test="${'protocol'==fName }"><c:set var="fName" value="Protokoll" /></c:if>
+		<a style="margin-left:20px;" href="${explorer_url1}=${item.id}">${fName} </a>
+	</div>	
+</c:forEach>
+
+</jsp:root>

@@ -1,0 +1,63 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+	<div id="folderContentContainer">
+		<c:if test="${not empty explorerMtl}">
+			<form:form id="f1" modelAttribute="explorerMtl">
+				<table class ="explorer">
+					<caption id="f_${explorerMtl.folderO.id}" class="select table-caption">
+						<div class="folderPadding dijitTreeIcon dijitFolderOpened">
+							${explorerMtl.folderO.folder}
+						</div>
+					</caption>
+					<c:choose>
+						<c:when test="${'protocol'==explorerMtl.folderO.folder }">
+							<tr><td colspan="4" style="border: 2px dotted;">
+								<span class="red b"><fmt:message key="ui_subdir_select"/></span>
+							</td></tr>
+						</c:when>
+						<c:when test="${'newSchema'==param.a}">
+						<tr><td colspan="4" style="border: 2px dotted;">
+							<span class="red b"><fmt:message key="ui_schemaInProtocol_select"/></span>
+						</td></tr>
+						</c:when>
+						<c:when test="${'saveNewPatient'==currentSWFState}">
+						<tr><td colspan="4" style="border: 2px dotted;">
+							<c:choose>
+								<c:when test="${'patient'==explorerMtl.folderO.folder }">
+									<span class="red b"><fmt:message key="ui_subdir_selectPatient"/></span>
+									<!-- 
+									<span class="note"><fmt:message key="ui_subdir_select"/></span>
+									 -->
+								</c:when>
+								<c:otherwise>
+									<edit:saveNewPatientContext />
+								</c:otherwise>
+							</c:choose>
+						</td></tr>
+						</c:when>
+						<c:otherwise></c:otherwise>
+					</c:choose>
+					<jsp:include page="content/${explorerMtl.folderType}.jspx" />
+				</table>
+				<edit:revise visibility="hidden"/>
+			</form:form>
+			<c:if test="${not empty explorerMtl.patientMoveList }">
+				<owsui:titlePane id="patient2move" mtitle="ui_title_patientenMove" isOpened="${false}">
+					<table class ="explorer">
+						<qhtm:patientTable patientList="${explorerMtl.patientMoveList}"/>
+					</table>
+				</owsui:titlePane>
+			</c:if>
+		</c:if>
+		<div style="float:right;" id="returnToTop">
+			<br />
+			<p><a href="#top"><fmt:message key="ui_returnToTop" /></a></p>
+		</div>
+	</div>
+</jsp:root>

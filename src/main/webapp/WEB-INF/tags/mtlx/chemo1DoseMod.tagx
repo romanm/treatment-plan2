@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="ts"	type="com.qwit.domain.Ts"/>
+<jsp:directive.attribute name="doseT"		type="com.qwit.domain.Tree"/>
+<jsp:directive.attribute name="doseModT"	type="com.qwit.domain.Tree"/>
+<jsp:directive.attribute name="view" />
+<jsp:directive.attribute name="notMeal" type="java.lang.Boolean" />
+<c:set var="calcDose100" value="${schemaMtl.calcDoseR[doseT]}" />
+<!-- ≅ ↔ ≈ -->
+
+<c:choose>
+	<c:when test="${empty ts}">
+		<fmt:formatNumber  pattern="#.####" value="${calcDose100}" />
+	</c:when>
+	<c:otherwise>
+<c:choose>
+	<c:when test="${'ivariable'==doseModT.tabName}">
+		<fmt:formatNumber var="doseValue" pattern="##" value="${calcDose100*(doseModT.mtlO.ivalue/100)}" />
+		<c:set var="procent" value="${doseModT.mtlO.ivalue}" />
+	</c:when>
+	<c:when test="${'dose'==doseModT.tabName and 'pc'==doseModT.mtlO.type}">
+		<fmt:formatNumber var="doseValue" pattern="##" value="${doseModT.mtlO.value}" />
+		<fmt:formatNumber var="procent" pattern="##" value="${doseModT.mtlO.value/schemaMtl.calcDose[doseT]*100}" />
+	</c:when>
+	<c:when test="${'dose'==doseModT.tabName and 'p'==doseModT.mtlO.type}">
+		<c:set var="fraction" value="${doseModT.mtlO.value/doseT.mtlO.value}" />
+		<fmt:formatNumber var="doseValue" pattern="##" value="${calcDose100*fraction}" />
+		<fmt:formatNumber var="procent" pattern="##" value="${fraction*100}" />
+	</c:when>
+	<c:when test="${empty calcDose100}">
+	<!--
+		<fmt:formatNumber var="doseValue" pattern="##" value="${doseT.mtlO.value}" />
+	-->
+		<c:choose>
+			<c:when test="${doseT.mtlO.valueInt}">
+				<fmt:formatNumber var="doseValue" pattern="##" value="${doseT.mtlO.value}" />
+			</c:when>
+			<c:otherwise>
+				<c:set var="doseValue"  value="${doseT.mtlO.value}" />
+			</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:otherwise><c:set var="doseValue" value="${calcDose100}"/></c:otherwise>
+</c:choose>
+
+<c:set var="isMealDose" value="${fn:contains(ts.timesT.mtlO.abs,'=')}"/>
+<c:set var="isMealDose" value="${notMeal?false:isMealDose}"/>
+<c:if test="${0.0==doseValue or 1.0>doseValue}">
+	<c:if test="${not empty doseModT}">
+		<c:choose>
+			<c:when test="${'ivariable'==doseModT.tabName}">
+		<fmt:formatNumber var="doseValue" pattern="#.####" value="${doseModT.mtlO.ivalue}" />
+			</c:when>
+			<c:otherwise>
+		<fmt:formatNumber var="doseValue" pattern="#.####" value="${doseModT.mtlO.value}" />
+			</c:otherwise>
+		</c:choose>
+	</c:if>
+</c:if>
+<c:set var="malInDay" value="1" />
+<c:choose>
+	<c:when test="${'day'==doseT.mtlO.pro}">
+		<spring:eval var="malInDay" expression="schemaMtl.malInDay(ts)" />
+		<fmt:formatNumber var="mealDoseValue" pattern="##" value="${doseValue/ malInDay}" />
+		${mealDoseValue}
+	</c:when>
+	<c:when test="${isMealDose}">
+		<c:set var="malN" 
+			value="${'day'!=doseT.mtlO.pro?malInDay:fn:length(fn:replace(fn:replace(ts.timesT.mtlO.abs,'=',''),'0',''))}" />
+		<fmt:formatNumber var="mealDoseValue" pattern="##.##" value="${doseValue/ malN}" />
+		<c:out value="${fn:replace(fn:replace(ts.timesT.mtlO.abs,'=','-'),'1',mealDoseValue)}"/>
+	</c:when>
+	<c:otherwise>${doseValue}</c:otherwise>
+</c:choose>
+
+<c:if test="${not empty procent }">
+	<c:out value=" " />
+	<span class="small">(${procent}%)</span>
+	<!--
+	<c:choose>
+		<c:when test="${'calcDoseProc'==view }">
+			<span class="small">(${procent}%)</span>
+		</c:when>
+		<c:otherwise>
+			<span class="small">(${procent}%≅${calcDose100})</span>
+		</c:otherwise>
+	</c:choose>
+	-->
+</c:if>
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

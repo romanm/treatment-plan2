@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<edit:ifThenElseIf />
+
+<table>
+	<c:choose>
+	<c:when test="${'then'==docMtl.editNodeT.mtlO.expr or 'else'==docMtl.editNodeT.mtlO.expr}">
+		<tr><td>
+		<select size="${fn:length(exprUnit.ifThenExpr)+2}" id="selectThenExpr" onchange="selectExpr(this);">
+			<optgroup label="Ausdruck">
+				<edit:exprOption list="${exprUnit.ifThenExpr}" className="expr" />
+			</optgroup>
+		</select>
+		</td>
+		<!-- 
+		</tr>
+		<tr>
+		 -->
+		<td>
+		<qhtm:a idt="${docMtl.editNodeT.id}" action="newThenDoseProcent">
+			<fmt:message key="mtl_dose_procent" />
+		</qhtm:a>
+		<c:out value=" | " />
+		<br/>
+		<qhtm:a idt="${docMtl.editNodeT.id}" action="newThenDose">
+			<fmt:message key="mtl_dose" />
+		</qhtm:a>
+		<c:out value=" | " />
+		<br/>
+		<qhtm:a idt="${docMtl.editNodeT.id}" action="newThenApp">
+			<fmt:message key="mtl_app" />
+		</qhtm:a>
+		<c:out value=" | " />
+		<br/>
+		<qhtm:a idt="${docMtl.editNodeT.id}" action="newThenDay">
+			<fmt:message key="mtl_day" />
+		</qhtm:a>
+		</td></tr>
+	</c:when>
+	<c:when test="${'andOrExpr'==docMtl.editNodeT.mtlO.expr}" />
+	<c:when test="${'forBegin'==docMtl.editNodeT.mtlO.value}" >
+		<tr><td>
+		<qhtm:a idt="${docMtl.editNodeT.id}" action="newForBeginDrug">
+		addDrug
+		</qhtm:a>
+		</td></tr>
+	</c:when>
+	<c:when test="${'equality'==docMtl.editNodeT.mtlO.expr}" >
+		<tr><td>
+		<select size="${fn:length(exprUnit.ruleLabors)+fn:length(exprUnit.ruleIfExpr)+2}" id="selectLogicalExpr" onchange="selectExpr(this);">
+			<optgroup label="Ausdruck">
+				<edit:exprOption list="${exprUnit.ruleIfExpr}" className="expr" />
+			</optgroup>
+			<optgroup label="Laborwert/Befund">
+				<edit:exprOption list="${exprUnit.ruleLabors}" className="labor" />
+			</optgroup>
+		</select>
+		<br/>
+		<c:if test="${docMtl.editIfT==docMtl.editNodeT.parentT }">
+			<qhtm:a idt="${docMtl.editNodeT.id}" action="andExpr">and</qhtm:a>
+			|
+			<qhtm:a idt="${docMtl.editNodeT.id}" action="orExpr">or</qhtm:a>
+		</c:if>
+		</td></tr>
+	</c:when>
+	
+	</c:choose>
+</table>
+
+</jsp:root>

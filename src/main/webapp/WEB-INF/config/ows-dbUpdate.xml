@@ -1,0 +1,760 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	"
+>
+
+<bean id="dbConfig" class="com.qwit.config.DbConfig">
+	<property name="userProtocol"	value="Benutzerschemata"/>
+	<property name="userPatient"	value="Benutzertestpatienten"/>
+</bean>
+
+<bean id="owsImportDao" class="com.qwit.service.JpaImportDao">
+	<property name="entityManagerFactory">
+		<bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+			<property name="dataSource" ref="dataSource2import" />
+			<property name="jpaVendorAdapter">
+				<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="dirDocCreator" class="com.qwit.service.DirDocCreator"/>
+
+<bean id="treeCreator" class="com.qwit.service.DbNodeCreator" />
+
+<bean id="docStatusCreator" p:tabName="pvariable" p:idclass="getIdclass1"  p:ref="getRef1" class="com.qwit.service.DbNodeCreator" ><property name="childsL"><list>
+	<bean p:tabName="task" p:idclass="getIdclass2" p:setTree="setTree2" class="com.qwit.service.DbNodeCreator" />
+	<bean p:tabName="notice" p:idclass="getIdclass3" class="com.qwit.service.DbNodeCreator" />
+</list></property></bean>
+
+<bean id="drugModCreator" p:tabName="notice" class="com.qwit.service.DbNodeCreator" ><property name="childsL"><list>
+	<bean p:tabName="task" p:idclass="getIdclass1" p:ref="getRef1" class="com.qwit.service.DbNodeCreator" ><property name="childsL"><list>
+		<bean p:tabName="drug" p:idclass="getIdclass2" p:ref="getRef2" p:setTree="setTree2" class="com.qwit.service.DbNodeCreator" />
+	</list></property></bean>
+</list></property></bean>
+
+<bean id="doseModTaskCreator" p:tabName="dose" p:idclass="getIdclass1" p:ref="getRef1" class="com.qwit.service.DbNodeCreator" ><property name="childsL"><list>
+	<bean p:tabName="pvariable" p:idclass="getIdclass2" p:setTree="setTree2" class="com.qwit.service.DbNodeCreator" >
+	</bean></list></property>
+</bean>
+<bean id="doseModDayCreator" p:tabName="day" class="com.qwit.service.DbNodeCreator">
+	<property name="childsL"><list>
+		<ref bean="doseModTaskCreator"/>
+	</list></property>
+</bean>
+
+<bean id="doseModCreator" p:tabName="notice" p:ref="getRef1" class="com.qwit.service.DoseModCreator"><property name="childsL"><list>
+	<bean p:tabName="task" p:idclass="getIdclass1" p:ref="getRef2" class="com.qwit.service.DbNodeCreator" ><property name="childsL"><list>
+		<bean p:tabName="pvariable" class="com.qwit.service.DbNodeCreator" />
+		<bean p:tabName="drug" p:idclass="getIdclass2" class="com.qwit.service.DbNodeCreator" ><property name="childsL"><list>
+			<bean p:tabName="dose" p:idclass="getIdclass3" p:ref="getRef1" class="com.qwit.service.DbNodeCreator" ><property name="childsL"><list>
+				<bean p:tabName="pvariable" p:idclass="getIdclass4" p:setTree="setTree1" class="com.qwit.service.DbNodeCreator" >
+				</bean></list></property>
+			</bean></list></property>
+		</bean></list></property>
+	</bean></list></property>
+</bean>
+
+<bean id="nodeCreator"	class="com.qwit.service.TaskNodeCreator"/>
+<bean id="nodeNoticeCreator"	p:tabName="notice"	class="com.qwit.service.TaskNodeCreator"/>
+<bean id="taskNoticeCreator"	p:tabName="notice"	class="com.qwit.service.TaskNodeCreator"><property name="childsL"><list>
+	<ref bean="dayTimesCreator"/>
+	</list> </property>
+</bean>
+
+<!-- Task1 element -->
+<bean id="taskDrugCreator" p:tabName="drug" p:idclass="getIdclass1" class="com.qwit.service.TaskNodeCreator"><property name="childsL"><list>
+		<bean p:tabName="dose" class="com.qwit.service.DbNodeCreator" />
+		<ref bean="dayTimesCreator"/>
+	</list> </property>
+</bean>
+<bean id="drugDrugCreator" p:tabName="drug" class="com.qwit.service.TaskNodeCreator"><property name="childsL"><list>
+	<bean p:tabName="dose" class="com.qwit.service.DbNodeCreator" /></list></property>
+</bean>
+<bean id="taskLaborCreator" p:tabName="labor" class="com.qwit.service.TaskNodeCreator"><property name="childsL"><list>
+	<ref bean="dayTimesCreator"/>
+	</list></property>
+</bean>
+<bean id="taskFindingCreator" p:tabName="finding" class="com.qwit.service.TaskNodeCreator"><property name="childsL"><list>
+	<ref bean="dayTimesCreator"/>
+	</list></property>
+</bean>
+<bean id="dayTimesCreator" p:tabName="day" class="com.qwit.service.TaskNodeCreator"> <property name="childsL"> <list>
+	<bean p:tabName="times" class="com.qwit.service.DbNodeCreator" /> </list> </property>
+</bean>
+
+<bean id="findFolderWithName" p:tabName="task" class="com.qwit.service.DbNodeCreator">
+	<property name="findSelect" value="select t1.* from tree t1,folder f1 where t1.id=f1.idfolder and f1.folder=:param1" />
+</bean>
+
+<bean id="ruleCreator" p:tabName="expr" p:idclass="getIdclass1" class="com.qwit.service.TaskNodeCreator"><property name="childsL"><list><!-- if -->
+	<bean p:tabName="expr" p:idclass="getIdclass2" class="com.qwit.service.DbNodeCreator" ><property name="childsL"><list><!-- eq -->
+		<bean p:tabName="expr" p:idclass="getIdclass3" class="com.qwit.service.DbNodeCreator" /><!-- expr1 -->
+		<bean p:tabName="expr" p:idclass="getIdclass4" class="com.qwit.service.DbNodeCreator" ><property name="childsL"><list><!-- expr2 -->
+			<bean p:tabName="pvariable" p:idclass="getIdclass5" class="com.qwit.service.DbNodeCreator" /><!-- ? pvalue -->
+			</list></property>
+		</bean></list></property>
+	</bean>
+	<bean p:tabName="expr" p:idclass="getIdclass6" class="com.qwit.service.DbNodeCreator" /><!-- then -->
+	</list></property>
+</bean>
+
+
+<!-- ******************************************************
+
+	PROTOCOL DOCUMENT CREATORS
+
+*********************************************************** -->
+<bean id="instituteCreator" class="com.qwit.service.DbInstituteCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"institute",'||t1.id||')' AS u1,
+'INSERT INTO institute 
+	(idinstitute,
+	institute) VALUES 
+	('||currval('dbid')||',
+	"?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='institute'
+					</value>
+					<!-- 
+					<value>
+						select 
+						'INSERT INTO tree (id,idclass,tab_name,did) VALUES 
+						(
+							'||nextval('dbid')||','||currval('dbid')||',"institute",'||t1.id||'
+						)' 
+						AS u1,
+						'INSERT INTO institute 
+						(
+							idinstitute,institute,city,zip,street,country, 
+							phone, fax, styletask, shortname, taskstart, 
+							dose_round_percent, morning, noon, evening, night, 
+							bsaformula, daysintensive, newtherapydayhour, 
+							oldtimescalc, printpaper, pl_task_show, task_ed_dtt, 
+							task_cycle_template, taskstart_hide
+						)
+						VALUES
+						(
+							'||currval('dbid')||',
+							"?","?","?","?","?","?","?","?","?","?","?",
+							"?","?","?","?","?","?","?","?","?","?","?",
+							"?","?","?"
+						)'
+						AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='institute'
+					</value>
+					 -->
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="checkitemCreator" class="com.qwit.service.DbCheckitemCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"checkitem",'||t1.id||')' AS u1
+,'INSERT INTO checkitem 
+	(idcheckitem,checkitem,type)VALUES
+	('||currval('dbid')||',"?","?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='checkitem'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="protocolCreator" class="com.qwit.service.DbProtocolCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+		<!-- 
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"protocol",'||t1.id||')' AS u1
+,'INSERT INTO protocol 
+	(idprotocol,protocol,protocolvar,protocoltype,phase,prospective,randomized
+	,expansion,indication,infostatus,intention,status,studynumber
+	,starttime,enddate,starttext,stand,amendment,amendmentnr,infodate,longname) VALUES
+	('||currval('dbid')||',"?","?","?","?","?","?"
+	,"?","?","?","?","?","?"
+	,"?","?","?","?","?","?","?","?")' 
+AS u2 FROM tree t1, folder f1,folder f0 WHERE t1.id=f1.idfolder and f1.folder='protocol' AND f0.idfolder=f1.fdid AND f0.folder='folder'
+					</value>
+				</list>
+			</property>
+		 -->
+		</bean>
+	</property>
+</bean>
+
+<bean id="personroleCreator" class="com.qwit.service.DbPersonroleCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"personrole",'||t1.id||')' AS u1
+,'INSERT INTO Personrole 
+	(idPersonrole,Personrole) VALUES
+	('||currval('dbid')||',"?")' AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='personrole'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="armCreator" class="com.qwit.service.DbArmCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"studyarm",'||t1.id||')' AS u1
+,'INSERT INTO studyarm 
+	(idstudyarm,studyarm) VALUES
+	('||currval('dbid')||',"?")' AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='studyarm'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="checklistCreator" class="com.qwit.service.DbChecklistCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"checklist",'||t1.id||')' AS u1
+,'INSERT INTO checklist 
+	(idchecklist,checklist,type) VALUES
+	('||currval('dbid')||',"?","?")' AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='checklist'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="documentCreator" class="com.qwit.service.DbDocumentCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"document",'||t1.id||')' AS u1
+,'INSERT INTO document 
+	(iddocument,
+	document,contenttype,filename,type,url) VALUES
+	('||currval('dbid')||',
+	"?","?","?","?","?")' AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='document'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="contactpersonCreator" class="com.qwit.service.DbContactpersonCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	( id,idclass,tab_name,did) VALUES 
+	( '||nextval('dbid')||','||currval('dbid')||',"contactperson",'||t1.id||')' AS u1,
+'INSERT INTO contactperson 
+	( idcontactperson, 
+	contactperson, phone, mobil, note, email, fax, forename, title) VALUES
+	( '||currval('dbid')||',
+	"?", "?", "?", "?", "?", "?", "?", "?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='contactperson'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="diagnoseCreator" class="com.qwit.service.DbDiagnoseCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	( id,idclass,tab_name,did) VALUES 
+	( '||nextval('dbid')||','||currval('dbid')||',"diagnose",'||t1.id||')' AS u1,
+'INSERT INTO diagnose 
+	( iddiagnose, 
+	diagnose) VALUES
+	( '||currval('dbid')||',
+	"?")' 
+	AS u2 FROM tree t1, folder f1,folder f0 where t1.id=f1.idfolder and f1.folder='diagnose' AND f0.idfolder=f1.fdid AND f0.folder='folder'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<!-- ******************************************************
+
+	 SCHEMA DOCUMENT CREATORS  
+
+*********************************************************** -->
+<bean id="literatureCreator" class="com.qwit.service.DbLiteratureCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"literature",'||t1.id||')' AS u1 ,
+'INSERT INTO literature 
+	(idliterature,
+	title,authors,spring,springtype,page,year,volume,url) VALUES
+	('||currval('dbid')||',
+	"?","?","?","?","?","?","?","?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='literature'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="findingCreator" class="com.qwit.service.DbFindingCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"finding",'||t1.id||')' AS u1
+,'INSERT INTO finding 
+	(idfinding,
+	finding,unit)VALUES
+	('||currval('dbid')||',
+	"?","?")' 
+	AS u2 FROM tree t1, folder f1,folder f0 WHERE t1.id=f1.idfolder and f1.folder='finding' AND f0.idfolder=f1.fdid AND f0.folder='folder'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="urlCreator" class="com.qwit.service.DbUrlCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"url",'||t1.id||')' AS u1
+,'INSERT INTO url (idurl,url,text)VALUES
+	('||currval('dbid')||',"?","?")' 
+	AS u2 FROM tree t1, folder f1,folder f0 WHERE t1.id=f1.idfolder and f1.folder='url' AND f0.idfolder=f1.fdid AND f0.folder='folder'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="laborCreator" class="com.qwit.service.DbLaborCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"labor",'||t1.id||')' AS u1
+,'INSERT INTO labor 
+	(idlabor,
+	labor,unit,type)VALUES
+	('||currval('dbid')||',
+	"?","?","?")' 
+	AS u2 FROM tree t1, folder f1,folder f0 WHERE t1.id=f1.idfolder and f1.folder='labor' AND f0.idfolder=f1.fdid AND f0.folder='folder'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="taskCreator" class="com.qwit.service.DbTaskCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"task",'||t1.id||')' AS u1
+,'INSERT INTO task 
+	(idtask,
+	task,type,taskvar,duration)VALUES
+	('||currval('dbid')||',
+	"?","?","?","?")' 
+	AS u2 FROM tree t1, folder f1,folder f0 
+	WHERE t1.id=f1.idfolder and f1.folder='task' AND f0.idfolder=f1.fdid AND f0.folder='folder'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="symptomCreator" class="com.qwit.service.DbSymptomCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"symptom",'||t1.id||')' AS u1 ,
+'INSERT INTO symptom 
+	(idsymptom,
+	symptom,type,unit)VALUES
+	('||currval('dbid')||',
+	"?","?","?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='symptom'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="appCreator" class="com.qwit.service.DbAppCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"app",'||t1.id||')' AS u1,
+'INSERT INTO app 
+	(idapp,	appapp,unit)VALUES
+	('||currval('dbid')||',	"?","?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='app'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+<bean id="exprCreator" class="com.qwit.service.DbExprCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"expr",'||t1.id||')' AS u1, 
+'INSERT INTO expr 
+	(idexpr,
+	expr,value,unit,type)VALUES
+	('||currval('dbid')||',
+	"?","?","?","?")'
+	AS u2 from tree t1, folder f1,folder f0 where t1.id=f1.idfolder and f1.folder='expr' AND f0.idfolder=f1.fdid AND f0.folder='folder'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="tabletCreator" class="com.qwit.service.DbTabletCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"tablet",'||t1.id||')' AS u1 ,
+'INSERT INTO tablet 
+	(idtablet,
+	value,portion,unit,type)VALUES
+	('||currval('dbid')||',
+	"?","?","?","?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='tablet'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+<bean id="doseCreator" class="com.qwit.service.DbDoseCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"dose",'||t1.id||')' AS u1 ,
+'INSERT INTO dose 
+	(iddose,
+	value,unit,app,pro,type)VALUES
+	('||currval('dbid')||',
+	"?","?","?","?","?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='dose'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+<bean id="dayCreator" class="com.qwit.service.DbDayCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"day",'||t1.id||')' AS u1 ,
+'INSERT INTO day 
+	(idday,
+	abs,newtype) VALUES 
+	('||currval('dbid')||',
+	"?","?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='day'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+<bean id="drugCreator" class="com.qwit.service.DbDrugCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did,iddoc) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"drug",'||t1.id||',"?")' AS u1 ,
+'INSERT INTO drug 
+	(iddrug,drug,idgeneric) VALUES 
+	('||currval('dbid')||',"?","?")' 
+AS u2 FROM tree t1, folder f1,folder f0 WHERE t1.id=f1.idfolder and f1.folder='chemo' AND f0.idfolder=f1.fdid AND f0.folder='drug'
+					</value>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did,iddoc) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"drug",'||t1.id||',"?")' AS u1 ,
+'INSERT INTO drug 
+	(iddrug,drug,idgeneric) VALUES 
+	('||currval('dbid')||',"?","?")' 
+AS u2 FROM tree t1, folder f1,folder f0 WHERE t1.id=f1.idfolder and f1.folder='support' AND f0.idfolder=f1.fdid AND f0.folder='drug'
+					</value>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did,iddoc) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"drug",'||t1.id||','||currval('dbid')||')' AS u1 ,
+'INSERT INTO drug 
+	(iddrug, drug,idgeneric) VALUES 
+	('||currval('dbid')||',"?",'||currval('dbid')||')' 
+AS u2 FROM tree t1, folder f1,folder f0 WHERE t1.id=f1.idfolder and f1.folder='chemo' AND f0.idfolder=f1.fdid AND f0.folder='drug'
+					</value>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did,iddoc) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"drug",'||t1.id||','||currval('dbid')||')' AS u1 ,
+'INSERT INTO drug 
+	(iddrug, drug,idgeneric) VALUES 
+	('||currval('dbid')||',"?",'||currval('dbid')||')' 
+AS u2 FROM tree t1, folder f1,folder f0 WHERE t1.id=f1.idfolder and f1.folder='support' AND f0.idfolder=f1.fdid AND f0.folder='drug'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+<bean id="timesCreator" class="com.qwit.service.DbTimesCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"times",'||t1.id||')' AS u1
+,'INSERT INTO times 
+	(idtimes,
+	abs) VALUES 
+	('||currval('dbid')||',
+	"?")' AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='times'
+					</value>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"times",'||t1.id||')' AS u1,
+'INSERT INTO times 
+	(idtimes,
+	relunit,apporder,visual,relvalue ) VALUES 
+	('||currval('dbid')||',
+	"?","?","?","?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='times'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="pvCreator" class="com.qwit.service.DbPvariableCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"pvariable",'||t1.id||')' AS u1,
+'INSERT INTO pvariable 
+	(idpvariable,
+	pvariable,pvalue,unit)VALUES
+	('||currval('dbid')||',
+	"?","?","?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='pvariable'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="nvCreator" class="com.qwit.service.DbNvariableCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"nvariable",'||t1.id||')' AS u1,
+'INSERT INTO nvariable 
+	(idnvariable,nvariable,nvalue)VALUES
+	('||currval('dbid')||',"?","?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='nvariable'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="ivCreator" class="com.qwit.service.DbIvariableCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"ivariable",'||t1.id||')' AS u1,
+'INSERT INTO ivariable 
+	(idivariable,ivariable,ivalue)VALUES
+	('||currval('dbid')||',"?","?")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='ivariable'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="procent100" p:pvar="percent" p:pval="100" p:unt="%" class="com.qwit.service.DbPvariableCreator"/>
+
+<bean id="noticeCreator" class="com.qwit.service.DbNoticeCreator">
+	<property name="dbUpdate">
+		<bean class="com.qwit.service.DbUpdate">
+			<property name="sqlL">
+				<list>
+					<value>
+select 'INSERT INTO tree 
+	(id,idclass,tab_name,did) VALUES 
+	('||nextval('dbid')||','||currval('dbid')||',"notice",'||t1.id||')' AS u1,
+'INSERT INTO notice 
+	(idnotice,
+	notice,type)VALUES
+	('||currval('dbid')||',
+	"""?""","""?""")' 
+	AS u2 from tree t1, folder f1 where t1.id=f1.idfolder and f1.folder='notice'
+					</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+<bean id="testPatientCreator" p:tabName="task" class="com.qwit.service.DbNodeCreator">
+	<property name="dbUpdate">
+		<bean id="testPatient" class="com.qwit.service.DbUpdate" p:date="2010-05-02 04:04:08">
+			<property name="ifNotDbObj" 
+			value="SELECT t2.* FROM Tree t2, Folder f1, Folder f2 
+						 WHERE f1.folder='patient' AND f2.folder='testPatient' 
+						 AND f1.idfolder=f2.fdid AND t2.id=f2.idfolder"/>
+			<property name="sqlL">
+				<list>
+					<value>SELECT 'INSERT INTO tree (id,tab_name,did,idclass,iddoc) VALUES
+					('||nextval('dbid')||',"folder",'||idfolder||','||currval('dbid')||','||t1.iddoc||')'
+					FROM folder f1,tree t1 WHERE f1.folder='patient' AND t1.id=f1.idfolder</value>
+					<value>SELECT 'INSERT INTO folder (idfolder,folder,fdid,reada,writea) 
+					VALUES ('||currval('dbid')||',"testPatient",'||f1.idfolder||',32,32)' 
+					FROM folder f1, tree t1,history 
+					WHERE f1.folder='patient' AND t1.id=f1.idfolder AND t1.id=idhistory;</value>
+					<value>SELECT 'INSERT INTO history (idhistory,mdate,idauthor) 
+					VALUES ('||currval('dbid')||',"'||now()||'",'||idauthor||')'
+					FROM folder f1, tree t1,history 
+					WHERE f1.folder='patient' AND t1.id=f1.idfolder AND t1.id=idhistory;</value>
+				</list>
+			</property>
+		</bean>
+	</property>
+</bean>
+
+</beans>

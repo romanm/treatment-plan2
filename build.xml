@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ows.setup" default="jsp.copy">
+	<property name="targetWarDir" location="target/sokrathes1"/>
+	<target name="jsp.copy" description="Fast jsp deploy">
+		<copy todir="${targetWarDir}">
+			<fileset dir="src/main/webapp"/>
+		</copy>
+		<copy todir="${targetWarDir}/WEB-INF/classes">
+			<fileset dir="src/main/resources"/>
+		</copy>
+	</target>
+
+	<property name="srcConfigFolder" location="src/main/webapp/WEB-INF/config" />
+	<property name="srcTmpFolder" location="src/main/webapp/WEB-INF/config/tmp" />
+	<property name="resourcesFolder" location="src/main/resources" />
+	
+	<target name="mvn.packagge" description="exec mvn package">
+		<exec executable="mvn">
+			<arg value="package"/>
+		</exec>
+	</target>
+	<!-- make AMQP server -->
+	<target name="config.amqp.server" description="make a Qtoo installation as AMQP server">
+		<copy 	tofile="${srcConfigFolder}/rabbitmq-config.xml"
+				file="${srcTmpFolder}/rabbitmq-server-config.xml" overwrite="true"/>
+	</target>
+	<target name="config.amqp.client" description="make a Qtoo installation as AMQP client">
+		<copy 	tofile="${srcConfigFolder}/rabbitmq-config.xml"
+				file="${srcTmpFolder}/rabbitmq-client-config.xml" overwrite="true"/>
+	</target>
+	
+	<target name="config.amqp.connection.gpoh" description="make gpoh connection channel for either AMQP server or client">
+			<copy 	tofile="${resourcesFolder}/rabbitmq.properties"
+					file="${srcTmpFolder}/rabbitmq-gpoh.properties" overwrite="true"/>
+	</target>
+	<target name="config.amqp.connection.fuchs4" description="make fuchs4 connection channel for either AMQP server or client">
+			<copy 	tofile="${resourcesFolder}/rabbitmq.properties"
+					file="${srcTmpFolder}/rabbitmq-fuchs4.properties" overwrite="true"/>
+	</target>
+	<target name="config.amqp.connection.fuchs4.localhost.debug" description="make connection to fuchs4 db on localhost for either AMQP server or client">
+			<copy 	tofile="${resourcesFolder}/rabbitmq.properties"
+					file="${srcTmpFolder}/rabbitmq-fuchs4-localhost.properties" overwrite="true"/>
+	</target>
+	
+</project>

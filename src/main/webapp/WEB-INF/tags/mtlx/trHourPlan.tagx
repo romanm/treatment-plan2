@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="dayDrugT" type="com.qwit.domain.Tree" required="true" description="The drug tree object"/>
+<jsp:directive.attribute name="doseT" type="com.qwit.domain.Tree" required="true" description="The dose tree object"/>
+<jsp:directive.attribute name="dayIntensiv"	type="java.lang.Integer" required="true"/>
+
+<c:set var="dayDrugM"
+				value="${docMtl.hourPlan.intensivDayDrugHourM[dayIntensiv]}" />
+<tr class="group">
+	<c:choose>
+		<c:when test="${'drug'==dayDrugT.tabName}">
+			<td class="alignleft"><mtl:drug drugT="${dayDrugT}" /></td>
+			<td></td>
+			<td class="alignleft">
+				<mtl:doseApp doseT="${doseT}"/>
+				<spring:eval var="appT" expression="jxp.getApp(dayDrugT)" />
+				<c:if test="${not empty appT}">
+					<c:out value=" " />
+					<mtl:appAppTempo appT="${appT}"/>
+				</c:if>
+			</td>
+		</c:when>
+		<c:otherwise>
+			<td class="alignleft" colspan="3"><mtl:drug drugT="${dayDrugT}" /></td>
+		</c:otherwise>
+	</c:choose>
+	<c:forEach var="hour" begin="0" end="23">
+		<td>
+		${dayDrugM[dayDrugT][hour]}
+		</td>
+	</c:forEach>
+</tr>
+<spring:eval var="ddrugs" expression="jxp.childs(dayDrugT, 'drug')" />
+<c:forEach var="ddrugP" items="${ddrugs}">
+	<c:set var="ddrugT" value="${ddrugP.value }" />
+	<spring:eval var="ddoseT" expression="docMtl.getDrugDoseT(ddrugT)" />
+	<tr>
+		<td class="alignleft">+<mtl:drug drugT="${ddrugT}" /></td>
+		<td></td>
+		<td class="alignleft">
+		</td>
+		<c:forEach var="hour" begin="0" end="23"><td></td></c:forEach>
+	</tr>
+</c:forEach>
+</jsp:root>

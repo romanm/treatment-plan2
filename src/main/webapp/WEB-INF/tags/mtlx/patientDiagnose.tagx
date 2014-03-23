@@ -1,0 +1,51 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="diagnoseT" type="com.qwit.domain.Tree" description="The task tree object"/>
+
+<c:choose>
+	<c:when test="${empty diagnoseT }">
+		<c:choose>
+			<c:when test="${empty schemaMtl and not empty patientMtl}">
+				<span class="red">
+					<a href="patientflow?id=${docMtl.docT.id}&amp;a=patientDiagnose">
+						?____________________
+					</a>
+				</span>
+			</c:when>
+			<c:when test="${not empty schemaMtl and not empty patientMtl}">
+				<span class="red">
+					<a href="schemaflow?id=${docMtl.docT.id}&amp;a=patientDiagnose">
+						?____________________
+					</a>
+				</span>
+			</c:when>
+			<c:when test="${not empty schemaMtl}">
+				?________________
+			</c:when>
+			<!--
+			<c:otherwise>
+				<qhtm:a idt="${doseT.id}" action="patientDiagnose">
+					?________________
+				</qhtm:a>
+			</c:otherwise>
+			 -->
+		</c:choose>
+	</c:when>
+	<c:otherwise>
+		<qhtm:a idt="${doseT.id}" action="patientDiagnose">
+		<c:out value="${diagnoseT.mtlO.diagnose }" />
+		<c:forEach var="noticeT" items="${diagnoseT.childTs }">
+			<c:if test="${'notice'==noticeT.tabName }">
+				<c:out value=", " />
+				${noticeT.mtlO.notice }
+			</c:if>
+		</c:forEach>
+		</qhtm:a>
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

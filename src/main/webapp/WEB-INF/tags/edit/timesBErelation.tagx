@@ -1,0 +1,33 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<jsp:directive.attribute name="ts"	type="com.qwit.domain.Ts" required="true"/>
+<c:choose>
+	<c:when test="${empty ts.timesT.mtlO.relunit or 'S'==ts.timesT.mtlO.relunit}">
+	</c:when>
+	<c:otherwise>
+${ts.timesT.mtlO.relvalue}
+<fmt:message key="ui_times_${ts.timesT.mtlO.relunit}"/>
+	</c:otherwise>
+</c:choose>
+<c:set var="refTimesT" value="${docMtl.tree[ts.timesT.ref]}"/>
+<c:if test="${not empty refTimesT}">
+<spring:eval var="rn" expression="docMtl.getTimesTs(refTimesT,1).getNr()" />
+<c:choose>
+	<c:when test="${ts.timesT.mtlO.apporder=='0'}">${rn}></c:when>
+	<c:when test="${ts.timesT.mtlO.apporder=='2'}">>${rn}></c:when>
+	<c:when test="${ts.timesT.mtlO.apporder=='3'}">>${rn}</c:when>
+	<c:when test="${ts.timesT.mtlO.apporder=='1'}">&lt;${rn}</c:when>
+</c:choose>
+</c:if>
+
+</jsp:root>

@@ -1,0 +1,29 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/fn"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+<jsp:directive.attribute name="varT" type="com.qwit.domain.Tree" required="true" description=""/>
+<jsp:directive.attribute name="unit" description=""/>
+
+<c:forEach  var="valueT" items="${varT.childTs}">
+	<c:choose>
+		<c:when test="${valueT.tabName=='nvariable'}">
+			<c:set var="nvalueO" value="${valueT.mtlO}" />
+			${nvalueO.nvalue} ${unit}
+			<c:set var="gfrLaborValueT" value="${valueT}" scope="request" />
+		</c:when>
+		<c:when test="${valueT.tabName=='ivariable'}">
+			<c:set var="ivalueO" value="${valueT.mtlO}" />
+			${ivalueO.ivalue} ${unit}
+		</c:when>
+		<c:when test="${valueT.tabName=='pvariable'}">
+			<c:set var="pvalueO" value="${valueT.mtlO}" />
+			<c:if test="${pvalueO.pvariable==varT.tabName}">
+				${pvalueO.pvalue} ${unit}
+			</c:if>
+		</c:when>
+	</c:choose>
+</c:forEach>
+
+</jsp:root>

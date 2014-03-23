@@ -1,0 +1,27 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:spring="http://www.springframework.org/tags" 
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx" 
+>
+<jsp:directive.attribute name="drugT" type="com.qwit.domain.Tree" required="true" description="The drug tree object"/>
+<mtl:drugName drugT="${drugT}" />
+<c:if test="${formUtil.mode=='confirmDrug' and schemaMtl.editNodeT.id==drugT.id}">
+	<span style="color: red;">/${schemaMtl.editTradeC.drug}?</span>
+</c:if>
+<c:if test="${formUtil.mode=='newTrade' and schemaMtl.editNodeT.id==drugT.id}">
+	<span style="color: red;">/${schemaMtl.editTradeC.drug}?</span>
+</c:if>
+<c:if test="${formUtil.mode=='newDrug' and schemaMtl.editNodeT.id==drugT.id}">
+	<span style="color: red;">/${schemaMtl.editDrugC.drug}?</span>
+</c:if>
+<c:if test="${withDose}">
+	<spring:eval var="doseT" expression="jxp.getDose(drugT)" />
+	<c:if test="${fn:indexOf(doseT.mtlO.unit,'/')>0}">
+		<c:set var="unit"><mtl:doseUnit doseT="${doseT}"/></c:set>
+		<c:set var="doseValue"><mtl:doseValue doseT="${doseT}"/></c:set>
+		<span class="small">(${fn:trim(doseValue)} ${fn:trim(unit)})</span>
+	</c:if>
+</c:if>
+
+</jsp:root>

@@ -1,0 +1,29 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+
+<h3><a href="${user_url}?idt=${docMtl.docT.idClass}"><fmt:message key="uiDocStatus"/></a></h3>
+
+<form:form id="f2" modelAttribute="formUtil">
+	<form:select path="pvO.pvalue" size="6">
+		<option value="test"><fmt:message key="pv_infostatus_test" /></option>
+		<option class="red" value="work">
+			<fmt:message key="pv_infostatus_work" /></option>
+		<option class="yellow" selected="selected" value="submitted1">
+			<fmt:message key="pv_infostatus_submitted1" /></option>
+		<option class="yellow" value="submitted">
+			<fmt:message key="pv_infostatus_submitted" /></option>
+		<option class="green" value="ok"><fmt:message key="pv_infostatus_ok" /></option>
+		<option value="old"><fmt:message key="pv_infostatus_old" /></option>
+	</form:select>
+	<owsui:htmlEditor notice="${docMtl.editNoticeC.notice}"/>
+	<form:hidden id="inputNotice" path="editNoticeC.notice"/>
+	<input type="submit" name="_eventId_save"	value="${ui_button_save}"	onclick="setNotice()" />
+	<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}"/>
+</form:form>
+
+</jsp:root>

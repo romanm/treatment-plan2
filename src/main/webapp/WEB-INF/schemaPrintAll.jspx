@@ -1,0 +1,39 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<div id="content">
+	<div style="float: right;" class="small" >
+		<fmt:message key="ui_begin" />:
+		<fmt:setLocale value="de" scope="session" />
+		<fmt:formatDate value="${schemaMtl.ofDate.mdate}" type="both" dateStyle="short" timeStyle="short" />
+	</div>
+	<h2><a href="showr?id=${schemaMtl.docT.id}&amp;part=ed" >
+		<qhtm:spanSchemaName taskO="${schemaMtl.docT.mtlO}"/>
+	</a></h2>
+	<mtl:schemaTaskList blockT="${schemaMtl.docT}"/>
+	<h2><a href="showr?id=${schemaMtl.docT.id}&amp;part=week" >
+		<qhtm:spanSchemaName taskO="${schemaMtl.docT.mtlO}"/>
+	</a></h2>
+	<mtl:weekTable taskT="${schemaMtl.docT}"/>
+
+	<!-- new page -->
+	<h2 style="page-break-before: always;">
+	<a href="showr?id=${schemaMtl.docT.id}&amp;part=plan" >
+		<qhtm:spanSchemaName taskO="${schemaMtl.docT.mtlO}"/>
+	</a></h2>
+	<mtl:dayPlan/>
+	
+	<h2><a href="showr?id=${schemaMtl.docT.id}&amp;part=info" >
+		<qhtm:spanSchemaName taskO="${schemaMtl.docT.mtlO}"/>
+	</a></h2>
+	<!-- 
+	<div style="-moz-column-count:2;-moz-column-gap:1.5em;text-align:justify;">
+	-->
+	<div>
+		<mtl:alienNotice />
+	</div>
+</div>
+
+</jsp:root>

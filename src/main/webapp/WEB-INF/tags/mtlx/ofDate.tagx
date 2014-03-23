@@ -1,0 +1,25 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/fn"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:mtl="http://java.sun.com/jsp/jstl/mtlx"
+>
+<jsp:directive.attribute name="historyT"	type="com.qwit.domain.Tree" required="true" description=""/>
+<jsp:directive.attribute name="patientMtl"	type="com.qwit.model.PatientMtl"	required="true" description=""/>
+
+<c:set var="ofDateT" value="${patientMtl.ofDateM[historyT]}" />
+<fmt:formatDate value="${ofDateT.history.mdate}" dateStyle="short"/>
+<fmt:formatDate value="${ofDateT.history.mdate}" pattern="kk:mm"/>
+<!--
+<c:forEach items="${historyT.childTs}" var="pv">
+	<c:if test="${pv.tabName=='pvariable'}">
+		<c:set var="ofDate" value="${patientMtl.classM[pv.idClass]}" />
+		<c:if test="${ofDate.pvariable=='ofDate'}">
+			<fmt:formatDate value="${pv.history.mdate}" dateStyle="short"/>
+			<fmt:formatDate value="${pv.history.mdate}" pattern="kk:mm"/>
+		</c:if>
+	</c:if>
+</c:forEach>
+ -->
+
+ </jsp:root>

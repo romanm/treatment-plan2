@@ -1,0 +1,118 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="patientTaskT" type="com.qwit.domain.Tree" required="true"
+	description="Patient task tree object"/>
+<jsp:directive.attribute name="therapyChange" type="java.util.Map" required="true"
+	description="Therapy change map"/>
+<c:if test="${not empty patientTaskT}">
+	<spring:eval var="therapyChangePI" expression="jxp.var('notice').var('therapyChange')
+					.jxpip(patientTaskT,'childTs[tabName=$notice and mtlO/type=$therapyChange]')" />
+	<spring:eval var="therapyDrugPI" expression="jxp.var('drug')
+					.jxpip(patientTaskT,'childTs[tabName=$drug]')" />
+</c:if>
+<c:forEach var="therapyDrugP" items="${therapyDrugPI}" varStatus="stat">
+	<qhtm:tag name="span" prefix="dr_" tree="${therapyDrugP.value}">
+		<mtl:drugName drugT="${therapyDrugP.value}" />
+	</qhtm:tag>
+	<c:out value=" " />
+	<c:forEach items="${therapyDrugP.value.childTs}" var="thenElseT">
+		<c:choose>
+			<c:when test="${'expr'==thenElseT.tabName }">
+				<c:forEach items="${thenElseT.childTs}" var="ruleElT">
+					<c:choose>
+						<c:when test="${'dose'==ruleElT.tabName}">
+						<qhtm:tag name="span" prefix="dose_" tree="${ruleElT}">
+							<mtl:doseValue doseT="${ruleElT}"/>
+							<mtl:doseUnit doseT="${ruleElT}"/>
+							<c:if test="${ruleElT.mtlO.pro=='day'}">/d</c:if>
+						</qhtm:tag>
+						<c:out value=" " />
+						</c:when>
+						<c:when test="${'app'==ruleElT.tabName}">
+							<qhtm:tag name="span" prefix="app_" tree="${ruleElT}">
+								<spring:message code="uiTempo"/> 
+								<c:out value=" " />
+								<mtl:appAppTempo appT="${ruleElT}"/>
+							</qhtm:tag>
+						</c:when>
+						<c:when test="${'ivariable'==ruleElT.tabName and 'taskTsNr'==ruleElT.mtlO.ivariable}">
+							<c:set var="gabeNr" value=" Appl. ${ruleElT.mtlO.ivalue}" />
+							<!-- 
+							<c:set var="gabeNr" value=" Gabe ${ruleElT.mtlO.ivalue}" />
+							 -->
+						</c:when>
+					</c:choose>
+				</c:forEach>
+			</c:when>
+		</c:choose>
+		${gabeNr}
+	</c:forEach>
+	
+	<br/>
+</c:forEach>
+<c:forEach var="therapyChangeP" items="${therapyChangePI}" varStatus="stat">
+	<c:if test="${not empty schemaMtl and stat.count==1 }">
+		Dosis modifikation:<br/>
+	</c:if>
+	<qhtm:tag name="span" prefix="tc_" tree="${therapyChangeP.value}">
+		${therapyChangeP.value.mtlO.notice}
+		<c:if test="${empty therapyChangeP.value.mtlO.notice}">
+			?____________________
+		</c:if>
+		.
+	</qhtm:tag>
+	<c:forEach var="therapyChangeElT" items="${therapyChangeP.value.childTs}">
+		<c:choose>
+			<c:when test="${ref!=therapyChangeElT.ref }">
+				${doseChange}
+				<c:out value="${not empty doseChange?', ':''}" />
+				<c:set var="tcMap" value="${therapyChange[therapyChangeElT.ref]}" />
+				${tcMap.drug} 
+				<fmt:formatNumber var="drug100Dose" pattern="##" value="${tcMap.value}" />
+				${drug100Dose}
+				${tcMap.unit} ${tcMap.app}
+				<c:set var="doseChange" value=" " />
+			</c:when>
+			<c:otherwise><c:set var="doseChange" value=", ${doseChange}" /></c:otherwise>
+		</c:choose>
+		<c:set var="ref" value="${therapyChangeElT.ref}"/>
+
+		<c:set var="doseChange">
+			<qhtm:tag name="span" prefix="tce_" tree="${therapyChangeElT}">
+				<spring:eval var="taskTsNrP" expression="jxp.var('taskTsNr').jxp(therapyChangeElT)
+					.getPointer('childTs[mtlO/ivariable=$taskTsNr]')" />
+				<c:if test="${not empty taskTsNrP.value}">
+					Appl. ${taskTsNrP.value.mtlO.ivalue }
+					<!-- 
+					Gabe ${taskTsNrP.value.mtlO.ivalue }
+					 -->
+				</c:if>
+				<c:set var="value" value="${tcMap.value}" />
+				<c:choose>
+					<c:when test="${'dose'==therapyChangeElT.tabName and 'pc'==therapyChangeElT.mtlO.type}">
+						<c:set var="unit" value="${tcMap.unit}" />
+						<spring:eval var="drug100Dose" expression="docMtl.calc(patientMtl,unit,value)" />
+						<span title="${therapyChangeElT.mtlO.value}/${drug100Dose}">
+							(≈<fmt:formatNumber pattern="##" value="${therapyChangeElT.mtlO.value/drug100Dose*100}" />%)
+						</span>
+					</c:when>
+					<c:when test="${'dose'==therapyChangeElT.tabName and 'p'==therapyChangeElT.mtlO.type}">
+						<fmt:formatNumber pattern="##" value="${therapyChangeElT.mtlO.value}" />
+						${therapyChangeElT.mtlO.unit}
+						(≈<fmt:formatNumber pattern="##" value="${therapyChangeElT.mtlO.value/value *100}" />%)
+					</c:when>
+					<c:when test="${'ivariable'==therapyChangeElT.tabName}">
+						(${therapyChangeElT.mtlO.ivalue}%)
+					</c:when>
+				</c:choose>
+			</qhtm:tag>${doseChange}
+		</c:set>
+	</c:forEach>
+	${doseChange}
+</c:forEach>
+</jsp:root>

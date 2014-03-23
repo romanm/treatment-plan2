@@ -1,0 +1,51 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+
+<edit:updateProtocol />
+
+<!-- 
+	<fmt:message key="ui_title_dialogEditConceptName" />
+	<table>
+		<tr><th>Name</th></tr>
+		<tr><td>
+			<form:input path="conceptC.protocol" cssStyle="width:160px" />
+		</td><td>
+		</td></tr>
+		<tr><th>Intention</th></tr>
+		<tr><td>
+			<fmt:message var="peop" key="mtl_protocol_intention_peop" />
+			<form:checkbox path="conceptC.intentionRests" value="PEOP1" label="${peop}" />
+			<br />
+			<fmt:message var="neo" key="mtl_protocol_intention_neo" />
+			<form:radiobutton path="conceptC.intentionAdjuvant" value="neo" label="${neo}" />
+			<br />
+			<fmt:message var="adj" key="mtl_protocol_intention_adj" />
+			<form:radiobutton path="conceptC.intentionAdjuvant" value="adj" label="${adj}" />
+			<br />
+			<fmt:message var="pal" key="mtl_protocol_intention_pal" />
+			<form:radiobutton path="conceptC.intentionAdjuvant" value="pal" label="${pal}" />
+			<br />
+			<fmt:message var="kur" key="mtl_protocol_intention_kur" />
+			<form:checkbox path="conceptC.intentionRests" value="KUR2" label="${kur}" />
+			<br />
+			<fmt:message var="v1line" key="mtl_protocol_intention_1line" />
+			<form:radiobutton path="conceptC.intentionLine" value="1line" label="${v1line}" />
+			<br />
+			<fmt:message var="v2line" key="mtl_protocol_intention_2line" />
+			<form:radiobutton path="conceptC.intentionLine" value="2line" label="${v2line}" />
+			<br />
+			<fmt:message var="sal" key="mtl_protocol_intention_sal" />
+			<form:checkbox path="conceptC.intentionRests" value="SAL3" label="${sal}" />
+		</td></tr>
+	</table>
+	<input type="submit" name="_eventId_editDuration" value="${ui_button_OK}" class="small"/>
+	<input type="submit" name="_eventId_cancel" value="${ui_button_cancel}" class="small"/>
+ -->
+	<!-- 
+	<owsui:cancelButton />
+	 -->
+</jsp:root>

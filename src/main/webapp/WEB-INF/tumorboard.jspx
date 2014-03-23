@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags" 
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<jsp:directive.page import="nl.captcha.Captcha" />
+
+<!-- 
+<mtl:breadcrumb />
+ -->
+<c:set var="stb">Session tumorboard: ${session_day }.${session_month}.${session_year}</c:set>
+<div id="headline">
+	<spring:message code="ui_breadcrumbIndex" />
+	${lsaquo}
+	<a href="tumorboardhome">Tumorboard Startseite</a>
+	${lsaquo}
+	${stb}
+</div>
+
+<div id="content" class="schemaColor">
+<!-- 
+${requestScope['javax.servlet.forward.context_path']}
+${pageContext.servletContext.contextPath}
+${pageContext.servletContext.serverInfo}
+<c:forEach var="row3" items="${pageContext.servletContext.attributeNames}" varStatus="stat">
+	${row3 }
+</c:forEach>
+
+${pageContext.servletConfig}
+${pageContext.servletConfig.servletName}
+${pageContext.session}
+${pageContext.page}
+${pageContext.request}
+<c:forEach var="row3" items="${pageContext.request.attributeNames}" varStatus="stat">
+	${row3 }
+</c:forEach>
+aa
+${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}
+<img src="/fuchs4/stickyImg" />
+<jsp:scriptlet>
+	Captcha captcha = (Captcha) session.getAttribute(Captcha.NAME);
+	request.setAttribute("captcha", captcha);
+	request.setCharacterEncoding("UTF-8"); // Do this so we can capture non-Latin chars
+	String answer = request.getParameter("answer");
+	//session.removeAttribute(Captcha.NAME);
+</jsp:scriptlet>
+${captcha.answer}
+ -->
+
+<form:form id="f1" modelAttribute="patientMtl">
+	<c:choose>
+		<c:when test="${'view2'==tuboPart}">
+			<mtl:tumorboard2 />
+		</c:when>
+		<c:otherwise>
+			<mtl:tumorboard />
+		</c:otherwise>
+	</c:choose>
+	<edit:revise visibility="hidden"/>
+</form:form>
+</div>
+
+<div id="sidebar" >
+	<owsui:docToolbar />
+	<edit:panel />
+	<fmt:formatDate value="${owsSession.tumorboardDate.time }" pattern="EEEE: kk:mm" />
+	<owsui:titlePane id="stb_patiente" title="${stb}" isOpened="${true}">
+		<owsui:tumorboardDay url="tumorboard"/>
+	</owsui:titlePane>
+	<h2><fmt:message key="ui_title_views"/></h2>
+	<ul>
+		<li><qhtm:aView id="${docMtl.tuboId}" part="view1" level="tumorboard">view1</qhtm:aView></li>
+		<li><qhtm:aView id="${docMtl.tuboId}" part="view2" level="tumorboard">view2</qhtm:aView></li>
+	</ul>
+</div>
+
+</jsp:root>

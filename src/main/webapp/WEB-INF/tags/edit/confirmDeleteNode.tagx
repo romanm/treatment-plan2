@@ -1,0 +1,64 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<form:form id="f2" modelAttribute="patientMtl">
+<fmt:message key="ui_button_confirm" />
+<c:out value=" "/>
+<fmt:message key="cpDelete" />
+
+<div class="note">
+	<c:choose>
+		<c:when test="${'ivariable'==docMtl.editNodeT.tabName }">
+		ivariable
+		</c:when>
+		<c:when test="${'notice'==docMtl.editNodeT.tabName }">
+			<div>
+				${docMtl.editNodeT.mtlO.notice}.
+			</div>
+			<c:forEach var="therapyChangeElT" items="${docMtl.editNodeT.childTs}">
+				<c:choose>
+					<c:when test="${'ivariable'==therapyChangeElT.tabName}">
+						<div>
+							<c:set var="tcMap" value="${docMtl.therapyChange[therapyChangeElT.ref]}" />
+							${tcMap.drug} ${tcMap.value} ${tcMap.unit} ${tcMap.app}
+							(${therapyChangeElT.mtlO.ivalue}%)
+						</div>
+					</c:when>
+				</c:choose>
+			</c:forEach>
+		</c:when>
+		<c:when test="${'protocol'==docMtl.editNodeT.tabName }">
+			<fmt:message key="ui_protocol" />
+			${docMtl.editNodeT.mtlO.protocol}
+			<div style="float: right;">${docMtl.chronologNr[docMtl.editNodeT.id]}</div>
+			<div class="clear" >&#160;</div>
+			<c:forEach var="taskId" items="${docMtl.task4protocol}">
+				<div>
+					<fmt:message key="uiTherapySchema" />
+					${docMtl.tree[taskId].mtlO.task}
+					<div style="float: right;">${docMtl.chronologNr[taskId]}</div>
+					<div class="clear" >&#160;</div>
+				</div>
+			</c:forEach>
+		</c:when>
+		<c:when test="${'task'==docMtl.editNodeT.tabName }">
+			<fmt:message key="uiTherapySchema" />
+			${docMtl.editNodeT.mtlO.task}
+			<div style="float: right;">
+				${docMtl.chronologNr[docMtl.editNodeT.id]}
+			</div>
+		</c:when>
+	</c:choose>
+</div>
+<br/>
+<input type="submit" name="_eventId_save"	value="${ui_button_OK}"/>
+<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}"/>
+</form:form>
+
+</jsp:root>

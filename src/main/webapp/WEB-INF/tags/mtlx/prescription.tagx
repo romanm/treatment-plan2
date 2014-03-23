@@ -1,0 +1,45 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	>
+	
+<c:if test="${not empty schemaMtl}">
+	<qhtm:patientHead />
+</c:if>
+<h1><fmt:message key="uiChemoPrescription"/></h1>
+<c:forEach var="drugT" items="${docMtl.docT.childTs}">
+	<c:if test="${'drug'==drugT.tabName }">
+		<p>
+			<mtl:drug drugT="${drugT}"/>
+			<spring:eval var="doseT" expression="jxp.getDose(drugT)"/>
+			<spring:eval var="tsDrug" expression="schemaMtl.getDrugTs1(drugT)"/>
+			<c:set var="doseTitle">
+				<mtl:doseValue doseT="${doseT}"/>
+				<mtl:doseUnit doseT="${doseT}"/>
+			</c:set>
+			<span title="${doseTitle}">
+				<qhtm:chemoDoseMod ts="${tsDrug}" />
+				<c:out value=" " />
+				<mtl:doseUnit doseT="${doseT}" ts="${ts}" calculated="${true}" />
+			</span>
+			<c:forEach var="ddrugT" items="${drugT.childTs}">
+				<c:if test="${'drug'==ddrugT.tabName }">
+					<br/>
+					<c:out value="+" />
+					<mtl:drug drugT="${ddrugT}"/>
+					<spring:eval var="ddoseT" expression="jxp.getDose(ddrugT)"/>
+					<mtl:doseValue doseT="${ddoseT}" calculated="${true}"/>
+					<c:out value=" " />
+					<mtl:doseUnit doseT="${ddoseT}" calculated="${true}"/>
+				</c:if>
+			</c:forEach>
+		</p>
+	</c:if>
+</c:forEach>
+</jsp:root>

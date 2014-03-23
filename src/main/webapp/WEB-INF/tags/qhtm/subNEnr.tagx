@@ -1,0 +1,32 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="parentT" type="com.qwit.domain.Tree" required="true" description="The tree object"/>
+<c:choose>
+	<c:when test="${empty parentT }">
+		<!-- 
+			DEBUG ONLY
+		 -->
+	</c:when>
+	<c:when test="${not empty drugMtl }"/>
+	<c:otherwise>
+<spring:eval var="neIP" expression="jxp.var('notice').var('expr').var('dose').var('day')
+	.jxpip(parentT,'childTs[tabName=$notice or tabName=$expr]
+|childTs[tabName=$dose or tabName=$day]/childTs[tabName=$notice or tabName=$expr]')" />
+<sup>
+	<c:forEach var="neP" items="${neIP}" varStatus="stat">
+		<c:if test="${parentT==neP.value.parentT }">
+			<c:out value="${stat.count>1?', ':'' }${docMtl.footnotesM[neP.value]}"/>
+		</c:if>
+		<!-- 
+		<c:out value="${stat.count>1?', ':'' }${docMtl.neNr[neP.value]}"/>
+		 -->
+	</c:forEach>
+</sup>
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

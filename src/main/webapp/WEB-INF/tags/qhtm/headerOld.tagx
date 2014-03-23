@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+	xmlns:sql	="http://java.sun.com/jsp/jstl/sql"
+	xmlns:spring ="http://www.springframework.org/tags"
+	xmlns:security="http://www.springframework.org/security/tags"
+	xmlns:tiles	="http://tiles.apache.org/tags-tiles"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	>
+	
+	
+		<div id="header">
+		<c:set var="ows1sr" value="${fn:substring(pageContext.request.contextPath,0,fn:length(pageContext.request.contextPath)-1)}" />
+		<c:set var="owsContextPath" value="${pageContext.request.contextPath}" />
+
+		<div id="mainmenu">
+			<dl class="nav navcolumn1">
+			<!-- 
+				<dt><a href="#"><spring:message code="ui_title_mainMenu"/></a></dt>
+			 -->
+				<dd>
+					<a href="${explorer_url}?id=9931&amp;search="><spring:message code="ui_patients"/></a>
+					<!-- 
+					<a href="${explorer_url}?id=9931&amp;search="><spring:message code="ui_station"/></a>
+					 -->
+				</dd>
+				<!-- 
+				<dd>
+					<a href="tumorboardhome"><spring:message code="ui_tumorboard"/></a>
+				</dd>
+				 -->
+				<dd><a href="${explorer_url}?id=9932&amp;search=">
+					<spring:message code="ui_conceptsTemplate"/>
+					<!-- 
+					<spring:message code="ui_menuItem_concept"/>
+					 -->
+				</a></dd>
+				<!-- 
+				<dd><a href="${explorer_url}?id=9938&amp;search=">
+					<spring:message code="ui_more"/>
+				</a></dd>
+				 -->
+			</dl>
+			<c:set var="id1" value="${id==null?param.id:id}" />
+			<dl class="nav navcolumn2">
+				<dd>
+					<a href="institute?id=${stationId}"><spring:message code="ui_station"/></a>
+				</dd>
+				<dd><a href="${explorer_url}?id=9938&amp;search=">
+					<spring:message code="ui_more"/>
+				</a></dd>
+				<!-- 
+				<dt><a href="http://www.oncoworkstation.de"><spring:message code="ui_title_community" /></a></dt>
+				 -->
+				 <!-- 
+				<dd>
+					<c:choose>
+						<c:when test="${not empty param.folder}">
+							<a href="${ows1sr}/edit/tab?dir=${id1}"><spring:message code="ui_menuItem_oldVersion" /></a>
+						</c:when>
+						<c:when test="${not empty drugMtl}">
+							<a href="${ows1sr}/edit/drug?id=${id1}&amp;part=ed"><spring:message code="ui_menuItem_oldVersion" /></a>
+						</c:when>
+						<c:when test="${not empty docMtl}">
+							<a href="${ows1sr}/edit/task?id=${id1}&amp;part=ed"><spring:message code="ui_menuItem_oldVersion" /></a>
+						</c:when>
+						<c:when test="${not empty conceptMtl}">
+							<a href="${ows1sr}/edit/protocol?id=${id1}&amp;part=sd"><spring:message code="ui_menuItem_oldVersion" /></a>
+						</c:when>
+						<c:when test="${not empty patientMtl}">
+							<a href="${ows1sr}/edit/patient?id=${id1}&amp;part=history"><spring:message code="ui_menuItem_oldVersion" /></a>
+						</c:when>
+					</c:choose>
+				</dd>
+				  -->
+				<!-- 
+				<dd>
+					<c:set var="doc0911">
+						<c:choose>
+							<c:when test="${not empty docMtl}">schemaged?id=${id1}</c:when>
+							<c:when test="${not empty conceptMtl}">concept?id=${id1}</c:when>
+							<c:when test="${not empty patientMtl}">basefep?id=${id1}</c:when>
+						</c:choose>
+					</c:set>
+				</dd>
+				<dd><a href="#"><spring:message code="ui_menuItem_sitemap" /></a></dd>
+				 -->
+			</dl>
+		</div>
+		<div id="sitetitle">
+			<h1><a href="${owsContextPath}/home">
+				<spring:message code="ui_name" />
+				<spring:message code="ui_version" />
+			</a></h1>
+			<p><strong><spring:message code="ui_description_en" /></strong> 
+			<br/>
+			<strong><spring:message code="ui_description_de" /></strong> </p>
+		</div>
+	</div>
+	
+</jsp:root>

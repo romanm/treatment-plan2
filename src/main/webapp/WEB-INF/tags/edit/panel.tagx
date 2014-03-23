@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<div id="toolbar" >
+	<c:if test="${not empty docMtl.idt and docMtl.idt!=0}"><owsui:next/></c:if>
+</div>
+
+<div class="invisibleWhite" id="session"><c:out value="." /></div>
+
+<c:set var="editNodeName" value="${docMtl.editNodeT.tabName}" />
+
+<c:choose>
+	<c:when test="${'defineSchemaVariant'==currentSWFState}">
+		<c:set var="dialogtitle" value="ui_menuItemLink_defineSchemaVariant" />
+	</c:when>
+	<c:when test="${'editPatient'==currentSWFState}">
+		<c:set var="dialogtitle" value="ui_menuItemLink_editPatient" />
+	</c:when>
+	<c:when test="${'bsaDialog'==currentSWFState}">
+		<c:set var="dialogtitle" value="ui_dialogTitle_bsa" />
+	</c:when>
+	<c:when test="${'schemaBeginDate'==currentSWFState}">
+		<c:set var="dialogtitle" value="ui_dialogTitle_schemaBeginDate" />
+	</c:when>
+	<c:when test="${'beginDateCycleNrUpdate'==currentSWFState}">
+		<c:set var="dialogtitle" value="ui_menuItemLink_beginDateCycleNrUpdate" />
+	</c:when>
+	<c:when test="${'moveStation'==currentSWFState}">
+		<c:set var="dialogtitle" value="ui_menuItemLink_moveStation" />
+	</c:when>
+	<c:when test="${'addGcsf'==currentSWFState}">
+		<c:set var="dialogtitle" value="ui_dialogTitle_addGcsf" />
+	</c:when>
+	<c:when test="${'gfrLabor2auc'==currentSWFState}">
+		<c:set var="dialogtitle" value="ui_dialogTitle_gfrLabor2auc" />
+	</c:when>
+	<c:when test="${'patientDiagnose'==currentSWFState}">
+		<c:set var="dialogtitle" value="ui_dialogTitle_diagnose" />
+	</c:when>
+	<c:when test="${'chemoDoseMod2'==currentSWFState}">
+		<c:set var="dialogtitle" value="ui_dialogTitle_chemoDoseMod" />
+	</c:when>
+	<c:when test="${'dose'==editNodeName}">
+		<c:if test="${not empty schemaMtl}">
+			<spring:eval var="isChemoDose" expression="schemaMtl.isChemoDose(docMtl.getEditNodeT())" />
+		</c:if>
+		<!--spring:eval var="isChemoDose" expression="docMtl.isChemoDose(docMtl.getEditNodeT())" /-->
+		<c:choose>
+			<c:when test="${not empty schemaMtl.patientMtl and isChemoDose and 'dose'==editNodeName}">
+				<c:set var="dialogtitle" value="ui_dialogTitle_chemoDoseMod" />
+			</c:when>
+			<c:otherwise>
+				<c:set var="dialogtitle" value="ui_dialogTitle_editDose" />
+			</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:when test="${'times'==editNodeName}">
+		<c:set var="dialogtitle" value="ui_dialogTitle_editTimes" />
+	</c:when>
+	<c:when test="${'day'==editNodeName}">
+		<c:set var="dialogtitle" value="ui_dialogTitle_editDay" />
+	</c:when>
+	<c:when test="${not empty schemaMtl}">
+		<c:set var="dialogtitle" value="ui_dialogTitle_editSchema" />
+	</c:when>
+	<c:when test="${not empty patientMtl}">
+		<c:set var="dialogtitle" value="ui_dialogTitle_editPatient" />
+	</c:when>
+	<c:otherwise>
+		<c:set var="dialogtitle" value="ui_title_dialog" />
+	</c:otherwise>
+</c:choose>
+
+<c:set var="isPatientSchema" value="${empty urlFlow and not empty patientMtl and not empty schemaMtl}" />
+<c:set var="isOpened" value="${true}" />
+<c:choose>
+	<c:when test="${isPatientSchema}">
+		<edit:aucMessage/>
+	</c:when>
+</c:choose>
+<!-- 
+<c:choose>
+	<c:when test="${isPatientSchema}"> <c:set var="isOpened" value="${true}" /> </c:when>
+	<c:when test="${not empty schemaMtl}"> <c:set var="isOpened" value="${true}" /> </c:when>
+	<c:when test="${not empty conceptMtl}"> <c:set var="isOpened" value="${true}" /> </c:when>
+	<c:when test="${not empty urlFlow}"> <c:set var="isOpened" value="${true}" /> </c:when>
+</c:choose>
+ -->
+<owsui:titlePane id="ep_${id}" mtitle="${dialogtitle}" isOpened="${isOpened}">
+<!--
+${currentSWFState}
+${docMtl.rightWriteYes}>${docMtl.accessRight} and (not ${empty patientMtl} or not ${empty schemaMtl})}
+-->
+<c:choose>
+	<c:when test="${'nullSeekDrug'==formUtil.mode}">
+		Medikament mit Name ${schemaMtl.editDrugC.drug } gibts nicht in Daten Bank.
+		<a href="#" onclick="window.open('explorer?id=${formUtil.drugFolderId}'
+			, 'Zweitfenster', 'width=900, height=900, scrollbars=yes')">
+			Möchten sie neue Medikament anlegen?
+		</a>
+	</c:when>
+	<c:when test="${'summeDoseNotice'==currentSWFState}"><edit:summeDoseNotice /></c:when>
+	<c:when test="${'summeDoseExpr'==currentSWFState}"><edit:summeDoseExpr /></c:when>
+	<c:when test="${'importSchema'==currentSWFState}"><edit:importSchema /></c:when>
+	<c:when test="${'schemaBeginDate'==currentSWFState}"><edit:schemaBeginDate /></c:when>
+	<c:when test="${'moveStationConfirm'==currentSWFState}"><edit:moveStation /> </c:when>
+	<c:when test="${'archivPatient'==currentSWFState}"><edit:archivPatient /> </c:when>
+	<c:when test="${docMtl.rightWriteYes>docMtl.accessRight and (not empty patientMtl or not empty schemaMtl)}">
+		<div class="red">
+			<fmt:message key="ui_noRightToWrite"/>
+		</div>
+		<input type="button" onclick="cancelReload();" value="${ui_button_cancel}" />
+		
+	<c:if test="${empty currentSWFState and not empty patientMtl and empty docMtl.idt}">
+		<div>
+			<hr/>
+			<a href="patientflow?id=${docMtl.docT.id}&amp;idt=0&amp;a=moveStation">
+				<fmt:message key="ui_menuItemLink_moveStation" />
+			</a>
+		</div>
+	</c:if>
+		
+	</c:when>
+	<c:when test="${'editPatient'==currentSWFState}">	<edit:editPatient /></c:when>
+	<c:when test="${'cmDayDelay'==currentSWFState}">	<edit:cmDayDelay /></c:when>
+	<c:when test="${'editSchemaProperty'==currentSWFState}"><edit:editSchemaProperty /></c:when>
+	<c:when test="${'setIntensivDay'==currentSWFState}"><edit:setIntensivDay /></c:when>
+
+	<c:when test="${'beginDateCycleNrUpdate'==currentSWFState}">
+														<edit:schemaBeginDate /> </c:when>
+	<c:when test="${'bsaDialog'==currentSWFState}">		<edit:bsaDialog />	</c:when>
+			
+	<c:when test="${'drugNewTablet'==currentSWFState}">	<edit:drugNewTablet /> </c:when>
+	<c:when test="${'tabletDivisor'==currentSWFState}">	<edit:tabletDivisor /> </c:when>
+	<c:when test="${'newCycle'==currentSWFState}">		<edit:newCycle /> </c:when>
+	<c:when test="${'schemaRewriteConfirm'==currentSWFState}">
+														<edit:schemaRewriteConfirm /> </c:when>
+	<c:when test="${'newStation'==currentSWFState}">	<edit:newStation /> </c:when>
+	<c:when test="${'newStationUser'==currentSWFState}"><edit:newStationUser /> </c:when>
+	
+	<c:when test="${not empty schemaMtl.patientMtl and 'expr'==editNodeName}">	<edit:patientExpr/></c:when>
+	<c:when test="${'chemoDoseMod'==currentSWFState}">		<edit:chemoDoseMod /> </c:when>
+	<c:when test="${'chemoDoseMod2'==currentSWFState}">		<edit:chemoDoseMod2 /> </c:when>
+	<c:when test="${'patientDiagnose'==currentSWFState}">	<edit:patientDiagnose /> </c:when>
+	<c:when test="${'gfrLabor2auc'==currentSWFState}">		<edit:gfrLabor2auc /> </c:when>
+	<c:when test="${'addGcsf'==currentSWFState}">			<edit:addGcsf /> </c:when>
+	<c:when test="${'creatinineLabor2auc'==currentSWFState}"><edit:creatinineLabor2auc /> </c:when>
+	<c:when test="${'moveStation'==currentSWFState}">		<edit:moveStation /> </c:when>
+	
+	<c:when test="${'defineSchemaVariant'==currentSWFState}"><edit:defineSchemaVariant /> </c:when>
+	<c:when test="${'confirmDeleteNode'==currentSWFState}"><edit:confirmDeleteNode /> </c:when>
+	<c:when test="${'newDoc'==formUtil.mode}">			<edit:newDoc /> </c:when>
+	<c:when test="${'changeDocStatus'==formUtil.mode}">	<edit:docStatus /> </c:when>
+	<c:when test="${'renameFolder'==formUtil.mode}">	<edit:renameFolder /></c:when>
+	<c:when test="${'importProtocol'==formUtil.mode}">	<edit:importProtocol /></c:when>
+	<c:when test="${'newGeneric'==formUtil.mode}">		<edit:newGeneric /></c:when>
+	<c:when test="${'newThenDoseProcent'==formUtil.mode}">
+														<edit:thenDoseProcent /></c:when>
+	<c:when test="${'newTrade'==formUtil.mode}">		<edit:newTrade /></c:when>
+        <c:when test="${'editDrugName'==formUtil.mode}">	<edit:editDrugName /></c:when>
+	<c:when test="${'newFolder'==formUtil.mode}">		<edit:newFolder /></c:when>
+	<c:when test="${'deleteFolder'==currentSWFState}">	<edit:deleteFolder /></c:when>
+	<c:when test="${'patientData'==formUtil.mode}">		<edit:seekPatient /></c:when>
+	<c:when test="${'dose'==editNodeName}">	<edit:dose/></c:when>
+	<c:when test="${'newProtocol'==currentSWFState}">
+			<edit:newProtocol />
+	</c:when>
+	<c:otherwise>
+		<form:form id="f2" modelAttribute="docMtl">
+			<c:choose>
+				<c:when test="${'protocol'==explorerMtl.treeBreadcrumb[0].folder }"> 
+					<edit:protocolFilter />
+				</c:when>
+				<c:when test="${isPatientSchema}">
+					<b>Dosismodifikation</b>
+					<br/>
+					a) für gesamten Zyklus: Sichtmodus <fmt:message key="uiTherapySchema"/>
+					 benutzen und  auf die zu ändernde Dosis klicken. 
+					<br/>
+					b) für einzelne Applikationstage: Sichtmodus <fmt:message key="uiChemoTherapyPlan"/>
+					 benutzen und  auf die zu ändernde Dosis klicken. 
+					<b>Therapieverschiebung</b>
+					<br/>
+					Sichtmodus Chemo-Ablaufplan chronologisch benutzen, mit rechter Maustaste auf zu ändernden Tag klicken und Verschiebung wählen.
+				</c:when>
+				<c:when test="${not empty schemaMtl and empty docMtl.idt}">
+					<div>
+						<qhtm:a idt="${docMtl.docT.id}" action="newDrug">
+							<fmt:message key="ui_menuItemLink_newDrug" />
+						</qhtm:a>
+					</div>
+					<div>
+						<qhtm:a idt="${docMtl.taskSupportT.id}" action="newSupportDrug">
+							<fmt:message key="ui_menuItemLink_newSupportDrug" />
+						</qhtm:a>
+					</div>
+					<c:if test="${'hour'==owsSession.schemaPart }">
+						<hr/>
+						<div>
+							<qhtm:a idt="${docMtl.taskSupportT.id}" action="setIntensivDay">
+								<fmt:message key="ui_menuItemLink_setIntensivDay" />
+							</qhtm:a>
+						</div>
+					</c:if>
+				</c:when>
+				<c:when test="${not empty patientMtl and empty docMtl.idt}">
+					<!-- 
+					 -->
+					<div>
+						<a href="patientflow?id=${docMtl.docT.id}&amp;idt=0&amp;a=moveStation">
+							<fmt:message key="ui_menuItemLink_moveStation" />
+						</a>
+					</div>
+					<div>
+						<a href="patientflow?id=${docMtl.docT.id}&amp;idt=0&amp;a=patientDiagnose">
+							Diagnose hinzufügen
+						<!-- 
+							<fmt:message key="ui_diagnose" />
+							<c:out value=" " />
+							<fmt:message key="ui_massMaintenance_insert" />
+						 -->
+						</a>
+					</div>
+					<div>
+						<a href="patientflow?id=${docMtl.docT.id}&amp;idt=0&amp;a=bsaDialog">
+							<fmt:message key="mtl_finding_height" />
+							<c:out value="/" />
+							<fmt:message key="mtl_finding_weight" />
+							<c:out value=" " />
+							<fmt:message key="ui_update" />
+						</a>
+					</div>
+					<spring:eval var="lastSchemaCycleP" expression="jxp.jxp(patientMtl.getDocT())
+		.var('task').var('cycle').getPointer('childTs[tabName=$task][1]/childTs[mtlO/pvariable=$cycle]')" />
+					<c:if test="${not empty lastSchemaCycleP.value }">
+					<c:set var="lastSchemaT" value="${lastSchemaCycleP.value.parentT }" />
+					<div>
+						<hr/>
+						<a href="schemaflow?id=${lastSchemaT.ref}&amp;idt=${lastSchemaT.ref}&amp;a=newCycle">
+							<fmt:message var="newCycle" key="ui_menuItemLink_newCycle"/>
+							<c:out value="Neuen Zyklus hinzufügen (Z-Nr. ${1+lastSchemaCycleP.value.mtlO.pvalue }) ${lastSchemaT.mtlO.task}"/>
+							<!-- 
+							<c:out value="${lastSchemaT.mtlO.task}  - ${newCycle} ${1+lastSchemaCycleP.value.mtlO.pvalue } ..."/>
+							 -->
+						</a>
+						<hr/>
+					</div>
+					</c:if>
+					<div>
+						<a href="explorer=9932">Anderes Schema wählen</a>
+						<!-- 
+						<a href="explorer=9932">Schema wechsel</a>
+						 -->
+					</div>
+				</c:when>
+				<c:when test="${not empty conceptMtl and empty docMtl.idt}">
+					<a href="conceptflow?id=${docMtl.docT.id}&amp;a=newSchema">
+						<fmt:message key="ui_schemaNew" />
+					</a>
+				</c:when>
+				<c:when test="${empty urlFlow }"> Noch kein Dialog ist eröffnet. </c:when>
+				<c:when test="${not empty docMtl.idt and docMtl.idt!=0}">
+					<c:choose>
+						<c:when test="${ not empty conceptMtl}">
+							<c:choose>
+								<c:when test="${'newChoose'==formUtil.mode}"/>
+								<c:when test="${'newSchema'==formUtil.mode}"><edit:newConceptSchema /></c:when>
+								<c:when test="${'armName'==formUtil.mode}"><edit:armName /></c:when>
+								<c:when test="${docMtl.idt==docMtl.docT.id}"><edit:conceptName /></c:when>
+							</c:choose>
+						</c:when>
+						<c:when test="${docMtl.idt==docMtl.docT.id and not empty schemaMtl}"> 
+							<edit:schemaName /> </c:when>
+						<c:when test="${'app'==editNodeName}">	<edit:app/></c:when>
+						<c:when test="${'expr'==editNodeName}">	<edit:expr/></c:when>
+						<c:when test="${'day'==editNodeName}">	<edit:day/></c:when>
+						<c:when test="${'drug'==editNodeName 
+							and 'expr'==docMtl.editNodeT.parentT.tabName
+							and 'forBegin'==docMtl.editNodeT.parentT.mtlO.value}" />
+						<c:when test="${'drug'==editNodeName}">		<edit:drug /></c:when>
+						<c:when test="${'notice'==editNodeName}">	<edit:notice /></c:when>
+						<c:when test="${'times'==editNodeName}">	<edit:times /></c:when>
+						<c:when test="${'diagnose'==editNodeName}">	<edit:diagnose /></c:when>
+					</c:choose>
+				</c:when>
+				<c:otherwise>
+					<c:choose>
+						<c:when test="${formUtil.mode=='newDoc'}"> newDoc </c:when>
+					</c:choose>
+				</c:otherwise>
+			</c:choose>
+			<mtl:form2hidden />
+		</form:form>
+	</c:otherwise>
+</c:choose>
+</owsui:titlePane>
+
+<c:if test="${'notice'==docMtl.editNodeT.tabName or 'protocol'==docMtl.editNodeT.tabName or 'chemoDoseMod'==currentSWFState  or 'editSchemaProperty'==currentSWFState }">
+⇑⇓↑↓⇦←⇨→↔ ↯ ↭ ⇰ ↝ | αβγμ | ±≈∼÷²³≤≥ | ¼½¾‰° | «»”„™ | &#x2640;&#x2642;
+</c:if>
+
+<c:if test="${('drug'==editNodeName and (
+		'task'==docMtl.editNodeT.parentT.tabName 
+		or 'drug'==docMtl.editNodeT.parentT.tabName)
+		) 
+		or 'dose'==editNodeName or 'day'==editNodeName or 'times'==editNodeName }">
+	<owsui:titlePane id="epll_${id}" mtitle="ui_dialogTitle_editPath" isOpened="true">
+		<edit:linkBoard />
+	</owsui:titlePane>
+</c:if>
+
+</jsp:root>

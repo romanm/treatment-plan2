@@ -1,0 +1,20 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+<jsp:directive.attribute name="doseT" type="com.qwit.domain.Tree" required="true" description="The drug tree object"/>
+<jsp:directive.attribute name="calculated" type="java.lang.Boolean" description="View not view calculated dose"/>
+<c:choose>
+	<c:when test="${empty schemaMtl.patientMtl and calculated and not empty schemaMtl.calcDoseR[doseT]}"
+		>${schemaMtl.calcDoseR[doseT]}</c:when>
+	<c:when test="${empty schemaMtl.patientMtl and calculated and fn:indexOf(doseT.mtlO.unit,'/')>0}">?____</c:when>
+	<c:when test="${not empty schemaMtl.patientMtl and calculated}">
+		${schemaMtl.calcDoseR[doseT]}
+	</c:when>
+	<c:when test="${empty doseT.mtlO}">###</c:when>
+	<c:otherwise>
+		<fmt:formatNumber pattern="##.###">${doseT.mtlO.value}</fmt:formatNumber>
+	</c:otherwise>
+</c:choose>
+</jsp:root>

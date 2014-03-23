@@ -1,0 +1,16 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<c:choose>
+	<c:when test="${'week'==part or 'plan'==part}" >
+		<c:set var="isMyRevise" value="true"/>
+	</c:when>
+	<c:when test="${empty urlFlow}" />
+</c:choose>
+<c:if test="${isMyRevise}">
+	<edit:revise visibility="hidden"/>
+</c:if>
+
+</jsp:root>

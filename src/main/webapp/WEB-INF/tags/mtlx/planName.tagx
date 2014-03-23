@@ -1,0 +1,36 @@
+<jsp:root version="2.0"
+	xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="blockT" type="com.qwit.domain.Tree" required="true" description="The block tree object"/>
+
+<c:set var="protocolC" value="${schemaMtl.conceptMtl.classM[schemaMtl.docT.docT.idClass]}" />
+<c:if test="${schemaMtl.docT.docT.tabName=='protocol' and protocolC.protocoltype=='study'}">
+	<span class="n"> ${protocolC.protocol}
+		<c:if test="${not empty protocolC.protocolvar}">
+			<span class="small">(${protocolC.protocolvar})</span>
+		</c:if>,
+	</span>
+</c:if>
+
+<c:choose>
+	<c:when test="${not empty schemaMtl}">
+		<!-- 
+		<span class="b">${blockT.mtlO.task}</span>
+		 -->
+		<spring:message code="tag_task_tumortherapy" />
+	</c:when>
+	<c:when test="${not empty drugMtl}">
+	<qhtm:a idt="${blockT.id}" action="setBlockId">
+		<span class="${drugMtl.blockId==blockT.id?'b':''}">
+			Verwendungs Block <spring:eval expression="drugMtl.blockNr(blockT)"/>
+		</span>
+	</qhtm:a>
+	</c:when>
+</c:choose>
+
+</jsp:root>

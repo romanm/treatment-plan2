@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+	"-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+	"http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+	
+<tiles-definitions>
+	<definition name="saveNewGeneric"	extends="explorer" />
+	<definition name="newProtocol"		extends="explorer" />
+	<definition name="saveNewPatient"	extends="explorer" />
+	<definition name="importProtocol"	extends="explorer" />
+	<definition name="renameFolder"		extends="explorer" />
+	<definition name="newFolder"		extends="explorer" />
+	<definition name="deleteFolder"		extends="explorer" />
+	<definition name="explorerpost=*"	extends="explorer" />
+	<definition name="explorer=*"		extends="explorer" />
+	<definition name="explorer"			extends="layoutx1">
+		<put-attribute name="body" >
+			<definition template="/WEB-INF/explorer/explorer.jspx">
+				<put-attribute name="fragContent"		value = "/WEB-INF/explorer/content.jspx" />
+				<put-attribute name="menuFolderTree"	value = "/WEB-INF/explorer/menuFolderTree.jspx" />
+				<put-attribute name="menuDialog"		value = "/WEB-INF/explorer/menuDialog.jspx" />
+			</definition>
+		</put-attribute>
+	</definition>
+	<definition name="explorerDataStore"	template="/WEB-INF/layouts/json.jspx" />
+</tiles-definitions>

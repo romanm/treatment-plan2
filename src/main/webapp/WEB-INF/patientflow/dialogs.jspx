@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:security="http://www.springframework.org/security/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<!-- 
+<mtl:requestVariablen />
+ -->
+<owsui:docToolbar />
+<!-- 
+ dialogs
+ -->
+ <div>
+	<edit:panel />
+ </div>
+<div>
+	<h2><fmt:message key="ui_title_views"/></h2>
+	<ul>
+		<li>
+		<a href="patient-times-${patientMtl.docT.id }">
+			Chronologische Liste
+		</a>
+		</li>
+		<li>
+		<a href="patient-year-${patientMtl.docT.id }">Jahresübersicht</a>
+		</li>
+		<li>
+			<a href="pdf-patient-${owsSession.patientPart}-${docMtl.docT.id }">
+				<img alt="pdf" src="resources/images/pdf.gif"/>
+			pdf
+			</a>
+		</li>
+	<security:authorize ifAllGranted="ROLE_SUPERVISOR">
+		<li><a href="xml-${docMtl.docT.id }">xml</a></li>
+	</security:authorize>
+	</ul>
+	<spring:eval var="urlPL" expression="jxp.var('url').jxpip(docMtl.getDocT(),'childTs[tabName=$url]')" />
+	<spring:eval var="urlPLhasNext" expression="urlPL.hasNext()" />
+	<c:if test="${urlPLhasNext}">
+		<h2><fmt:message key="ui_title_oldDb"/></h2>
+		<ul>
+			<c:forEach var="urlP" items="${urlPL}">
+				<spring:eval var="isJohannisplatz" 
+					expression="urlP.getValue().getMtlO().getUrl().contains('johannisplatz')" />
+				<li>
+					<a href="framesetlayout=${docMtl.docT.id }?idurl=${urlP.value.id}">
+						${isJohannisplatz?'Johannisplatz':'' } Databank.
+					</a>
+				</li>
+			</c:forEach>
+		</ul>
+	</c:if>
+</div>
+
+	<h2><fmt:message key="ui_therapieProtocolsUsed" /></h2>
+	<ul>
+		<c:forEach var="conceptT" items="${docMtl.docT.childTs }">
+			<c:if test="${'protocol'==conceptT.tabName }">
+				<li><a href="concept=${conceptT.id}">${conceptT.mtlO.protocol}</a></li>
+			</c:if>
+		</c:forEach>
+	</ul>
+
+</jsp:root>

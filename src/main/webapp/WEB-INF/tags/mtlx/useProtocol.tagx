@@ -1,0 +1,38 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+>
+
+<sql:setDataSource var="owsDbSource" driver="org.postgresql.Driver" dataSource="jdbc/ows" scope="session" />
+<sql:query var="schemaUseR" dataSource="${owsDbSource}" scope="session" >
+SELECT t2.id,patient.* FROM tree t1,tree t2,protocol,patient
+WHERE t1.id=t2.did
+AND t1.id=idpatient
+AND t2.idclass=idprotocol
+AND t2.idclass=?<sql:param value="${conceptMtl.docT.idClass}"/>
+</sql:query>
+
+<table>
+	<thead>
+		<tr>
+			<th><fmt:message key="pat_patient" /></th>
+			<th><fmt:message key="pat_forename" /></th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:forEach var="row" items="${schemaUseR.rows}">
+			<tr>
+				<td>
+				<a href="concept=${row['id']}">
+				${row['patient']}
+				</a>
+				</td>
+				<td>${row['forename']}</td>
+			</tr>
+		</c:forEach>
+	</tbody>
+</table>
+
+</jsp:root>

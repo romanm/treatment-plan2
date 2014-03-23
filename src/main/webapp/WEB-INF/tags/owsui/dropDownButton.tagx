@@ -1,0 +1,7 @@
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+id="${id}"  style="float: left;">
+<jsp:directive.attribute name="id" required="true" description="id"/>
+<div id="${id}_menu"><jsp:doBody /></div>
+<fmt:message key="ui_dropDownButton_${id}" var="ddb_msg"/>
+<script type="text/javascript">menu("${id}_menu");dropDownButton("${id}","${ddb_msg}");</script>
+</div>

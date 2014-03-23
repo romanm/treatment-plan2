@@ -1,0 +1,105 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<c:if test="${'register'==currentSWFState}">
+	<h3><fmt:message key="ui_register" /></h3>
+	<div><fmt:message key="ui_registerUser_description" /> </div>
+	<br />
+</c:if>
+<form:form id="f1" modelAttribute="registerUserForm">
+<form:errors path="*" cssClass="note" />
+<table class="formular" width="750px">
+	<tr>
+		<td width="200"><label for="title"><fmt:message key="ui_title" /></label> </td>
+		<td><form:input path="title" /></td>
+		<td><form:errors path="title" cssClass="note" /></td>
+	</tr>
+	<tr>
+		<td width="200"><label for="firstName"><fmt:message key="ui_firstName" /></label> </td>
+		<td><form:input path="firstName" /></td>
+		<td><form:errors path="firstName" cssClass="note" /></td>
+	</tr>
+	<tr>
+		<td><label for="secondName"><fmt:message key="ui_secondName" /></label> </td>
+		<td><form:input		path="secondName" /></td>
+		<td><form:errors	path="secondName" cssClass="note" /></td>
+	</tr>
+	<tr>
+		<td><label for="userName"><fmt:message key="ui_wish_loginname" /></label> </td>
+		<td><form:input  path="userName" /></td>
+		<td><form:errors path="userName" cssClass="note" /></td>
+	</tr>
+	<tr>
+		<td><label for="email"><fmt:message key="ui_email" /></label></td>
+		<td><form:input path="email" /></td>
+		<td><form:errors path="email" cssClass="note" /></td>
+	</tr>
+	<c:if test="${'register'==currentSWFState}">
+	<tr>
+		<td><label for="password"><fmt:message key="ui_password" /></label> </td>
+		<td><form:input type="password" path="password" /></td>
+		<td><form:errors path="password" cssClass="note" /></td>
+	</tr>
+	<tr>
+		<td><label for="passwordRetyped"><fmt:message key="ui_retypePassword" /></label></td>
+		<td><form:input type="password" path="passwordRetyped" /></td>
+		<td><form:errors path="passwordRetyped" cssClass="note" /></td>
+	</tr>
+	
+	<tr>
+		<td><label for="captchaAnswer"><fmt:message key="ui_captcha" /></label></td>
+		<td><fmt:message key="ui_captcha_description" />
+			<br />
+			<!-- 
+			<img src="/qwit7/stickyImg" />
+			<img src="stickyImg" />
+			${stickyImg}
+			 -->
+			<spring:url value="/stickyImg" var="stickyImg" />
+			<img src="${stickyImg}" />
+			<br /> 
+			<form:input path="captchaAnswer" />
+		</td>
+		<td><form:errors path="captchaAnswer" cssClass="note" /></td>
+	</tr>
+	
+	<tr>
+		<td></td>
+		<td colspan="2">
+			<textarea rows="5" cols="80" style="width:100%;text-align:"
+				readonly="readonly" onfocus="this.rows=10" >
+			Allgemeine Geschäftsbedingungen:
+			</textarea>
+		</td>
+		
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="2">
+			Klicken Sie nachfolgend auf "Akzeptieren", um die oben genannten <a src="#" alt="">allgemeinen Nutzungsbedingungen</a> 
+			anzunehmen und die <a src="" alt="">Programmrichtlinien</a> und die <a src="#" alt="">Datenschutzbestimmungen</a>  zu akzeptieren.
+		</td>
+		
+	</tr>
+	</c:if>
+	
+	<tr>
+		<td></td>
+		<td>
+			<fmt:message var="s" key="ui_register_submit" />
+			<center>
+				<input type="submit" id="changePassword" value="${s}"  name="_eventId_save"/>
+			</center> 
+		</td>
+	</tr>	
+</table>
+</form:form>
+</jsp:root>

@@ -1,0 +1,16 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm" 
+>
+<form:form id="f2" modelAttribute="patientSchema">
+	<fmt:message key="ui_schemaRewriteConfirm" />
+<br/>
+	<input type="submit" name="_eventId_save"			value="${ui_button_save}" />
+	<input type="submit" name="_eventId_cancel"			value="${ui_button_cancel}" />
+</form:form>
+</jsp:root>

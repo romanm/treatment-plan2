@@ -1,0 +1,122 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:s="http://www.springframework.org/tags" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<!--
+<table>
+	<s:eval var="noticeNulls" expression="jxp.noticeNull(drugMtl.docT)" />
+	<c:forEach var="noticeT" items="${noticeNulls}" >
+		<tr>
+			<owshtm:td prefix="nt_" id="${noticeT.id}">
+				<mtl:editNoticeType noticeT="${noticeT}"/>
+			</owshtm:td>
+			<td>
+				<mtl:toxSymptome noticeT="${noticeT}"/>
+				<mtl:maxDose noticeT="${noticeT}"/>
+				<owshtm:div prefix="nn_" id="${noticeT.id}">
+					<mtl:editNotice noticeT="${noticeT}"/>
+				</owshtm:div>
+			</td>
+		</tr>
+	</c:forEach>
+	<s:eval var="noticeByTypes" expression="jxp.noticeByType(drugMtl.docT)" />
+	<s:eval var="noticeTypes" expression="noticeByTypes.keySet()" />
+	<c:forEach var="type" items="${noticeTypes}" >
+		<tr>
+			<s:eval var="notices" expression="noticeByTypes.get(type)" />
+			<owshtm:td prefix="nt_" id="${notices[0].id}">
+				<mtl:editNoticeType noticeT="${notices[0]}"/>
+				<b>
+					<fmt:message key="mtl_notice_type_${notices[0].mtlO.type}"/>:
+				</b>
+			</owshtm:td>
+			<td>
+				<c:forEach var="noticeT" items="${notices}" >
+					<mtl:toxSymptome noticeT="${noticeT}"/>
+					<mtl:maxDose noticeT="${noticeT}"/>
+					<c:if test="${not empty docMtl.editNoticeC and docMtl.idt==noticeT.id}">
+						<mtl:editNoticeType noticeT="${noticeT}"/>
+					</c:if>
+					<owshtm:div prefix="nn_" id="${noticeT.id}">
+						<mtl:editNotice noticeT="${noticeT}"/>
+					</owshtm:div>
+				</c:forEach>
+			</td>
+		</tr>
+	</c:forEach>
+	<s:eval var="notices" expression="jxp.childs(drugMtl.docT, 'notice')" />
+	<c:forEach var="notice" items="${notices}" >
+		<tr>
+			<owshtm:td prefix="nt_" id="${notice.value.id}">
+				<mtl:editNoticeType noticeT="${notice.value}"/>
+			</owshtm:td>
+			<td>
+				<mtl:toxSymptome noticeT="${notice.value}"/>
+				<mtl:maxDose noticeT="${notice.value}"/>
+				<owshtm:span prefix="nn_" id="${notice.value.id}">
+					<mtl:editNotice noticeT="${notice.value}"/>
+				</owshtm:span>
+			</td>
+		</tr>
+	</c:forEach>
+	<s:eval var="literatures" expression="jxp.childs(drugMtl.docT, 'literature')" />
+	<c:forEach var="literature" items="${literatures}" >
+		<tr>
+			<owshtm:td prefix="lt_" id="${literature.value.id}">
+				<mtl:editStep idt="${literature.value.id}"><fmt:message key="tag_literature"/></mtl:editStep>
+			</owshtm:td>
+			<td><mtl:editLiterature tree="${literature.value}"/></td>
+		</tr>
+	</c:forEach>
+</table>
+ -->
+<c:set var="tabletHtml">
+	<s:eval var="tablets" expression="jxp.childs(drugMtl.docT, 'tablet')" />
+	<c:forEach var="tablet" items="${tablets}">
+		<qhtm:tag name="span" prefix="tb_" tree="${tablet.value}">
+			<mtl:tabletText tabletT="${tablet.value}" />,
+		</qhtm:tag>
+	</c:forEach>
+	<c:forEach var="tradeT" items="${drugMtl.tradeL}">
+		<s:eval var="tablets" expression="jxp.childs(tradeT, 'tablet')" />
+		<c:forEach var="tablet" items="${tablets}">
+			<qhtm:tag name="span" prefix="tb_" tree="${tablet.value}">
+				<mtl:tabletText tabletT="${tablet.value}" />,
+			</qhtm:tag>
+		</c:forEach>
+	</c:forEach>
+</c:set>
+<c:if test="${not empty tabletHtml}">
+	<table>
+		<tr>
+			<th><h4><fmt:message key="uiPills" /></h4></th>
+		</tr>
+		<tr>
+			<td>${fn:substring(tabletHtml,0,fn:length(tabletHtml)-1 )}</td>
+		</tr>
+	</table>
+</c:if>
+
+<s:eval var="exprPI" expression="jxp.childs(drugMtl.docT, 'expr')" />
+<c:forEach var="exprP" items="${exprPI}">
+	<c:if test="${'if'==exprP.value.mtlO.expr}">
+		<div>
+			<mtl:if ifT="${exprP.value}" />
+		</div>
+	</c:if>
+</c:forEach>
+<!-- 
+ -->
+<mtl:alienNotice />
+
+<s:eval var="tasks" expression="jxp.childs(drugMtl.docT, 'task')" />
+<c:forEach var="task" items="${tasks}">
+	<br/><hr/>
+	<mtl:schemaTaskList blockT="${task.value}"/>
+</c:forEach>
+
+</jsp:root>

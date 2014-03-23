@@ -1,0 +1,6 @@
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+id="${id}">
+<jsp:directive.attribute name="id" required="true" description="id"/>
+<jsp:doBody />
+<script type="text/javascript">toolbar('${id}');</script>
+</div>

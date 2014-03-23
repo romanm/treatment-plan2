@@ -1,0 +1,1269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<secured attributes="ROLE_USER" />
+	<persistence-context />
+
+	<var name="formUtil"	class="com.qwit.util.FormUtil" />
+	<var name="exprUnit"	class="com.qwit.model.ExprUnit" />
+	<var name="patientSchema"	class="com.qwit.model.PatientSchema" />
+	<var name="list"		class="java.util.ArrayList" />
+	<var name="tree"		class="com.qwit.domain.Tree" />
+	<var name="drugC"		class="com.qwit.domain.Drug" />
+	<var name="laborC"		class="com.qwit.domain.Labor" />
+	<var name="findingC"	class="com.qwit.domain.Finding" />
+	<input name="id"		type="int" required="true" />
+	<input name="idt"		type="int"/>
+	<input name="idc"		type="int"/>
+	<input name="a"			type="string"/>
+	<input name="modDay"	type="int"/>
+	<input name="part"		type="string"/>
+
+	<on-start>
+		<evaluate	expression="documentService.setFlushModeCommit()" />
+		<evaluate	expression="documentService.makeSchemaMtl(id)"	result="flowScope.schemaMtl" />
+		<evaluate	expression="formUtil.logline('--------on-start--1---'+schemaMtl)" />
+		<evaluate	expression="schemaMtl.getPatientMtl()"	result="flowScope.patientMtl" />
+		<evaluate	expression="formUtil.logline('--------on-start--2---'+patientMtl)" />
+		<set name="schemaMtl.idt"			value="requestParameters.idt" />
+		<set name="schemaMtl.idc"			value="requestParameters.idc" />
+		<set name="schemaMtl.tsNr"			value="requestParameters.tsNr" />
+		<set name="schemaMtl.action"		value="requestParameters.a" />
+		<set name="schemaMtl.modDay"		value="requestParameters.modDay" />
+		<set name="formUtil.part"			value="requestParameters.part" />
+		<set name="formUtil.jsonDrugs"		value="documentService.getJsonDrugs()" />
+		<set name="formUtil.jsonDoseUnit"	value="documentService.getJsonDoseUnit()" />
+		<set name="formUtil.jsonDoseApp"	value="documentService.getDoseApp()" />
+		<set name="formUtil.jsonLabor"		value="documentService.getJsonLabors()" />
+		<set name="formUtil.jsonLaborUnits"	value="documentService.getJsonLaborUnits()" />
+		<set name="formUtil.jsonFinding"	value="documentService.getJsonFindings()" />
+		<set name="formUtil.jsonFindingUnits"	value="documentService.getJsonFindingUnits()" />
+		<evaluate expression="formUtil.logline('--------on-start--3---'+schemaMtl)" />
+	</on-start>
+
+	<action-state id="handleAction">
+		<on-entry>
+			<evaluate expression="formUtil.logline('..handleAction..on-entry..a='+a
+			+'..getAction='+schemaMtl.getAction()+'..getIdt='+schemaMtl.getIdt())" />
+		</on-entry>
+		<!-- 
+		<evaluate expression="schemaMtl.getAction()"/>
+		<evaluate expression="schemaMtl.isNewEdit()"/>
+		 -->
+		<evaluate expression="handleAction.handleAction(schemaMtl)"/>
+		<transition on="gfrLabor2auc" to="gfrLabor2auc"/>
+		<transition on="addGcsf" to="addGcsf"/>
+		<transition on="creatinineLabor2auc" to="creatinineLabor2auc"/>
+		<transition on="exprUse" to="schemaExprUse"/>
+		<transition on="newBlockGcsf"		to="save">
+			<evaluate expression="formUtil.logline('--------newBlockGcsf----')" />
+			<evaluate expression="documentService.initTaskInsideDrug(schemaMtl,'task','gcsf')" />
+			<evaluate expression="formUtil.logline('--------newBlockGcsf----')" />
+		</transition>
+		<transition on="taskSupport" to="createEditObject">
+		<!--
+			<evaluate expression="schemaMtl.relocateEditNode(schemaMtl.getTaskSupportT())" />
+		-->
+			<evaluate expression="schemaMtl.relocateEditNode(schemaMtl.getInsideTask(schemaMtl.getDocT(), 'support'))" />
+		</transition>
+		<transition on="taskPremedication" to="createEditObject">
+			<evaluate expression="documentService.initInsideTask(schemaMtl,'taskPremedication')" />
+			<evaluate expression="schemaMtl.relocateEditNode(schemaMtl.getTaskPremedicationT())" />
+		</transition>
+		<transition on="taskHomeTablet" to="createEditObject">
+			<evaluate expression="documentService.initInsideTask(schemaMtl,'taskHomeTablet')" />
+			<evaluate expression="schemaMtl.relocateEditNode(schemaMtl.getTaskHomeTabletT())" />
+		</transition>
+		<transition on="takenBlock" to="takenBlock"/>
+		<transition on="rewrite" to="checkMod">
+			<set name="formUtil.mode"		value="'rewrite'"/>
+		</transition>
+		<transition on="tabletDivisor"	to="tabletDivisor"/>
+		<transition on="newDoc"			to="newDocx">
+			<set name="formUtil.mode"		value="'newDoc'"/>
+		</transition>
+		<!--
+		<transition on="cycleNr" to="cycleNr">
+			<set name="formUtil.mode"		value="'cycleNr'"/>
+			<set name="schemaMtl.action"	value="'cycleNr'"/>
+		</transition>
+		<transition on="patientDataEdit" to="patientDataEdit">
+			<set name="formUtil.mode" value="'patientDataEdit'" />
+			<evaluate expression="schemaMtl.openEditPatient()" />
+		</transition>
+		-->
+		<transition on="beginDateCycleNrUpdate" to="beginDateCycleNrUpdate"/>
+		<transition on="bsaDialog" to="bsaDialog">
+			<set name="schemaMtl.isPatientData"	value="true"/>
+		</transition>
+		<transition on="patientData" to="patientDataSeekx">
+			<evaluate expression="formUtil.logline('--------handleAction-----patientData----')" />
+			<set name="formUtil.mode" value="'patientData'"/>
+			<set name="schemaMtl.isPatientData" value="true"/>
+			<evaluate expression="schemaMtl.openEditPatient()" />
+			<evaluate expression="documentService.notFlowNotVariant(schemaMtl)" />
+		</transition>
+		<!-- 
+		<transition on="newCycle"		to="newCycle"/>
+		 -->
+		<transition on="cmDayDelay"		to="cmDayDelay"/>
+		<transition on="schemaRewrite"	to="schemaRewriteConfirm"/>
+		<transition on="importSchema"	to="importSchema"/>
+		<transition on="newCycle"		to="schemaBeginDate"/>
+		<transition on="beginDate"		to="schemaBeginDate">
+			<set name="schemaMtl.idt"	value="requestParameters.idt" />
+			<evaluate expression="documentService.addSessionPatient(schemaMtl)" />
+			<!-- 
+			<set name="formUtil.mode"	value="'beginDate'" />
+			 -->
+		</transition>
+		<transition on="use" to="schemaBeginDate">
+			<evaluate expression="formUtil.logline('--------patientDataSeekx----1-use----'+requestParameters.idt)" />
+			<set name="schemaMtl.idt"	value="requestParameters.idt" />
+			<evaluate expression="formUtil.logline('--------patientDataSeekx---2--use----'+schemaMtl.idt)" />
+			<evaluate expression="documentService.addSessionPatient(schemaMtl)" />
+			<evaluate expression="formUtil.logline('--------patientDataSeekx---3--use----'+schemaMtl.idt)" />
+		</transition>
+
+		<!-- 
+		<transition on="editSchemaNameAndO" to="createEditObject">
+			<evaluate expression="schemaMtl.setIdt(schemaMtl.getDocT().getId())" />
+		</transition>
+		 -->
+		<transition on="setIntensivDay" to="setIntensivDay"/>
+		<transition on="editSchemaProperty" to="editSchemaProperty">
+			<evaluate expression="formUtil.logline('.........editSchemaNameAndO...1...')" />
+		</transition>
+		<transition on="newLiterature"		to="createEditObject">
+			<evaluate expression="formUtil.logline('--------newLiterature--1--')" />
+			<evaluate expression="formUtil.logline('--------newLiterature--2--')" />
+			<evaluate expression="schemaMtl.setIdt(nodeCreator.setTagName('literature')
+			.setTreeManager(schemaMtl).addChild().getId())" />
+			<evaluate expression="formUtil.logline('--------newLiterature--3--')" />
+		</transition>
+		<transition on="newLabor" to="createEditObject">
+			<evaluate expression="schemaMtl.setIdt(taskLaborCreator.setTreeManager(schemaMtl).addChild().getId())" />
+		</transition>
+		<transition on="newFinding" to="createEditObject">
+			<evaluate expression="schemaMtl.setIdt(taskFindingCreator.setTreeManager(schemaMtl).addChild().getId())" />
+		</transition>
+		<transition on="newAdditionalDrug" to="createEditObject" >
+			<evaluate expression="formUtil.logline('----newAdditionalDrug------1--')" />
+			<evaluate expression="schemaMtl.setEditDrugT()" />
+			<evaluate expression="formUtil.logline('----newAdditionalDrug------2--')" />
+			<set name="tree"	value="drugDrugCreator.setTreeManager(schemaMtl).setParentT(schemaMtl.getEditNodeT()).addChild()" />
+			<evaluate expression="formUtil.logline('----newAdditionalDrug------3--')" />
+			<evaluate expression="schemaMtl.setIdt(tree.getId())" />
+			<evaluate expression="formUtil.logline('----newAdditionalDrug------4--')" />
+		</transition>
+		<transition on="newOnDemandDrug"	to="createEditObject">
+			<evaluate expression="schemaService.newOnDemandDrug(schemaMtl)" />
+		</transition>
+		<transition on="newSupportDrug"	to="createEditObject">
+			<evaluate expression="schemaService.addSupportDrug(schemaMtl)" />
+			<!-- 
+			<evaluate expression="schemaMtl.setBlockSupportDrug(taskDrugCreator, taskCreator, nodeCreator)" />
+			 -->
+			<!-- 
+			<evaluate expression="schemaMtl.setSupportTaskParent()" />
+			<evaluate expression="schemaMtl.setIdt(taskDrugCreator.setTreeManager(schemaMtl).addChild().getId())" />
+			 -->
+		</transition>
+		<transition on="newDrug"	to="createEditObject">
+		<!-- 
+			<evaluate expression="schemaMtl.setParentT(requestParameters.idt)" />
+			<evaluate expression="schemaMtl.setIdt(taskDrugCreator.setTreeManager(schemaMtl).addChild().getId())" />
+		 -->
+			<evaluate expression="schemaService.addTaskDrug(schemaMtl)" />
+		</transition>
+		<transition on="newApp" to="createEditObject">
+			<evaluate expression="documentService.addApp(schemaMtl)" />
+		</transition>
+		<transition on="newDay" to="createEditObject">
+			<evaluate expression="documentService.addDay(schemaMtl)" />
+		</transition>
+
+		<transition on="Notice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'')" />
+		</transition>
+		<transition on="noticeNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'notice')" />
+		</transition>
+		<transition on="tubo_adviceNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'tubo_advice')" />
+		</transition>
+		<transition on="totalsdoseNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'totalsdose')" />
+		</transition>
+		<transition on="gcsfNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'gcsf')" />
+		</transition>
+		<transition on="portNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'port')" />
+		</transition>
+		<transition on="tdaNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'tda')" />
+		</transition>
+		<transition on="breNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'bre')" />
+		</transition>
+		<transition on="literatureNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'literature')" />
+		</transition>
+		<transition on="paravasatNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'paravasat')" />
+		</transition>
+		<transition on="interactionNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'interaction')" />
+		</transition>
+		<transition on="toxicityNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'toxicity')" />
+		</transition>
+		<transition on="dreductionNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'dreduction')" />
+		</transition>
+		<transition on="dreductionHematoToxNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'dreductionHematoTox')" />
+		</transition>
+		<transition on="scriteriaNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'scriteria')" />
+		</transition>
+		<transition on="laborNotice" to="createEditObject">
+			<evaluate expression="documentService.addNotice(schemaMtl,'labor')" />
+		</transition>
+		<transition on="newTaskNotice" to="createEditObject">
+			<evaluate expression="schemaMtl.setIdt(taskNoticeCreator.setTreeManager(schemaMtl).addChild().getId())" />
+		</transition>
+		<transition on="newRule" to="createEditObject">
+			<evaluate expression="formUtil.logline('--------handleAction------newRule----')" />
+			<evaluate expression="ruleService.newRule(schemaMtl)" />
+		</transition>
+		<transition on="andExpr" to="createEditObject">
+			<evaluate expression="ruleService.andOrExpr(schemaMtl,'and')" />
+		</transition>
+		<transition on="orExpr" to="createEditObject">
+			<evaluate expression="ruleService.andOrExpr(schemaMtl,'or')" />
+		</transition>
+		<transition on="newElseIf"	to="createEditObject">
+			<evaluate expression="ruleService.newElseIf(schemaMtl)" />
+		</transition>
+		<transition on="newIfElse"	to="createEditObject">
+			<evaluate expression="ruleService.newIfElse(schemaMtl)" />
+		</transition>
+		<transition on="newThenApp"	to="createEditObject">
+			<set name="formUtil.mode"	value="'newThenApp'" />
+			<evaluate expression="ruleService.thenNode(schemaMtl,'app')" />
+		</transition>
+		<transition on="newThenDay"	to="createEditObject">
+			<set name="formUtil.mode"	value="'newThenDay'" />
+			<evaluate expression="ruleService.thenNode(schemaMtl,'day')" />
+		</transition>
+		<transition on="newThenDose"	to="createEditObject">
+			<set name="formUtil.mode"	value="'newThenDose'" />
+			<evaluate expression="ruleService.thenNode(schemaMtl,'dose')" />
+		</transition>
+		<transition on="newThenDoseProcent"	to="createEditObject">
+			<set name="formUtil.mode"	value="'newThenDoseProcent'" />
+			<evaluate expression="ruleService.thenNode(schemaMtl,'procent')" />
+		</transition>
+		<transition on="newForBeginDrug"	to="createEditObject">
+			<evaluate expression="ruleService.newForBeginDrug(schemaMtl)" />
+		</transition>
+
+		<transition on="newNotice" to="createEditObject">
+			<evaluate expression="documentService.newNotice(schemaMtl)" />
+			<!-- 
+			<evaluate expression="schemaMtl.setDoseNoticeParentT(requestParameters.idt)" />
+			<evaluate expression="schemaMtl.setIdt(nodeCreator.setTagName('notice').setTreeManager(schemaMtl).addChild().getId())" />
+			 -->
+		</transition>
+		<transition on="changeDocStatus" to="changeDocStatusx">
+			<set name="formUtil.mode" value="'changeDocStatus'"/>
+		</transition>
+		<transition on="upNode"		to="sort1to2" >
+			<evaluate expression="schemaMtl.moveNode('up')" />
+		</transition>
+		<transition on="downNode"	to="sort1to2" >
+			<evaluate expression="schemaMtl.moveNode('down')" />
+		</transition>
+		
+		<transition on="timesRelativPanel1"	to="schemaxViewAndEdit">
+			<evaluate expression="formUtil.logline('--------timesRelativPanel1----------')" />
+			<set name="owsSession.timesRelativPanel"	value="1" />
+		</transition>
+		<transition on="timesRelativPanel2"	to="schemaxViewAndEdit">
+			<evaluate expression="formUtil.logline('--------timesRelativPanel2----------')" />
+			<set name="owsSession.timesRelativPanel"	value="2" />
+		</transition>
+		
+		<transition on="patientDiagnose"	to="patientDiagnose" />
+		<transition on="chemoDoseMod"	to="chemoDoseMod">
+		<!-- 
+			<evaluate expression="documentService.createOpenDoseMod(schemaMtl)" />
+		 -->
+		</transition>
+		<transition on="modDay"	to="schemaxViewAndEdit">
+			<evaluate expression="documentService.createOpenDoseMod(schemaMtl)" />
+		</transition>
+		<transition on="sameDayTogether"	to="schemaxViewAndEdit">
+			<set name="owsSession.sameDayTogether"	value="!owsSession.sameDayTogether" />
+		</transition>
+		<transition on="copy2"	to="schemaxViewAndEdit">
+			<evaluate expression="formUtil.logline('----handleAction----copy--1--------')" />
+			<evaluate expression="copyPasteService.copy(schemaMtl)" />
+			<!-- 
+			<evaluate expression="schemaMtl.copy()" />
+			 -->
+			<evaluate expression="formUtil.logline('----handleAction----copy--2--------')" />
+			<!--
+			<set name="userCareSessionContainer.userCareSession.copyNodeT"	value="schemaMtl.copyNodeT" />
+			-->
+		</transition>
+		<transition on="deleteNode"	to="deleteNode" />
+		<transition on="save"		to="save">
+			<evaluate expression="documentService.saveSchemaNative(schemaMtl)" />
+		</transition>
+		<transition on="yes"		to="createEditObject"/>
+		<transition on="no"			to="schemaxViewAndEdit">
+			<evaluate expression="schemaMtl.setEditNodeT()" />
+		</transition>
+		<transition on="success"	to="createEditObject" />
+		
+		<on-exit>
+			<evaluate expression="formUtil.logline('--------handleAction-----on-exit---getIdt-'+schemaMtl.getIdt())" />
+			<set name="schemaMtl.action"	value="null" />
+		</on-exit>
+	</action-state>
+	
+	<!-- open new edit form -->
+	<action-state id="createEditObject">
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------createEditObject----------')" />
+			<evaluate expression="schemaMtl.setEditNodeT()" />
+			<evaluate expression="formUtil.logline('--------createEditObject----------'+schemaMtl.editNodeName)" />
+		</on-entry>
+		<evaluate expression="schemaMtl.editNodeName" />
+		<transition on="patient"	to="schemaxViewAndEdit"/>
+		<transition on="task"	to="schemaxViewAndEdit">
+		</transition>
+		<transition on="drug"		to="schemaxViewAndEdit">
+			<evaluate expression="formUtil.logline('--------createEditObject--------drug--1')" />
+			<evaluate expression="schemaMtl.openEditDrug()" />
+			<evaluate expression="formUtil.logline('--------createEditObject--------drug--2')" />
+			<evaluate expression="schemaMtl.usedDose.readDrugDose(simpleJdbc, schemaMtl)" />
+			<evaluate expression="formUtil.logline('--------createEditObject--------drug--3')" />
+			<evaluate expression="documentService.addDrugMtl(schemaMtl)" />
+			<evaluate expression="formUtil.logline('--------createEditObject--------drug--4')" />
+		</transition>
+		<transition on="dose"		to="schemaxViewAndEdit">
+			<evaluate expression="formUtil.logline('--------createEditObject--------dose--1')" />
+			<evaluate expression="schemaMtl.openEditDose()" />
+			<evaluate expression="formUtil.logline('--------createEditObject--------dose--2')" />
+			<evaluate expression="schemaMtl.usedDose.readDrugDose(simpleJdbc, schemaMtl)" />
+			<evaluate expression="formUtil.logline('--------createEditObject--------dose--3')" />
+			<evaluate expression="documentService.addDrugMtl(schemaMtl)" />
+			<evaluate expression="formUtil.logline('--------createEditObject--------dose--4')" />
+		</transition>
+		<transition on="app"	to="schemaxViewAndEdit">
+			<evaluate expression="schemaMtl.openEditApp()" />
+		</transition>
+		<transition on="day"		to="schemaxViewAndEdit">
+			<evaluate expression="schemaMtl.openEditDay()" />
+		</transition>
+		<transition on="times"		to="schemaxViewAndEdit">
+			<evaluate expression="schemaMtl.openEditTime()" />
+		</transition>
+		<transition on="finding"	to="schemaxViewAndEdit">
+			<evaluate expression="schemaMtl.openEditFinding()" />
+		</transition>
+		<transition on="labor"	to="schemaxViewAndEdit">
+			<evaluate expression="schemaMtl.openEditLabor()" />
+		</transition>
+		<transition on="notice"	to="schemaxViewAndEdit">
+			<evaluate expression="schemaMtl.openEditNotice()" />
+			<evaluate expression="formUtil.logline('--------createEditObject-------notice--1-')" />
+			<set name="list"	value="documentService.addNoticeList(schemaMtl)" />
+			<evaluate expression="formUtil.logline('--------createEditObject-------notice--2-')" />
+		</transition>
+		<transition on="literature"	to="schemaxViewAndEdit" >
+			<evaluate expression="schemaMtl.openEditLiterature()" />
+		</transition>
+		<transition on="expr"	to="schemaxViewAndEdit">
+			<evaluate expression="ruleService.openEditExpr(schemaMtl,exprUnit)" />
+			<!-- 
+			<evaluate expression="schemaMtl.openEditExpr()" />
+			<evaluate expression="exprUnit.read(documentService.getEntityManager(), schemaMtl)" />
+			 -->
+		</transition>
+		<transition on="pvariable"	to="schemaxViewAndEdit">
+			<evaluate expression="schemaMtl.openEditPvariable()" />
+		</transition>
+		<transition on="success"	to="schemaxViewAndEdit" />
+	</action-state>
+
+<!-- 
+	<view-state id="schemaDrugEdit"	model="schemaMtl">
+		<binder>
+			<binding property="editDrugC.drug" />
+		</binder>
+		<transition on="editStep"			to="reviseEditNode" >
+			<evaluate expression="schemaMtl.editStep()" />
+		</transition>
+		<transition on="cancel">
+			<set name="schemaMtl.idt"	value="null" />
+			<evaluate expression="schemaMtl.editStep()" />
+			<evaluate expression="schemaMtl.editStepCancel()" />
+			<set name="formUtil.mode"	value="''" />
+		</transition>
+	</view-state>
+ -->
+
+	<!-- schemaView || node Form -->
+	<view-state id="schemaxViewAndEdit"	model="schemaMtl">
+		<binder>
+			<binding property="action" />
+			<binding property="modDay" />
+			<binding property="tsNr" />
+			<binding property="idt" />
+			<binding property="prefixc" />
+			<binding property="idc" />
+			<binding property="editNodeT.ref" />
+			<!-- Labor -->
+			<binding property="editedLaborC.labor" />
+			<binding property="editedLaborC.unit" />
+			<!-- Finding -->
+			<binding property="editedFindingC.finding" />
+			<binding property="editedFindingC.unit" />
+			<!-- Drug -->
+			<binding property="editDrugC.drug" />
+			<!-- Dose -->
+			<binding property="editDoseC.app" />
+			<binding property="editDoseC.unit" />
+			<binding property="editDoseC.value" />
+			<binding property="editDoseC.pro" />
+			<binding property="chemoPcDoseC.value" />
+			<binding property="doseModType" />
+			<binding property="procent" />
+			<!-- Tempo -->
+			<binding property="editAppC.appapp" />
+			<binding property="editAppC.unit" />
+			<!-- Day -->
+			<binding property="editDayC.abs" />
+			<binding property="editDayC.newtype" />
+			<!-- Times -->
+			<binding property="editTimesC.abs" />
+			<binding property="editTimesC.relunit" />
+			<binding property="editTimesC.apporder" />
+			<binding property="editTimesC.relvalue" />
+			<binding property="editTimesC.visual" />
+			<binding property="weekMealViewSplit" />
+			<!-- Notice -->
+			<binding property="editNoticeC.notice" />
+			<binding property="editNoticeC.type" />
+			<binding property="laborChain" />
+			<!-- Duration -->
+			<!-- Pvariable -->
+			<binding property="editPvC.pvalue" />
+			<!-- expr -->
+			<binding property="andOrExprO.value" />
+			<binding property="editEqvalO.value" />
+			<binding property="editExpr1Id" />
+			<binding property="typeOfDialog" />
+			<!-- Literature -->
+			<binding property="editLiteratureO.title" />
+			<binding property="editLiteratureO.authors" />
+			<binding property="editLiteratureO.spring" />
+			<binding property="editLiteratureO.springtype" />
+			<binding property="editLiteratureO.page" />
+			<binding property="editLiteratureO.year" />
+			<binding property="editLiteratureO.volume" />
+			<binding property="editLiteratureO.url" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('------schemaxViewAndEdit---on-entry--1-----')" />
+		</on-entry>
+		<on-render>
+			<evaluate expression="formUtil.logline('------schemaxViewAndEdit---on-render--2-----')" />
+		</on-render>
+		<!-- 
+		<transition on="editStep"			to="reviseEditNode" >
+			<evaluate expression="formUtil.logline('-schemaxViewAndEdit-editStep-getIdt-'+schemaMtl.getIdt())" />
+			<evaluate expression="schemaMtl.editStep()" />
+		</transition>
+		 -->
+		<transition on="copy"				to="reviseEditNode">
+			<set name="schemaMtl.action"	value="'save'" /></transition>
+		<transition on="paste"				to="reviseEditNode">
+			<set name="schemaMtl.action"	value="'paste'" /></transition>
+		<transition on="newDrug"			to="reviseEditNode">
+			<set name="schemaMtl.action"	value="newDrug" /></transition>
+		<transition on="save"				to="reviseEditNode">
+			<set name="schemaMtl.action"	value="'save'" /></transition>
+		<transition on="newAdditionalDrug"	to="reviseEditNode">
+			<evaluate expression="schemaMtl.setIdt(requestParameters.idt)" />
+			<set name="schemaMtl.action"	value="'newAdditionalDrug'" /></transition>
+		<transition on="duration"			to="schemaxViewAndEdit" >
+			<set name="formUtil.mode"	value="'duration'" /></transition>
+		<transition on="part"				to="schemaxViewAndEdit">
+			<set name="formUtil.part"	value="requestParameters.part" />
+		</transition>
+		<transition on="addDDrugDose"			to="createEditObject" >
+			<evaluate expression="documentService.addDDrugDose(schemaMtl)" />
+		</transition>
+		<transition on="newIdClass"			to="createEditObject" >
+			<evaluate expression="schemaMtl.changeIdClass(requestParameters.newIdClass, documentService.getEntityManager())" />
+		</transition>
+		<transition on="cancel">
+			<set name="schemaMtl.idt"	value="null" />
+			<evaluate expression="schemaMtl.editStep()" />
+			<evaluate expression="schemaMtl.editStepCancel()" />
+			<set name="formUtil.mode"	value="''" />
+		</transition>
+		<transition on="editDuration"	to="schemaxViewAndEdit" >
+			<evaluate expression="schemaMtl.nextCurrentId()" />
+			<set name="formUtil.mode"	value="''" />
+			<set name="schemaMtl.idt"	value="null" />
+			<set name="schemaMtl.idc"	value="null" />
+		</transition>
+	</view-state>
+
+	<action-state id="reviseEditNode">
+		<evaluate expression="schemaMtl.editNodeName" />
+		<transition on="labor"		to="isNewLabor" />
+		<transition on="finding"	to="isNewFinding" />
+		<transition on="drug"	to="isNewDrug" />
+		<transition on="patient"	to="handleAction"/>
+		<transition on="expr"	to="handleAction">
+			<evaluate expression="formUtil.logline('--------reviseEditNode---expr--1-----')" />
+			<evaluate expression="ruleService.reviseExpr(schemaMtl,exprUnit)" />
+			<evaluate expression="documentService.addHistory(schemaMtl.editNodeT)" />
+			<evaluate expression="formUtil.logline('--------reviseEditNode---expr--2-----')" />
+		</transition>
+		<transition on="dose"	to="handleAction">
+			<evaluate expression="formUtil.logline('--------reviseEditNode---dose--1-----')" />
+			<evaluate expression="formUtil.logline('--------reviseEditNode---action-----'+schemaMtl.getAction())" />
+			<evaluate expression="formUtil.logline('--------reviseEditNode-dose--idt-----'+schemaMtl.getIdt())" />
+			<evaluate expression="documentService.reviseDose(schemaMtl)" />
+			<evaluate expression="documentService.addHistory(schemaMtl.editNodeT)" />
+			<evaluate expression="formUtil.logline('--------reviseEditNode---dose--2-----')" />
+			<evaluate expression="formUtil.logline('--------reviseEditNode-dose--idt-----'+schemaMtl.getIdt())" />
+			<!-- 
+			<evaluate expression="schemaMtl.closeEditId()" />
+			 -->
+		</transition>
+		<transition on="task"	to="handleAction" />
+		<transition on="app"	to="handleAction" >
+			<evaluate expression="formUtil.logline('--------reviseEditNode---app--1-----')" />
+		<!-- 
+			<evaluate expression="schemaMtl.addEditMObject(appCreator.setMtlO(schemaMtl.getEditAppC()).build())" />
+		 -->
+			<evaluate expression="documentService.reviseApp(schemaMtl)" />
+			<evaluate expression="documentService.addHistory(schemaMtl.editNodeT)" />
+			<evaluate expression="formUtil.logline('--------reviseEditNode---app--2-----')" />
+		</transition>
+		<transition on="day"	to="handleAction">
+			<evaluate expression="schemaMtl.addEditMObject(dayCreator.setMtlO(schemaMtl.getEditDayC()).build())"/>
+			<evaluate expression="schemaMtl.setPlanToNull()" />
+			<evaluate expression="documentService.addHistory(schemaMtl.editNodeT)" />
+		</transition>
+		<transition on="times"	to="handleAction">
+			<evaluate expression="formUtil.logline('--------reviseEditNode---times--1-----')" />
+			<evaluate expression="documentService.reviseTimes(schemaMtl)" />
+			<evaluate expression="schemaMtl.changeWeekSplit(documentService.pvL(schemaMtl.getNewPvWeekMealView()))" />
+			<evaluate expression="documentService.addHistory(schemaMtl.editNodeT)" />
+			<evaluate expression="formUtil.logline('--------reviseEditNode---times--2-----')" />
+		</transition>
+		<transition on="pvariable"	to="handleAction">
+			<evaluate expression="schemaMtl.docStatus(docStatusCreator)"/>
+		</transition>
+		<transition on="notice"		to="handleAction">
+			<evaluate expression="documentService.reviseNotice(schemaMtl)" />
+			<evaluate expression="documentService.addHistory(schemaMtl.editNodeT)" />
+		</transition>
+		<transition on="literature"		to="handleAction">
+			<evaluate expression="formUtil.logline('--------reviseEditNode---literature--1-----')" />
+			<evaluate expression="literatureCreator.revise(schemaMtl)"/>
+			<evaluate expression="formUtil.logline('--------reviseEditNode---literature--2-----')" />
+			<evaluate expression="documentService.addHistory(schemaMtl.editNodeT)" />
+			<evaluate expression="formUtil.logline('--------reviseEditNode---literature--3-----')" />
+		</transition>
+		<transition on="success"	to="handleAction"/>
+	</action-state>
+
+	<!-- DRUG -->
+	<action-state id="isNewDrug" >
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------newDrugObject----------'+schemaMtl.getEditDrugC().getDrug())" />
+			<set name="drugC" value="documentService.seekDrug(schemaMtl.getEditDrugC().getDrug())" />
+			<evaluate expression="formUtil.logline('--------newDrugObject----------'+schemaMtl.seekDrugAction(drugC))" />
+		</on-entry>
+		<evaluate expression="schemaMtl.seekDrugAction(drugC)" />
+		<transition on="nullSeekDrug"	to="schemaxViewAndEdit">
+			<evaluate expression="documentService.nullSeekDrug(schemaMtl,formUtil)" />
+		</transition>
+		<!-- 
+		<transition on="nullSeekDrug"	to="newDrugObject">
+			<set name="formUtil.mode"	value="'newDrug'" />
+		</transition>
+		 -->
+		<transition on="nullDrug"		to="handleAction">
+			<evaluate expression="schemaMtl.removeTaskDrug()" />
+		</transition>
+		<transition on="findDrug"	to="handleAction">
+			<evaluate expression="schemaMtl.addEditMObject(drugC)" />
+			<!--  to Feature #14 -->
+			<evaluate expression="documentService.addHistory(schemaMtl.editNodeT)" />
+			<set name="formUtil.mode"	value="null" />
+		</transition>
+	</action-state>
+
+	<view-state id="newDrugObjectx" model="schemaMtl">
+		<binder>
+			<binding property="idt" />
+			<binding property="editDrugC.drug" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------newDrugObject----------')" />
+		</on-entry>
+		<transition on="editStep"	to="reviseEditNode" />
+		<!-- 
+		<transition on="generic"	to="confirmDrug" >
+			<set name="formUtil.mode" value="'confirmDrug'"/>
+			<evaluate expression="schemaMtl.reviseNewGeneric(schemaMtl.editDrugC)"/>
+		</transition>
+		<transition on="trade"		to="registryDrugObject" >
+			<set name="formUtil.jsonGeneric" value="documentService.getJsonGeneric()" />
+			<evaluate expression="schemaMtl.newTrade()" />
+			<set name="formUtil.mode" value="'newTrade'" />
+		</transition>
+		 -->
+	</view-state>
+	<view-state id="registryDrugObjectx" model="schemaMtl">
+		<binder>
+			<binding property="editDrugC.drug" />
+		</binder>
+		<transition on="editStep"	to="isOldGeneric" >
+			<set name="formUtil.mode" value="'confirmDrug'"/>
+		</transition>
+	</view-state>
+	<decision-state id="isOldGeneric">
+		<on-entry>
+			<set name="drugC" value="documentService.seekDrug(schemaMtl.getEditDrugC().getDrug())" />
+		</on-entry>
+		<if test="drugC!=null"	then="confirmDrug"	else="registryDrug"/>
+		<on-exit>
+			<evaluate expression="schemaMtl.reviseNewDrugC(drugC)" />
+		</on-exit>
+	</decision-state>
+	<view-state id="confirmDrugx" model="schemaMtl">
+		<transition	on="save"		to="save" >
+				<evaluate expression="documentService.saveSchemaNative(schemaMtl)" />
+		</transition>
+	</view-state>
+	<!-- Schema from template replace -->
+	
+	<!-- LABOR SECTION -->
+		<decision-state id="isNewLabor" >
+			<on-entry>
+				<set name="laborC" value="documentService.seekLabor(schemaMtl.editedLaborC)" />
+			</on-entry>
+			<if test="laborC!=null" then="reviseLaborObject" else="newLaborObject"/>
+		</decision-state>
+		<view-state id="newLaborObjectx" model="schemaMtl">
+			<binder>
+				<binding property="idt" />
+				<binding property="editedLaborC.unit" />
+			</binder>
+			<on-entry>
+				<set name="formUtil.mode"	value="'newLabor'" />
+			</on-entry>
+			<transition on="editStep"	to="reviseLaborObject" >	
+				<set name="laborC"	value="schemaMtl.editedLaborC" />
+			</transition>
+			<on-exit>
+				<set name="formUtil.mode"	value="null" />
+			</on-exit>
+		</view-state>	
+		<action-state id="reviseLaborObject" >
+			<evaluate expression="documentService.reviseMObject(laborC,schemaMtl)" />
+			<evaluate expression="documentService.addHistory(schemaMtl.editNodeT)" />
+			<transition on="success" to="handleAction"/>
+		</action-state>
+	<!-- /LABOR SECTION -->
+	<!-- FINDING SECTION -->
+		<decision-state id="isNewFinding" >
+			<on-entry>
+				<set name="findingC" value="documentService.seekFinding(schemaMtl.editedFindingC)" />
+			</on-entry>
+			<if test="findingC!=null" then="reviseFindingObject" else="newFindingObject"/>
+		</decision-state>
+		
+		<action-state id="reviseFindingObject" >
+			<evaluate expression="documentService.reviseMObject(findingC,schemaMtl)" />
+			<evaluate expression="documentService.addHistory(schemaMtl.editNodeT)" />
+			<transition on="success" to="handleAction"/>
+		</action-state>
+	
+		<view-state id="newFindingObjectx" model="schemaMtl">
+			<binder>
+				<binding property="idt" />
+				<binding property="editedFindingC.unit" />
+			</binder>
+			<on-entry>
+				<set name="formUtil.mode"	value="'newFinding'" />
+			</on-entry>
+			<transition on="editStep"	to="reviseFindingObject" >	
+				<set name="findingC"	value="schemaMtl.editedFindingC" />
+			</transition>
+			<on-exit>
+				<set name="formUtil.mode"	value="null" />
+			</on-exit>
+		</view-state>
+	<!-- /FINDING SECTION -->
+
+	<view-state id="changeDocStatusx" model="formUtil">
+		<binder>
+			<binding property="pvO.pvalue" />
+			<binding property="editNoticeC.notice" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------changeDocStatus----------1')" />
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="formUtil.logline('--------changeDocStatus----------2')" />
+			<set name="formUtil.idt"	value="schemaMtl.docT.id" />
+			<evaluate expression="documentService.saveDocState(docStatusCreator, pvCreator,noticeCreator,formUtil,schemaMtl)" />
+		</transition>
+		<transition on="cancel" to="cancel"/>
+	</view-state>
+	
+	<view-state id="newDocx" model="formUtil">
+		<binder>
+			<binding property="newDoc.protocol" />
+		</binder>
+		<on-entry>
+			<set name="formUtil.folderT"	value="schemaMtl.folderT" />
+		</on-entry>
+		<transition on="save" to="saveNewDoc">
+			<evaluate expression="documentService.saveNewProtocolOld(formUtil)" />
+		</transition>
+		<transition on="cancel" to="schemaxViewAndEdit"/>
+	</view-state>
+	
+	<view-state id="bsaSavex" model="schemaMtl">
+		<on-entry>
+			<set name="formUtil.viewState"	value="'bsaSave'" />
+		</on-entry>
+		<!-- 
+		<transition on="back"	to="bsaDialog"/>
+		 -->
+		<transition on="save"	to="save">
+			<set name="formUtil.mode"	value="null" />
+			<evaluate expression="documentService.saveBsa(schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="patientDataEditx" model="schemaMtl">
+		<binder>
+			<!-- Patient -->
+			<binding property="editPatientC.patient" />
+			<binding property="editPatientC.forename" />
+			<binding property="editPatientC.sex" />
+			<binding property="bdate"		required="true"/>
+			<binding property="cycleNumber"	required="true"/>
+		</binder>
+		<transition on="save" to="save">
+			<evaluate expression="documentService.saveChangePatient(schemaMtl)" />
+		</transition>
+		<transition on="cancel" to="schemaxViewAndEdit"/>
+	</view-state>
+
+	<view-state id="patientDataSeekx" model="schemaMtl">
+		<binder>
+			<!-- Patient -->
+			<binding property="editPatientC.patient" />
+			<binding property="editPatientC.forename" />
+			<!-- 
+			<binding property="editPatientC.birthdate" />
+			<binding property="bdate" converter="shortDate" required="true"/>
+			 -->
+			<binding property="editPatientC.sex" />
+			<binding property="bdate" required="true"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------patientDataSeekx-----patientData----')" />
+		</on-entry>
+		<on-render>
+			<evaluate expression="documentService.seekPatient(schemaMtl)" />
+		</on-render>
+		<transition on="newPatient" to="schemaBeginDate">
+			<evaluate expression="schemaMtl.setNewPatient(documentService.getFolder('patient'))" />
+			<!-- 
+			<set name="formUtil.mode"	value="'beginDate'" />
+			 -->
+		</transition>
+		<transition on="use" to="schemaBeginDate">
+			<evaluate expression="formUtil.logline('--------patientDataSeekx----1-use----'+requestParameters.idt)" />
+			<set name="schemaMtl.idt"	value="requestParameters.idt" />
+			<evaluate expression="formUtil.logline('--------patientDataSeekx---2--use----'+schemaMtl.idt)" />
+			<evaluate expression="documentService.addSessionPatient(schemaMtl)" />
+			<evaluate expression="formUtil.logline('--------patientDataSeekx---3--use----'+schemaMtl.idt)" />
+			<!-- 
+			<set name="formUtil.mode"	value="'beginDate'" />
+			 -->
+		</transition>
+		<transition on="seek"/>
+	</view-state>
+
+	<view-state id="setIntensivDay" view="schemaxViewAndEdit" model="schemaMtl">
+		<binder>
+			<binding property="intensivDays"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('.........setIntensivDay...entry..1')" />
+			<evaluate expression="documentService.setIntensivDayEntry(schemaMtl)" />
+			<evaluate expression="formUtil.logline('.........setIntensivDay...entry..2')" />
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="documentService.setIntensivDaySave(schemaMtl)" />
+		</transition>
+	</view-state>
+	
+	<view-state id="editSchemaProperty" view="schemaxViewAndEdit" model="schemaMtl">
+		<binder>
+			<binding property="schemaC.task" />
+			<binding property="schemaC.duration" />
+			<binding property="appDuration" />
+			<binding property="schemaC.outpatient" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('.........editSchemaNameAndO...entry..')" />
+			<evaluate expression="patientSchemaService.editSchemaPropertyEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="formUtil.logline('.........editSchemaNameAndO...save..')" />
+			<evaluate expression="patientSchemaService.editSchemaPropertySave(patientSchema, schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="cmDayDelay" view="schemaxViewAndEdit" model="patientSchema">
+		<binder>
+			<binding property="bdate"		required="true"/>
+			<binding property="delayedDay"	required="true"/>
+			<binding property="notice"		required="true"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('.........cmDayDelay...on-entry.1.')" />
+			<evaluate expression="patientSchemaService.cmDayDelayEntry(patientSchema, schemaMtl)" />
+			<evaluate expression="formUtil.logline('.........cmDayDelay...on-entry.2.')" />
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="patientSchemaService.cmDayDelaySave(patientSchema, schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="schemaRewriteConfirm" view="schemaxViewAndEdit" model="patientSchema">
+		<on-entry>
+			<evaluate expression="formUtil.logline('.........schemaRewriteConfirm...on-entry..')" />
+			<evaluate expression="deleteService.schemaRewriteConfirmEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="deleteService.schemaRewriteConfirmSave(patientSchema,schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="importSchema" view="schemaxViewAndEdit" model="schemaMtl">
+		<on-entry>
+			<evaluate	expression="importService.schema2import(schemaMtl)"	result="flowScope.importDocMtl" />
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="importService.importSchemaViaNetwork(importDocMtl, schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="schemaBeginDate" view="schemaxViewAndEdit" model="patientSchema">
+		<binder>
+			<binding property="bdate" required="true"/>
+			<binding property="cycleNr"	required="true"/>
+			<!--
+			<view-state id="beginDatex" model="schemaMtl">
+			<binding property="cycleNumber"	required="true"/>
+			-->
+		</binder>
+		<on-entry>
+		<!-- 
+			<evaluate expression="schemaMtl.editStepPatient()" />
+			<evaluate expression="schemaService.beginDatexEntry(schemaMtl)" />
+			<evaluate expression="patientSchemaService.beginDatexEntry(schemaMtl)" />
+		 -->
+			<evaluate expression="patientSchemaService.schemaBeginDateEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<!-- 
+		<transition on="cancel" to="cancel"/>
+		 -->
+		<transition on="save" to="save2patient">
+			<evaluate expression="formUtil.logline('--------save2patient-----1-----'+schemaMtl.getBdate())" />
+			<evaluate expression="patientSchemaService.saveSchema2Patient(patientSchema, schemaMtl)" />
+			<evaluate expression="formUtil.logline('--------save2patient-----3-----')" />
+		</transition>
+	</view-state>
+	<view-state id="beginDateCycleNrUpdate" view="schemaxViewAndEdit" model="patientSchema">
+		<binder>
+			<binding property="bdate"	required="true"/>
+			<binding property="cycleNr"	required="true"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.beginDateCycleNrEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="patientSchemaService.changeBeginDateCycleNr(patientSchema, schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<!-- Schema from template replace -->
+	<decision-state id="checkMod">
+		<!--on-entry>
+			<evaluate expression="schemaMtl.setModL(documentService.seekMod(schemaMtl))" />
+		</on-entry>
+		<if test="schemaMtl.getModNr()>0" then="deleteMod" else="rewrite"/-->
+		<if test="schemaMtl.getModTL().size()>0" then="deleteMod" else="rewrite"/>
+	</decision-state>
+
+	<view-state id="deleteModx" model="schemaMtl">
+		<transition on="rewrite"	to="rewrite"/>
+		<transition on="cancel"		to="schemaxViewAndEdit">
+			<set name="formUtil.mode"		value="null" />
+			<set name="schemaMtl.action"	value="null" />
+		</transition>
+	</view-state>
+	<action-state id="takenBlock" >
+		<evaluate expression="schemaMtl.takenBlock(taskDrugCreator, documentService)" />
+		<transition on="success"	to="schemaxViewAndEdit" >
+		</transition>
+	</action-state>
+	<action-state id="rewrite" >
+		<evaluate expression="documentService.rewriteSchema(schemaMtl)" />
+		<transition on="success" to="save"/>
+	</action-state>
+
+	<action-state id="deleteNode">
+	<!--
+		<on-entry>
+			<set name="schemaMtl.idt"	value="requestParameters.idt" />
+		</on-entry>
+	-->
+		<evaluate expression="deleteService.deleteEditNode(schemaMtl)" />
+		<transition on="success"	to="save" >
+			<evaluate expression="documentService.saveSchemaNative(schemaMtl)" />
+		</transition>
+	</action-state>
+
+	<view-state id="cycleNrx" model="schemaMtl">
+		<binder>
+			<binding property="cycleNr" />
+			<binding property="appNr" />
+			<binding property="isApp" />
+			<binding property="schemaC.duration" />
+		</binder>
+		<transition on="cancel" to="schemaxViewAndEdit">
+			<set name="formUtil.mode"		value="null" />
+			<set name="schemaMtl.action"	value="null" />
+		</transition>
+		<transition on="save" to="save">
+			<evaluate expression="documentService.saveCycleNr(schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<!-- 
+	<view-state id="duration" model="schemaMtl">
+		<binder>
+			<binding property="schemaC.duration" />
+		</binder>
+		<transition on="editNode"	to="schemaxViewAndEdit" >
+			<evaluate expression="schemaMtl.nextCurrentId()" />
+		</transition>
+	</view-state>
+	 -->
+
+	<action-state id="sort1to2">
+		<evaluate expression="schemaMtl.action" />
+		<transition on="success"	to="save">
+			<evaluate expression="formUtil.logline('--------sort1to2----------')" />
+			<evaluate expression="documentService.saveSchemaNative(schemaMtl)" />
+			<evaluate expression="formUtil.logline('--------sort1to2----------')" />
+		</transition>
+	</action-state>
+
+	<!-- depr -->
+	<view-state id="bsaDialogOld"  view="schemaxViewAndEdit"  model="patientSchema">
+		<binder>
+			<!-- Bsa -->
+			<binding property="weightKg" />
+			<binding property="heightCm" />
+			<binding property="bsaType" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------bsaDialog---entry-------')" />
+			<evaluate expression="patientSchemaService.bsaDialogEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<transition on="calculation">
+			<evaluate expression="formUtil.logline('--------bsaDialog---calculation-------')" />
+			<evaluate expression="patientSchemaService.bsaDialogCalc(patientSchema,schemaMtl)" />
+		</transition>
+		<transition on="save"	to="save" >
+			<evaluate expression="formUtil.logline('--------bsaDialog---save-------')" />
+			<evaluate expression="patientSchemaService.bsaDialogSave(patientSchema,schemaMtl)" />
+		</transition>
+		<!-- 
+		<transition on="bsaSave"	to="bsaSave">
+			<set name="formUtil.viewState"	value="'bsaSave'" />
+			<evaluate expression="schemaMtl.patientMtl.reviseBsa()" />
+			<evaluate expression="schemaMtl.calcDose()" />
+		</transition>
+		 -->
+	</view-state>
+
+	<view-state id="bsaDialog" view="schemaxViewAndEdit" model="patientMtl">
+		<binder>
+			<!-- Bsa 
+			<render fragments="dialogs" /> 
+			-->
+			<binding property="weight" />
+			<binding property="height" />
+			<binding property="bsaType" />
+		</binder>
+		<on-entry>
+			<evaluate result="viewScope.ctt" expression="'content'" />
+			<!--
+			<render fragments="content, dialogs" />
+			<render fragments="dialogs, #{ctt}" />
+			-->
+		</on-entry>
+		<transition on="viewBsaFormula">
+			<evaluate expression="patientMtl.setViewBsaFormula()" />
+			<evaluate expression="patientMtl.calcBsa()" />
+			<evaluate expression="schemaMtl.calcDose()" />
+		</transition>
+		<transition on="calculation">
+			<evaluate expression="patientMtl.calcBsa()" />
+			<evaluate expression="schemaMtl.calcDose()" />
+		</transition>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.bsaDialogSave(patientMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="newCycle" model="patientSchema">
+		<binder>
+			<binding property="cycleNr"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.newCycleEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.newCycleSave(patientSchema,schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="tabletDivisor" model="patientSchema">
+		<binder>
+			<binding property="drugReception"/>
+			<binding property="t0quantity"/>
+			<binding property="t1quantity"/>
+			<binding property="t2quantity"/>
+			<binding property="t0dquantity"/>
+			<binding property="t1dquantity"/>
+			<binding property="t2dquantity"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.tabletDivisorEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<transition on="addDelTablet">
+			<evaluate expression="patientSchemaService.addDelTablet(patientSchema,schemaMtl)" />
+		</transition>
+		<transition on="calculation">
+			<evaluate expression="patientSchemaService.calculationTablet(patientSchema,schemaMtl)" />
+		</transition>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.schemaTabletDivisorSave(patientSchema,schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="addGcsf" view="schemaxViewAndEdit" model="schemaMtl">
+		<binder>
+			<binding property="idc"		required="true" />
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.addGcsfEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<transition on="save"	to="save" >
+			<set name="schemaMtl.idc"			value="requestParameters.idc" />
+			<evaluate expression="patientSchemaService.addGcsfSave(patientSchema,schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="gfrLabor2auc" view="schemaxViewAndEdit" model="patientSchema">
+		<binder>
+			<binding property="nlaborValue"	required="true" />
+			<binding property="bdate"		required="true" />
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.gfrLabor2aucEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.gfrLabor2aucSave(patientSchema,schemaMtl)" />
+		</transition>
+	</view-state>
+	<view-state id="creatinineLabor2auc"  view="schemaxViewAndEdit" model="patientSchema">
+		<binder>
+			<binding property="nlaborValue"	required="true" />
+			<binding property="laborUnit"	required="true" />
+			<binding property="bdate"		required="true" />
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.creatinineLabor2aucEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.creatinineLabor2aucSave(patientSchema,schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="schemaExprUse" model="patientSchema">
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.schemaExprUseSave(patientSchema,schemaMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="patientDiagnose" view="schemaxViewAndEdit" model="patientSchema">
+		<binder>
+			<binding property="notice" />
+			<binding property="iddiagnose" />
+			<binding property="diagnose" />
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.patientDiagnoseEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.patientDiagnoseSave(patientSchema,schemaMtl)" />
+		</transition>
+		<on-exit>
+			<evaluate expression="patientSchemaService.patientDiagnoseExit(patientSchema,schemaMtl)" />
+		</on-exit>
+	</view-state>
+	<view-state id="patientDiagnose2" view="schemaxViewAndEdit" model="patientSchema">
+	</view-state>
+
+	<view-state id="chemoDoseMod" model="patientSchema">
+		<binder>
+			<!-- general -->
+			<binding property="action" />
+			<binding property="tsNr" />
+			<binding property="idt" />
+			<!-- dose specific -->
+			<binding property="notice" />
+			<binding property="doseDeff" />
+			<binding property="doseCalcf" />
+			<!-- 
+			<binding property="doseDef" />
+			<binding property="doseCalc" />
+			 -->
+			<binding property="doseDef100" />
+			<binding property="doseProc" />
+			<binding property="doseCalc100" />
+			<binding property="doseModType" />
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.chemoDoseModEntry(patientSchema,schemaMtl)" />
+		</on-entry>
+		<transition on="editStep">
+			<evaluate expression="patientSchemaService.chemoDoseModEditStep(patientSchema,schemaMtl)" />
+		</transition>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.chemoDoseModSave(patientSchema,schemaMtl)" />
+		</transition>
+		<on-exit>
+			<evaluate expression="patientSchemaService.chemoDoseModExit(patientSchema,schemaMtl)" />
+		</on-exit>
+	</view-state>
+
+	<end-state id="save"			commit="true" view="externalRedirect:/schema-#{owsSession.schemaPart}-#{id}" >
+		<on-entry>
+			<evaluate expression="formUtil.logline('-------------- pass save state-----------------')" />
+			<evaluate expression="documentService.addHistory(schemaMtl.docT)" />
+		</on-entry>
+	</end-state>
+	<!-- 
+	<end-state id="save"			commit="true" view="externalRedirect:/schema?id=#{id}&amp;part=#{formUtil.part}" />
+	 -->
+
+	<!--  obsolete state -->
+	<end-state id="saveNewDoc"		commit="true" view="externalRedirect:/schema-#{owsSession.schemaPart}-#{formUtil.newTaskT.id}" />
+	
+	<end-state id="save2patient"	commit="true" view="externalRedirect:/schema-#{owsSession.schemaPart}-#{schemaMtl.idt}" />
+	<end-state id="cancel"			view="externalRedirect:/schema-#{owsSession.schemaPart}-#{id}" />
+
+	<global-transitions>
+		<transition on="parted">
+			<evaluate expression="formUtil.logline('--global-transitions--parted---')" />
+		<set name="owsSession.schemaPart" value="'ed'" /></transition>
+		<transition on="partplan">
+			<evaluate expression="formUtil.logline('--global-transitions--partplan---')" />
+			<set name="owsSession.schemaPart" value="'plan'" /></transition>
+		<transition on="partweek">	<set name="owsSession.schemaPart" value="'week'" /></transition>
+		<transition on="parthour">	<set name="owsSession.schemaPart" value="'hour'" /></transition>
+		<transition on="partinfo">	<set name="owsSession.schemaPart" value="'info'" /></transition>
+		<transition on="copy"	to="schemaxViewAndEdit">
+			<evaluate expression="formUtil.logline('--global-transitions--copy---getIdt-'+schemaMtl.getIdt())" />
+			<evaluate expression="formUtil.logline('--global-transitions--copy---getIdc-'+schemaMtl.getIdc())" />
+			<evaluate expression="formUtil.logline('--global-transitions--copy---requestParameters.idc-'+requestParameters.idc)" />
+			<!-- 
+			<evaluate expression="schemaMtl.copy()" />
+			 -->
+			<evaluate expression="copyPasteService.copy(schemaMtl)" />
+		</transition>
+		<transition on="paste"	to="save">
+			<!--
+			<set name="schemaMtl.copyNodeT"	value="userCareSessionContainer.userCareSession.copyNodeT" />
+			<evaluate expression="schemaMtl.paste()" />
+			-->
+			<evaluate expression="copyPasteService.paste(schemaMtl)" />
+			<evaluate expression="documentService.saveSchemaNative(schemaMtl)" />
+		</transition>
+		<transition on="part">
+			<set name="formUtil.part"			value="requestParameters.part" />
+		</transition>
+		<transition on="cancel"		to="schemaxViewAndEdit">
+			<evaluate expression="formUtil.logline('--global-transitions--cancel---getIdt-'+schemaMtl.getIdt())" />
+			<evaluate expression="formUtil.logline('--global-transitions--cancel---getIdc-'+schemaMtl.getIdc())" />
+			<set name="schemaMtl.idt"	value="null" />
+			<set name="schemaMtl.idc"	value="null" />
+			<evaluate expression="schemaMtl.setEditNodeT()" />
+			<evaluate expression="formUtil.logline('--global-transitions--cancel---getIdt-'+schemaMtl.getIdt())" />
+			<evaluate expression="formUtil.logline('--global-transitions--cancel---getIdc-'+schemaMtl.getIdc())" />
+		</transition>
+		<transition on="editStep"	to="reviseEditNode" >
+			<evaluate expression="formUtil.logline('--global-transitions--editStep---getIdt-'+schemaMtl.getIdt())" />
+			<evaluate expression="schemaMtl.editStep()" />
+		</transition>
+
+		<!-- Redirect to save on exception
+		<transition on-exception="org.springframework.webflow.engine.NoMatchingTransitionException" to="save">
+			<evaluate expression="formUtil.logerror(schemaMtl.action+'...org.springframework.webflow.engine.NoMatchingTransitionException...')" />
+			<set name="flashScope.actionExecutionException" value="'actionExecutionException_'+schemaMtl.action" />
+		</transition>
+		<transition on-exception="org.springframework.webflow.execution.ActionExecutionException" to="save">
+			<evaluate expression="formUtil.logerror(schemaMtl.action+'...actionExecutionException...')" />
+			<set name="flashScope.actionExecutionException" value="'actionExecutionException_'+schemaMtl.action" />
+		</transition>
+		 -->
+	</global-transitions>
+
+	<on-end>
+		<evaluate expression="formUtil.logline(' ')" />
+		<evaluate expression="formUtil.logline('-------------- on end-----------------')" />
+		<evaluate expression="formUtil.logline(' ')" />
+	</on-end>
+</flow>

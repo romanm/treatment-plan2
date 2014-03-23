@@ -1,0 +1,22 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/fn"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+<jsp:directive.attribute name="varT" type="com.qwit.domain.Tree" required="true" description=""/>
+<jsp:directive.attribute name="unit" description=""/>
+
+<c:forEach items="${varT.childTs}" var="valT">
+	<c:choose>
+		<c:when test="${valT.tabName=='ivariable' and valT.mtlO.ivariable==varT.tabName}">
+			<c:set var="ivalT" value="${valT}" />
+		</c:when>
+		<c:when test="${valT.tabName=='pvariable' and valT.mtlO.pvariable==varT.tabName}">
+			<c:set var="pvalT" value="${valT}" />
+		</c:when>
+	</c:choose>
+</c:forEach>
+<c:out value="${not empty ivalT?ivalT.mtlO.ivalue:pvalT.mtlO.pvalue}" />
+<c:out value=" " />
+<c:out value="${not empty unit?unit:varT.mtlO.unit}" />
+</jsp:root>

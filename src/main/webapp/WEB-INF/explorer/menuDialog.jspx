@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit" >
+
+	<!-- 
+	<edit:panel />
+	 -->
+	<c:choose>
+		<c:when test="${explorerMtl.isPatientFolder}">
+			<owsui:titlePane id="patient_administration" mtitle="ui_title_patientAdministration" isOpened="true">
+				<table width="auto">
+					<tr><td>
+						<fmt:message var="ui_menuItemLink_newPatient" key="ui_menuItemLink_newPatient" />
+						<input onclick="self.location.href='explorerflow?id=${explorerMtl.folderO.id}&amp;a=newPatient'"
+							 type="button" value="${ui_menuItemLink_newPatient}" />
+						</td>
+					</tr>
+					<tr><td> <center>oder</center> </td> </tr>
+					<tr><td>
+						<!--
+						<form method="get" action="explorer=${explorerMtl.folderO.id}" >
+						<form action="explorer=${explorerMtl.folderO.id}" >
+						-->
+						<form method="post" action="explorerpost=${explorerMtl.folderO.id}" >
+							<input name="search" value="${param.search}" />
+							<br/>
+							<input type="submit" value="Patient Suchen" style="width:150px;" />
+						</form>
+					</td></tr>
+				</table>
+			</owsui:titlePane>
+		</c:when>
+		<c:when test="${explorerMtl.isConceptFolder}">
+			<owsui:titlePane id="protocol_administration" mtitle="ui_title_protocolAdministration" isOpened="true">
+			<!-- 
+				<fmt:message var="ui_menuItemLink_newProtocol" key="ui_menuItemLink_newProtocol" />
+				<input onclick="self.location.href='explorerflow?id=${explorerMtl.folderO.id}&amp;a=newProtocol'"
+					 type="button" value="${ui_menuItemLink_newProtocol}" />
+			 -->
+				<button onclick="self.location.href='explorerflow?id=${explorerMtl.folderO.id}&amp;a=newProtocol'" >
+					<fmt:message key="ui_menuItemLink_newProtocol" />
+				</button>
+				<div align="center">
+				oder
+				</div>
+				<div align="center">
+					<button onclick="self.location.href='?a=newSchema'" >
+						<fmt:message key="ui_menuItemLink_newSchemaInProtocol" />
+					</button>
+					<!-- 
+					<a href="?a=newSchema">
+						<fmt:message key="ui_menuItemLink_newSchemaInProtocol" />
+					</a>
+					 -->
+				</div>
+				<div align="center">
+				oder
+				</div>
+				<div>
+				<!-- 
+					<form method="get" action="explorer=${explorerMtl.folderO.id}">
+						<input name="seek" value="${param.search}" />
+				 -->
+					<form action="explorer=${explorerMtl.folderO.id}">
+						<input name="seek" value="${owsSession.schemaSeek }" />
+						<br/>
+						<!-- 
+						<fmt:message var="uiTherapySchemaSeek" key="uiTherapySchemaSeek" />
+						<input type="submit" value="${uiTherapySchemaSeek}" style="width:150px;" />
+						 -->
+						<button type="submit" >
+							<fmt:message  key="uiTherapySchemaSeek" />
+						</button>
+					</form>
+				</div>
+			</owsui:titlePane>
+			<owsui:titlePane id="ep_${id}" title="${ui_seekFilter}" isOpened="${true}">
+				<edit:protocolFilter />
+			</owsui:titlePane>
+		</c:when>
+	</c:choose>
+	
+	<!-- OLD DIALOG -->
+	<!-- 
+	<c:if test="${'patient'==explorerMtl.folderType}">
+		<table width="100%">
+			<tr><td>
+				<c:if test="${'patient'==explorerMtl.folderO.folder }">
+					<div class="red"><fmt:message key="ui_subdir_select"/></div>
+				</c:if>
+	-->
+				<!-- 
+				<a class="next" href="explorerflow?id=${explorerMtl.folderO.id}&amp;a=newPatient">
+					<fmt:message key="ui_menuItemLink_newPatient" />
+				</a>
+				 -->
+	<!-- 
+				<fmt:message var="ui_menuItemLink_newPatient" key="ui_menuItemLink_newPatient" />
+				<input onclick="self.location.href='explorerflow?id=${explorerMtl.folderO.id}&amp;a=newPatient'"
+					 type="button" value="${ui_menuItemLink_newPatient}" />
+				oder
+			</td></tr><tr><td>
+				<form method="get" action="explorer=${explorerMtl.folderO.id}">
+					Suchen:
+					<input name="search" />
+					<br/>
+					<input type="submit" value="Patient Suchen" />
+				</form>
+			</td></tr>
+		</table>
+	</c:if>
+	-->
+
+<!-- 
+<c:set var="menu">	<fmt:message key="ui_title_menu"/> </c:set>
+ -->
+<c:set var="view"><fmt:message key="ui_title_views"/> </c:set>
+
+<!-- 
+<owsui:sidebarUl head="${menu}">
+<c:if test="${param.folder == 'patient' || formUtil.mode == 'newPatient'}">
+	<li>
+		<a id="newPatientLink" href="newpatient?idf=${param.id}&amp;folder=${param.folder}"><fmt:message key="ui_patientNew" /> </a>
+	</li>
+</c:if>
+
+<c:if test="${param.folder == 'protocol' || formUtil.mode == 'newProtocol' || formUtil.mode == 'importProtocol'}">
+	<li>
+		<a id="newProtocolLink" href="explorerflow?id=${param.id}&amp;a=newProtocol"><fmt:message key="ui_protocolNew" /></a>		
+	</li>
+	<li>
+		<a href="import?idf=${param.id}&amp;folder=${param.folder}" id="importProtocolLink"><fmt:message key="ui_protocolImport" /></a>
+	</li>
+</c:if>
+</owsui:sidebarUl>
+ -->
+
+<!--
+<owsui:sidebarUl head="${view}">
+	<c:if test="${explorerMtl.isConceptFolder }">
+		<li>
+			<a id="pilotTableLink" href="../extra/pilottable?id=1"><fmt:message key="ui_menuItem_pilotTable" /></a>
+		</li>
+	</c:if>
+</owsui:sidebarUl>
+  -->
+
+</jsp:root>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:security="http://www.springframework.org/security/tags"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+>
+
+
+		<c:set var="username" value="i_${docMtl.docT.id}" />
+		<c:if test="${not empty userMtl }">
+			<spring:eval var="owuserP" expression="jxp.var('owuser')
+				.jxp(docMtl.getDocT()).getPointer('childTs[tabName=$owuser]')" />
+				<!-- 
+			<spring:eval var="owuserP" expression="jxp.var('owuser')
+				.jxp(docMtl.getDocT()).getPointer('childTs[tabName=$owuser]')" />
+				 -->
+			<c:set var="username" value="${owuserP.value.mtlO.owuser}" />
+		</c:if>
+		${username }
+		
+<div>
+${pageContext.request.userPrincipal.name}
+<c:out value=" " />
+ROLE:
+	<security:authorize ifAllGranted="ROLE_USER">u</security:authorize>
+	<security:authorize ifAllGranted="ROLE_SUPERVISOR">s</security:authorize>
+	<security:authorize ifAllGranted="ROLE_THERAPY">t</security:authorize>
+</div>
+<div>
+${username}
+<c:out value=" " />
+ROLE:
+	<sql:query var="thisUserRole" dataSource="${owsDbSource}" scope="session" >
+		SELECT * FROM authorities WHERE username=?<sql:param value="${username}"/>
+	</sql:query>
+	<c:forEach var="row" items="${thisUserRole.rows}" varStatus="stat">
+		<spring:message code="ui_role_${row.authority }" />
+	</c:forEach>
+</div>
+		<sql:query var="instituteFolders" dataSource="${owsDbSource}" scope="session" >
+SELECT f00.idfolder ppId, f0.folder parentFolder, f0.idfolder parentId, f1.*,n1.* 
+FROM folder f1, noderole n1, folder f0 
+LEFT JOIN folder f00 ON f00.idfolder=f0.fdid
+LEFT JOIN 
+(SELECT idnode,min(username) 
+FROM noderole WHERE username!=?<sql:param value="${username}"/>
+GROUP BY idnode) n0 
+ON n0.idnode=f0.idfolder
+WHERE f0.idfolder=f1.fdid AND n1.idnode=f1.idfolder AND n1.username=?<sql:param value="${username}"/>
+ORDER BY f00.idfolder, f0.idfolder, f1.folder
+		</sql:query>
+		<security:authorize ifAllGranted="ROLE_SUPERVISOR">
+			<form action="setAdminNode" id="f2">
+				<input type="hidden" name="iddoc" value="${docMtl.docT.id }" />
+				Set ${username} user as admin to
+				<select name="idfolder">
+					<c:forEach var="row" items="${instituteFolders.rows}" varStatus="stat">
+						<option value="${row.idnode }">${row.folder}</option>
+					</c:forEach>
+				</select>
+				folder
+				.
+				<input type="submit" value="set adminNode" />
+			</form>
+			<sql:query var="thisUserRoleAdmin" dataSource="${owsDbSource}" scope="session" >
+				SELECT * FROM noderole,folder
+				WHERE admin='1' AND idnode=idfolder AND username=?<sql:param value="${username}"/>
+			</sql:query>
+			<c:if test="${thisUserRoleAdmin.rowCount>0}">
+				<form action="removeAdminNode" id="f3">
+					<input type="hidden" name="iddoc" value="${docMtl.docT.id }" />
+					Remove ${username} user as admin from
+					<select name="idfolder">
+						<option></option>
+						<c:forEach var="row" items="${thisUserRoleAdmin.rows}" varStatus="stat">
+							<option value="${row.idnode }">${row.folder}</option>
+						</c:forEach>
+					</select>
+					folder.
+					<input type="submit" value="remove adminNode" />
+				</form>
+			</c:if>
+		</security:authorize>
+		<c:set var="previousParentFolder" value="" />
+		<c:set var="folderNumber" value="0" />
+		<jsp:useBean id="ppf" class="java.util.HashMap"/>
+		<form action="setRWNodeRole" id="f4">
+		<table>
+			<tr><th><fmt:message key="ui_folderName"/></th>
+				<th>p#</th><th>#</th><th>r</th><th>w</th>
+			</tr>
+		<c:forEach var="row" items="${instituteFolders.rows}" varStatus="stat">
+			<c:set var="folderNumber" value="${folderNumber+1}" />
+			<c:if test="${previousParentFolder!=row.parentFolder }">
+				<c:set var="previousParentFolder" value="${row.parentFolder }" />
+				<tr><td class="${(1==ppf[row.ppId] or 1==folderNumber)?'':(empty ppf[row.parentId]?'b':'')}" style="font-style: italic;">${previousParentFolder}</td>
+					<td>${ppf[row.ppId]}</td>
+					<td>${folderNumber}</td>
+				</tr>
+				<c:set var="parentId" value="${row.parentId}" />
+				<c:set var="folderNumber" value="${folderNumber+1}" />
+				<spring:eval var="p1" expression="ppf.put(parentId,folderNumber)"/>
+			</c:if>
+			<c:set var="id" value="${row.idfolder}" />
+			<spring:eval var="p2" expression="ppf.put(id,folderNumber)"/>
+			<tr>
+				<td style="padding-left: 1em;" id="f_${id}" class="select">
+					<a href="explorer=${id}">${row.folder}</a>
+				</td>
+				<td></td>
+				<td>${folderNumber}</td>
+				<td>
+					<c:choose>
+						<c:when test="${row.read}">
+					<input type="checkbox" name="nr_${row.idnode }" checked="checked" disabled="disabled"/>
+						</c:when>
+						<c:otherwise>
+					<input type="checkbox" name="nr_${row.idnode }" disabled="disabled"/>
+						</c:otherwise>
+					</c:choose>
+				</td>
+				<td>
+					<security:authorize ifAllGranted="ROLE_SUPERVISOR">
+						<c:set var="rsv" value="true" />
+						<c:choose>
+							<c:when test="${row.write}">
+						<input type="checkbox" name="nw_${row.idnode }" checked="checked" />
+							</c:when>
+							<c:otherwise>
+						<input type="checkbox" name="nw_${row.idnode }" />
+							</c:otherwise>
+						</c:choose>
+					</security:authorize>
+					<c:if test="${not rsv }">
+						<c:choose>
+							<c:when test="${row.write}">
+						<input type="checkbox" name="nw_${row.idnode }" checked="checked" disabled="disabled"/>
+							</c:when>
+							<c:otherwise>
+						<input type="checkbox" name="nw_${row.idnode }" disabled="disabled"/>
+							</c:otherwise>
+						</c:choose>
+					</c:if>
+					<c:if test="${row.admin }">A</c:if>
+				</td>
+			</tr>
+		</c:forEach>
+		<c:if test="${instituteFolders.rowCount==0}">
+			<tr>
+				<td>
+				Kein personliches Verzeichniss
+				</td>
+			</tr>
+		</c:if>
+		<c:if test="${instituteFolders.rowCount>0}">
+			<tr><td colspan="4"/>
+				<td>
+			<input type="submit" value="save" />
+				</td>
+			</tr>
+		</c:if>
+		</table>
+		</form>
+
+</jsp:root>

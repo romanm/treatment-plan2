@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="ts"	type="com.qwit.domain.Ts"/>
+<jsp:directive.attribute name="view" />
+<jsp:directive.attribute name="notMeal" type="java.lang.Boolean" />
+
+<c:if test="${empty currTs}">
+	<c:set var="currTs" value="${ts}" scope="request" />
+</c:if>
+<c:set var="drugT" value="${ts.taskT}" />
+<spring:eval var="doseT" expression="jxp.child(drugT,'dose',1)" />
+
+<!--spring:eval var="tsDoseModP" expression="jxp.jxp(docMtl.getPschemaT())
+	.var('doseId',doseT.getId()).var('taskTsNr').var('taskTsNrVal',docMtl.getTaskTsNr(ts)).getPointer(
+'childTs/childTs[ref=$doseId and childTs/mtlO[ivariable=$taskTsNr and ivalue=$taskTsNrVal]]')" /-->
+	<!--
+	.var('refTask',drugT.getId()).var('taskTsNr').var('tTsNr',docMtl.getTaskTsNr(currTs)).var('dose').getPointer(
+	-->
+<spring:eval var="ruleDoseP" expression="jxp.jxp(docMtl.getPschemaT())
+	.var('refTask',drugT.getId()).var('taskTsNr').var('tTsNr',docMtl.getTaskTsNr(ts)).var('dose').getPointer(
+'childTs[ref=$refTask]/childTs[childTs/mtlO[ivariable=$taskTsNr]/ivalue=$tTsNr]/childTs[tabName=$dose]')" />
+<c:choose>
+	<c:when test="${not empty ruleDoseP.value }">
+		<spring:eval var="ruleDose" expression="docMtl.calc(ruleDoseP.getValue())" />
+		<span class="green">
+			<fmt:formatNumber pattern="##" value="${ruleDose}" />
+		</span>
+	</c:when>
+	<c:when test="${not empty docMtl.tsDoseM[ts]}">
+		<mtl:chemo1DoseMod ts="${ts}" doseT="${doseT}" doseModT="${docMtl.tsDoseM[ts]}" view="${view}" notMeal="${notMeal}" />
+	</c:when>
+	<c:otherwise>
+		<spring:eval var="doseModP" expression="jxp.jxp(docMtl.getPschemaT())
+		.var('taskTsNr').var('doseId',doseT.getId()).getPointer(
+		'childTs/childTs[ref=$doseId and not(childTs/mtlO[ivariable=$taskTsNr])]')" />
+		<mtl:chemo1DoseMod ts="${ts}" doseT="${doseT}" doseModT="${doseModP.value}" view="${view}" notMeal="${notMeal}" />
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

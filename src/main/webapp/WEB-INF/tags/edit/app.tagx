@@ -1,0 +1,36 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<c:set var="editId" value="${docMtl.editNodeT.id}" />
+
+<c:if test="${docMtl.editNodeT.tabName!='app'}">
+	<c:set var="editId" value="" />
+</c:if>
+	<div style="float: right;"><fmt:message key="uiTempo"/></div>
+	<h3>Absolut</h3>
+	<form:input id="appApp" path="editAppC.appapp" cssStyle="width:50px" onchange="changeAppapp(${editId})"/>
+	
+	<p>
+		<form:radiobutton id="um1" value="min" path="editAppC.unit" onclick="tempo1('min',${editId})"/>
+		<label for="um1">min</label>
+		<form:radiobutton id="uh1" value="h" path="editAppC.unit" onclick="tempo1('h',${editId})"/>
+		<label for="uh1">h</label>
+		<form:radiobutton id="ud1" value="d" path="editAppC.unit" onclick="tempo1('d',${editId})"/>
+		<label for="ud1">d</label>
+	</p>
+	<h3>Fest</h3>
+	<p>
+		<form:radiobutton id="um2" value="min" path="editAppC.unit" onclick="tempo0('um2',${editId})"/>
+		<label id="um2l" for="um2">Bolus</label>
+		<form:radiobutton id="uh2" value="h" path="editAppC.unit" onclick="tempo0('uh2',${editId})"/>
+		<label id="uh2l" for="uh2">KI</label>
+		<form:radiobutton id="ud2" value="d" path="editAppC.unit" onclick="tempo0('ud2',${editId})"/>
+		<label  id="ud2l" for="ud2">Kontinuierlich</label>
+	</p>
+
+</jsp:root>

@@ -1,0 +1,100 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="ifT" type="com.qwit.domain.Tree" required="true" description="The 'if' tree object"/>
+
+<c:set var="logicalExprT"	value="${ifT.childTs[0]}" />
+<c:set var="thenT"			value="${ifT.childTs[1]}" />
+<c:set var="elseT"			value="${ifT.childTs[2]}" />
+<c:set var="elseIfT"		value="${elseT.childTs[0]}" />
+
+<tr>
+<th><fmt:message key="uiIf"/>:</th>
+<td>
+<table>
+	<c:choose>
+		<c:when test="${logicalExprT.mtlO.expr=='equality'}">
+			<c:set var="equal1T" value="${logicalExprT.childTs[0].childTs[0]}" />
+			<c:set var="equal2T" value="${logicalExprT.childTs[1].childTs[0]}" />
+			<tr>
+				<td id="tdIfExpr1">
+					<c:choose>
+						<c:when test="${not empty equal1T}">
+							<fmt:message key="mtl_expr_value_${equal1T.mtlO.value}"/>
+						</c:when>
+						<c:otherwise>?____</c:otherwise>
+					</c:choose>
+				</td>
+				<td>
+				<form:hidden path="editExpr1Id"/>
+				<c:set var="eqVal" value="${schemaMtl.editEqvalO.value}" />
+				<form:select path="editEqvalO.value">
+					<c:forEach var="eqv" items="${fn:split('= != &gt; &gt;= &lt; &lt;=',' ')}">
+						<c:choose>
+							<c:when test="${eqv==eqVal}">
+						<option value="${eqv}" selected="selected">${eqv}</option>
+							</c:when>
+							<c:otherwise>
+						<option value="${eqv}">${eqv}</option>
+							</c:otherwise>
+						</c:choose>
+					</c:forEach>
+				</form:select>
+				</td>
+				<td>
+					<form:input path="editPvC.pvalue" cssStyle="width:40px"/>
+				</td>
+			</tr>
+		</c:when>
+		
+		<c:when test="${logicalExprT.mtlO.expr=='andOrExpr'}">
+		<c:forEach var="equalT" items="${logicalExprT.childTs}" varStatus="stat">
+			<c:set var="equalC" value="${schemaMtl.classM[equalT.idClass]}" />
+			<tr>
+				<th>
+					<c:if test="${stat.count==2}">${logicalExprT.mtlO.value}&#160;</c:if>
+				</th>
+				
+				<td><owsui:editorIfElement exprT="${equalT.childTs[0].childTs[0]}" />&#160;</td>
+				
+				<td>
+				<form:select path="editExprC.expr">
+					<qhtm:option value="=" myValue="${myValue}" />
+				</form:select>&#160;
+				</td>
+				<td><owsui:editorIfElement exprT="${equalT.childTs[1].childTs[0]}" />&#160;</td>
+			</tr>
+		</c:forEach>
+		</c:when>
+		
+	</c:choose>
+</table>
+</td>
+
+<th><fmt:message key="uiThen" />&#160;</th>
+<td><owsui:editorIfElement exprT="${thenT.childTs[0]}" />&#160;</td>
+
+<c:if test="${elseT.mtlO.expr=='else'}">
+<th><fmt:message key="uiElse" />&#160;</th>
+<td>
+<c:choose>
+	<c:when test="${elseIfT.tabName=='expr' and elseIfT.mtlO.expr=='if'}">
+		<fmt:message key="nextRow" />
+	</c:when>
+	<c:otherwise><owsui:editorIfElement exprT="${elseT.childTs[0]}" />&#160;</c:otherwise>
+</c:choose>
+</td>
+</c:if>
+
+</tr>
+<c:if test="${elseIfT.tabName=='expr' and elseIfT.mtlO.expr=='if'}">
+	<owsui:editorIf ifT="${elseIfT}" />
+</c:if>
+</jsp:root>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:expr="urn:jsptagdir:/WEB-INF/tags/expr"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<c:set var="ifLogicT" value="${docMtl.editNodeT.parentT.childTs[0]}" />
+<spring:eval var="tsLogicT" expression="jxp.var('drugInput')
+	.jxp(ifLogicT).getPointer('childTs/childTs[mtlO/value=$drugInput]')" />
+<c:choose>
+	<c:when test="${not empty tsLogicT and empty docMtl.tsNr }">
+	Gehen sie bitte
+	<c:out value=" " />
+	<fmt:message key="ui_1_view"/>
+	<c:out value=" " />
+	<spring:url var="href" value="schema?">
+		<spring:param name="id"		value="${docMtl.docT.id}"/>
+		<spring:param name="part"	value="plan"/>
+	</spring:url>
+	<a href="${href}"><fmt:message key="uiChemoTherapyPlan"/></a>
+	</c:when>
+	<c:otherwise>
+<form:form id="f2" modelAttribute="patientSchema">
+<table>
+	<tr>
+		<th>
+<fmt:message key="ui_button_confirm" />
+		</th>
+	</tr>
+	<tr>
+		<td>
+<expr:logicExprUse logicT="${ifLogicT}" />
+		</td>
+	</tr>
+	<tr>
+		<th>
+<fmt:message key="ui_apply" />
+		</th>
+	</tr>
+	<c:forEach items="${docMtl.editNodeT.childTs}" var="thenExprT">
+	<tr>
+		<td>
+		<mtl:ifElement exprT="${thenExprT}" />
+		</td>
+	</tr>
+	</c:forEach>
+</table>
+für Medikament in Position # ${docMtl.tsNr }
+<br/>
+<input type="submit" name="_eventId_save"	value="${ui_button_OK}"/>
+<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}"/>
+</form:form>
+</c:otherwise>
+</c:choose>
+
+</jsp:root>

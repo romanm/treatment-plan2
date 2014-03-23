@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+">
+
+	<bean	id="owsSession"	class="com.qwit.model.OwsSession"	scope="session">
+		<aop:scoped-proxy/>
+	</bean>
+
+	<bean id="mtlObjPool" class="com.qwit.util.MtlObjectePool">
+		<property name="buildMap">
+			<map>
+				<entry key="labor">
+					<map>
+						<entry key="GFR_mLmin">
+							<map>
+								<entry key="labor" value="GFR"/>
+								<entry key="unit" value="mL/min"/>
+							</map>
+						</entry>
+						<entry key="Creatinine_µmoll">
+							<map>
+								<entry key="labor" value="Creatinine"/>
+								<entry key="unit" value="µmol/l"/>
+							</map>
+						</entry>
+						<entry key="Creatinine_mgdl">
+							<map>
+								<entry key="labor" value="Creatinine"/>
+								<entry key="unit" value="mg/dl"/>
+							</map>
+						</entry>
+					</map>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="SpringTestFilter" class="com.qwit.filter.SpringTestFilter">
+	</bean>
+	
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<!-- von hermine aus werden emails ueber hogwarts gesendet, vom imsel aus nicht; 
+		host=localhost=>ows haengt nicht an sendMail,
+		aber email wird nicht versandt, vermutung : man muss sendmail richtig konfigurieren
+		 -->
+		<!-- 
+		<property name="host" value="hogwarts.imise.uni-leipzig.de"/>
+		<property name="host" value="localhost"/>
+		 -->
+		<property name="host" value="smtp.gmail.com" />
+		<property name="port" value="465" />
+	</bean>
+
+	<!-- this is a template message that we can pre_load with default state -->
+	<bean id="templateMessage" class="org.springframework.mail.SimpleMailMessage">
+		<property name="from" value="roman.mishchenko@gmail.com" />
+		<!-- 
+		<property name="from" value="roman.mishchenko@imise.uni-leipzig.de" />
+		 -->
+		<property name="subject" value="Empty Message" />
+	</bean>
+	<bean id="contactpersonManager" class="com.qwit.service.MailService">
+		<property name="mailSender" ref="mailSender" />
+		<property name="templateMessage" ref="templateMessage" />
+	</bean>
+
+	<bean id="tumorboardDate" class="com.qwit.service.TumorboardDate">
+		<constructor-arg index="1" value="11"/>
+		<constructor-arg index="0" value="2010"/>
+		<constructor-arg index="2" value="15"/>
+		<!-- 
+		<constructor-arg index="2" value="14"/>
+		<constructor-arg index="2" value="18"/>
+		 -->
+		<constructor-arg index="3" value="15"/>
+		<constructor-arg index="4" value="00"/>
+	</bean>
+	
+</beans>

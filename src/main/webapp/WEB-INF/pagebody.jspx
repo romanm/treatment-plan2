@@ -1,0 +1,26 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:tiles="http://tiles.apache.org/tags-tiles"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit" 
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+>
+
+<!-- pagebody -->
+<mtl:breadcrumb />
+
+<c:set var="contentClass" value="${fn:substring(flow,0,fn:length(flow)-4)}Content" />
+
+<div id="content" class="${contentClass}${empty patientMtl?' musterSchema':'' }">
+	<tiles:insertAttribute name="content" />
+</div>
+
+<div id="sidebar" >
+	<tiles:insertAttribute name="dialogs" />
+</div>
+
+</jsp:root>

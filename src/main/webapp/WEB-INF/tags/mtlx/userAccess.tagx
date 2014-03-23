@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:security="http://www.springframework.org/security/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+
+<c:set var="username" value="${docMtl.owuser.owuser}"/>
+
+<c:if test="${username!=pageContext.request.userPrincipal.name}">
+	<div>
+		Angemeldete Benutzer 
+		(${pageContext.request.userPrincipal.name})
+		<c:out value=" " />
+		ROLE:
+			<security:authorize ifAllGranted="ROLE_USER"><spring:message code="ui_role_ROLE_USER" />|</security:authorize>
+			<security:authorize ifAllGranted="ROLE_ADMINSTATION"><spring:message code="ui_role_ROLE_ADMINSTATION" />|</security:authorize>
+			<security:authorize ifAllGranted="ROLE_SUPERVISOR"><spring:message code="ui_role_ROLE_SUPERVISOR" />|</security:authorize>
+			<security:authorize ifAllGranted="ROLE_THERAPY"><spring:message code="ui_role_ROLE_THERAPY" />|</security:authorize>
+	</div>
+</c:if>
+
+<c:set var="instituteFolders" value="${docMtl.userFolderList}" />
+<c:if test="${not empty instituteFolders}">
+	<spring:eval var="folderSize" expression="instituteFolders.size()"/>
+</c:if>
+<c:if test="${not empty userMtl }">
+	<div>
+	Meine ROLE:
+		<sql:query var="thisUserRole" dataSource="${owsDbSource}" scope="session" >
+			SELECT * FROM authorities WHERE username=?<sql:param value="${username}"/>
+		</sql:query>
+		<c:forEach var="row" items="${thisUserRole.rows}" varStatus="stat">
+			<c:out value="${stat.first?'':'|' }"/>
+			<spring:message code="ui_role_${row.authority }" />
+		</c:forEach>
+	</div>
+	<c:if test="${isAdmin}">
+		<form action="setAdminNode" id="f2">
+			<input type="hidden" name="iddoc" value="${docMtl.docT.id }" />
+			Set ${username} user as admin to
+			<select name="idfolder">
+				<c:forEach var="row" items="${instituteFolders}" varStatus="stat">
+					<option value="${row.idnode }">${row.folder}</option>
+				</c:forEach>
+			</select>
+			folder
+			.
+			<input type="submit" value="set adminNode" />
+		</form>
+	</c:if>
+	<sql:query var="thisUserRoleAdmin" dataSource="${owsDbSource}" scope="session" >
+		SELECT * FROM noderole,folder
+		WHERE admin='1' AND idnode=idfolder AND username=?<sql:param value="${username}"/>
+	</sql:query>
+	<c:if test="${thisUserRoleAdmin.rowCount>0}">
+		<form action="removeAdminNode" id="f3">
+			<input type="hidden" name="iddoc" value="${docMtl.docT.id }" />
+			Remove ${username} user as admin from
+			<select name="idfolder">
+				<option></option>
+				<c:forEach var="row" items="${thisUserRoleAdmin.rows}" varStatus="stat">
+					<option value="${row.idnode }">${row.folder}</option>
+				</c:forEach>
+			</select>
+			folder.
+			<input type="submit" value="remove adminNode" />
+		</form>
+	</c:if>
+	<c:if test="${isAdmin}">
+		<form action="setAdminStation">
+			<input type="hidden" name="iddoc" value="${docMtl.docT.id }" />
+			<label for="rsu">Set ${username} user as station admin</label>
+			<c:choose>
+				<c:when test="${docMtl.adminStation}">
+			<input id="rsu" type="checkbox" name="adminStation" checked="checked" />
+				</c:when>
+				<c:otherwise>
+			<input id="rsu" type="checkbox" name="adminStation"/>
+				</c:otherwise>
+			</c:choose>
+			.
+			<input type="submit" value="set adminStation" />
+		</form>
+	</c:if>
+</c:if>
+<c:set var="previousParentFolder" value="" />
+<c:set var="folderNumber" value="0" />
+<jsp:useBean id="ppf" class="java.util.HashMap"/>
+<form:form id="f1" modelAttribute="userMtl">
+	<table>
+		<tr><td colspan="5" class="select" id="idClassF_3" >
+	<c:choose>
+		<c:when test="${not empty userMtl.targetF}">
+			${userMtl.targetF}
+		</c:when>
+		<c:otherwise>
+			Neue Verzeichnis Einfügen
+		</c:otherwise>
+	</c:choose>
+		</td></tr>
+	</table>
+	<c:if test="${not empty userMtl }"><mtl:form1hidden /></c:if>
+</form:form>
+		<form action="setRWNodeRole" id="f4">
+		<input type="hidden" name="iddoc" value="${docMtl.docT.id }" />
+		<table>
+			<tr><th><fmt:message key="ui_folderName"/></th>
+				<th>p#</th><th>#</th><th>r</th><th>w</th>
+			</tr>
+			<c:if test="${folderSize>0}">
+				<tr><td colspan="4"/>
+					<td><input type="submit" value="save" /></td>
+				</tr>
+			</c:if>
+		<c:forEach var="row" items="${instituteFolders}" varStatus="stat">
+			<c:set var="folderNumber" value="${folderNumber+1}" />
+			<c:if test="${previousParentFolder!=row.parentFolder }">
+				<c:set var="previousParentFolder" value="${row.parentFolder }" />
+				<tr><td class="${(1==ppf[row.ppId] or 1==folderNumber)?'':(empty ppf[row.parentId]?'b':'')}" style="font-style: italic;">${previousParentFolder}</td>
+					<td>${ppf[row.ppId]}</td>
+					<td>${folderNumber}</td>
+				</tr>
+				<c:set var="parentId" value="${row.parentId}" />
+				<c:set var="folderNumber" value="${folderNumber+1}" />
+				<spring:eval var="p1" expression="ppf.put(parentId,folderNumber)"/>
+			</c:if>
+			<c:set var="id" value="${row.idfolder}" />
+			<spring:eval var="p2" expression="ppf.put(id,folderNumber)"/>
+
+			<tr>
+				<td style="padding-left: 1em;" id="f_${id}" class="select">
+					<a href="explorer=${id}">${row.folder}</a>
+				</td>
+				<td></td>
+				<td>${folderNumber}</td>
+				<td>
+					<c:choose>
+						<c:when test="${row.read}">
+					<input type="checkbox" name="nr_${row.idnode }" checked="checked" disabled="disabled"/>
+						</c:when>
+						<c:otherwise>
+					<input type="checkbox" name="nr_${row.idnode }" disabled="disabled"/>
+						</c:otherwise>
+					</c:choose>
+				</td>
+				<td>
+					<security:authorize ifAllGranted="ROLE_SUPERVISOR">
+						<c:set var="isAdminForNode" value="${true}" />
+					</security:authorize>
+					<c:if test="${not isAdminForNode}">
+						<c:set var="isAdminForNode" value="${not empty docMtl.folderAdminMap[row.idnode]}" />
+					</c:if>
+					<c:choose>
+						<c:when test="${isAdminForNode and row.write}">
+					<input type="checkbox" name="nw_${row.idnode }" checked="checked" />
+						</c:when>
+						<c:when test="${isAdminForNode and not row.write}">
+					<input type="checkbox" name="nw_${row.idnode }" />
+						</c:when>
+						<c:when test="${row.write}">
+					<input type="checkbox" name="nw_${row.idnode }" checked="checked" disabled="disabled"/>
+						</c:when>
+						<c:otherwise>
+					<input type="checkbox" name="nw_${row.idnode }" disabled="disabled"/>
+						</c:otherwise>
+					</c:choose>
+					<c:if test="${row.admin }">A</c:if>
+				</td>
+			</tr>
+
+		</c:forEach>
+		<c:if test="${folderSize==0}">
+			<tr>
+				<td>Kein personliches Verzeichniss</td>
+			</tr>
+		</c:if>
+		<c:if test="${folderSize>0}">
+			<tr><td colspan="4"/>
+				<td><input type="submit" value="save" /></td>
+			</tr>
+		</c:if>
+		</table>
+		</form>
+</jsp:root>

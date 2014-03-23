@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+	xmlns:sql	="http://java.sun.com/jsp/jstl/sql"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:security="http://www.springframework.org/security/tags"
+	xmlns:tiles	="http://tiles.apache.org/tags-tiles"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:log ="http://jakarta.apache.org/taglibs/log-1.0"	
+	>
+	<jsp:directive.page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" />
+	<jsp:output doctype-root-element="html" doctype-public="-//W3C//DTD XHTML 1.1//EN"
+		doctype-system="http://www.w3c.org/TR/xhtml11/DTD/xhtml11.dtd" />
+	
+
+	<html>
+	<head>
+	</head>
+<body>
+<div>
+error redirect page
+</div>
+<log:error message="test the log emsssage" />
+<!-- 
+ Logger lgErr = Logger.getLogger("com.qwit");
+
+ lgErr.error("Detaillierte Informationen zum Fehler:", ${pageContext.exception});
+ lgErr.error("hello");
+ lgErr.fatal("hello");
+
+<spring:eval expression="owsSession.setSchemaPart(part)" />
+ -->
+
+
+	
+<!-- Redirected because we can't set the welcome page to a virtual URL.
+<c:redirect url="/home"/>
+ -->
+
+</body>
+</html>
+</jsp:root>

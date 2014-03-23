@@ -1,0 +1,8 @@
+<jsp:root version="2.0" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:fmt="http://java.sun.com/jsp/jstl/fmt">
+<jsp:directive.attribute name="id" required="true" description="id"/>
+<jsp:directive.attribute name="toOnClick" required="true" description="toOnClick"/>
+<fmt:message key="apply" var="apply"/>
+<input type="button" id="${id}" class="next" value="${ui_button_OK}" title="${apply}" 
+	onclick="${toOnClick};dojo.byId('idt').value=0;dojo.byId('editStep').click()"
+/>
+</jsp:root>

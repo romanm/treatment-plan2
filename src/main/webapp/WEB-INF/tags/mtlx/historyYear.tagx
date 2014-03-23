@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:joda="http://www.joda.org/joda/time/tags"
+	xmlns:spring="http://www.springframework.org/tags" 
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<spring:eval var="mwdPeriodPrinter" scope="application" expression="
+		new org.joda.time.format.PeriodFormatterBuilder()
+		.printZeroRarelyLast().appendMonths().appendSuffix(' Monat ', ' Monaten ')
+		.printZeroRarelyLast().appendWeeks().appendSuffix(' Woche ', ' Wochen ')
+		.printZeroRarelyLast().appendDays().appendSuffix(' Tag ', ' Tagen ')
+		.toFormatter()
+	" />
+<spring:eval var="ofDate1P" expression="jxp.var('ofDate')
+	.jxp(patientMtl.getDocT()).getPointer('childTs/childTs[mtlO/pvariable=$ofDate]')" />
+<spring:eval var="ofDateLastP" expression="jxp.var('ofDate')
+	.jxp(patientMtl.getDocT()).getPointer('childTs[last()]/childTs[mtlO/pvariable=$ofDate]')" />
+<c:set var="ofDate1DT" value="${ofDate1P.value.history.mdateDT }" />
+<c:set var="ofDateLastDT" value="${ofDateLastP.value.history.mdateDT }" />
+<joda:format var="key_ofDateLastDT" value="${ofDateLastDT}" pattern="${patientMtl.year.pattern }" />
+<joda:format var="key_ofDate1DT" value="${ofDate1DT}" pattern="${patientMtl.year.pattern }" />
+<joda:format var="fromDate" value="${ofDate1DT}" pattern="dd.MMMM y" />
+<joda:format var="toDate" value="${ofDateLastDT}" pattern="dd.MMMM y" />
+<spring:eval var="therapeHistoryP" expression="new org.joda.time.Period(ofDateLastP.value.history.mdate.time,ofDate1P.value.history.mdate.time)" />
+<spring:eval var="therepiePeriod" expression="mwdPeriodPrinter.print(therapeHistoryP)" />
+
+<c:out value="Therapie Historie: ${toDate} - ${fromDate} = ${therepiePeriod}" />
+
+<spring:eval var="monthBeginDT" expression="ofDate1DT.minusDays(ofDate1DT.getDayOfMonth()-1).minusMonths(3)" />
+	<table>
+		<colgroup>
+			<c:forEach var="monthNr" begin="1" end="4"><col width="25%"/></c:forEach>
+		</colgroup>
+		<tr>
+			<c:forEach var="monthNr" begin="1" end="4">
+				<spring:eval var="monthWorkDT" expression="monthBeginDT.plusMonths(monthNr-1)" />
+				<spring:eval var="daysInMonth" expression="monthWorkDT.plusMonths(1).minusDays(1).dayOfMonth" />
+				<td><table>
+					<caption class="patientContentH2"><joda:format value="${monthWorkDT}" pattern="MMMM" /></caption>
+					<c:forEach var="dayOfMonth" begin="1" end="${daysInMonth}">
+						<spring:eval var="dayWorkDT" expression="monthWorkDT.plusDays(dayOfMonth-1)" />
+						<joda:format var="key" value="${dayWorkDT}" pattern="${patientMtl.year.pattern }" />
+						<c:set var="ofDateDayLT" value="${patientMtl.year.m[key]}" />
+						<tr>
+							<td>
+								<c:if test="${key==key_ofDateLastDT}"><hr/></c:if>
+								<div class="${dayWorkDT.dayOfWeek>5?'b':''} nowrap 
+								${(not empty ofDateDayLT)?'patientContentH2':''}">
+									<joda:format value="${dayWorkDT}" pattern="dd E" />
+								</div>
+					<c:if test="${not empty ofDateDayLT}">
+					<c:forEach var="ofDateT" items="${ofDateDayLT}">
+						<c:set var="phe" value="${ofDateT.parentT}" />
+<c:choose>
+	<c:when test="${'protocol'==phe.tabName }">
+		<div class="conceptContentH2">
+			<a href="concept=${phe.id}" 
+				id="e1_${item.idpatient}"
+				class="inOtherTab select"
+			>${phe.mtlO.protocol}</a>
+		</div>
+	</c:when>
+	<c:when test="${'task'==phe.tabName }">
+		<div class="schemaContentH2">
+			<a href="schema-${owsSession.schemaPart}-${phe.ref}"
+				id="e1_${phe.ref}"
+				class="inOtherTab select schema"
+			>${phe.mtlO.task}</a>
+			<c:out value=" " />
+			<mtl:schemaCycleNr pschemaT="${phe}" />
+		</div>
+	</c:when>
+	<c:when test="${phe.tabName=='finding' and 'bsaType'==phe.mtlO.finding}">
+		<div>
+			<mtl:bsa />
+		</div>
+	</c:when>
+	<c:when test="${phe.tabName=='finding'}">
+		<div>
+			<mtl:message prefix="mtl_finding_" key="${phe.mtlO.finding}" />:
+			<mtl:value varT="${phe}" />
+		</div>
+	</c:when>
+	<c:when test="${phe.tabName=='diagnose'}">
+		<div>
+			<fmt:message key="ui_diagnose" />:
+			<mtl:patientDiagnose diagnoseT="${phe}" />
+		</div>
+	</c:when>
+	<c:when test="${not empty phe}">
+		${phe.tabName }--${phe.id}
+	</c:when>
+</c:choose>
+					</c:forEach>
+					<c:if test="${key==key_ofDate1DT}"><hr/></c:if>
+					</c:if>
+							</td>
+						</tr>
+					</c:forEach>
+				</table></td>
+			</c:forEach>
+		</tr>
+	</table>
+</jsp:root>

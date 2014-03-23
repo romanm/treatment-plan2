@@ -1,0 +1,21 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+	<jsp:directive.attribute name="noticeType" type="java.lang.String" required="false" description="Value of type fild from notice table"/>
+	<jsp:directive.attribute name="firstT" type="com.qwit.domain.Tree" required="true" />
+<!-- 
+<li id="${noticeType}_${docMtl.docT.id}" class="select taskNotice b" >
+ -->
+	<!-- 
+	<qhtm:a idt="${docMtl.docT.id}" action="${noticeType}Notice">
+	</qhtm:a>
+<li class="b">
+	<fmt:message key="mtl_notice_type_${noticeType}"/>
+</li>
+	 -->
+<qhtm:tag name="li" prefix="dv_" tree="${firstT}" cssClass="b taskNotice">
+	<fmt:message key="mtl_notice_type_${noticeType}"/>
+</qhtm:tag>
+</jsp:root>

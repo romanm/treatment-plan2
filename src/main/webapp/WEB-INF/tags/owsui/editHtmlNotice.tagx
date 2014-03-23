@@ -1,0 +1,31 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="noticeT" type="com.qwit.domain.Tree" required="true" description="The notice tree object"/>
+<c:choose>
+	<c:when test="${empty noticeT}"/>
+	<c:when test="${not empty docMtl.editNoticeC and docMtl.idt==noticeT.id}">
+		<c:set var="nh1" value="${fn:length(notice)/50 }"/>
+		<c:set var="nh1" value="${nh1 lt 5?5:(nh1 gt 15?15:nh1)}"/>
+		<div id="htmlEditor"> ${noticeT.mtlO.notice} </div>
+		<script type="text/javascript">htmlEditor2("${nh1}em");</script>
+		<owsui:okButton toOnClick="setNotice()" id="reviseNode2" />
+		<!-- 
+		<input type="button" class="next" onclick="setNotice();clickOK();" value="${ui_ok}"/>
+		 -->
+		<owsui:cancelButton />
+	</c:when>
+	<c:otherwise>
+		<qhtm:a idt="${noticeT.id}" >
+			<mtl:notice noticeT="${noticeT}" />
+		</qhtm:a>
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

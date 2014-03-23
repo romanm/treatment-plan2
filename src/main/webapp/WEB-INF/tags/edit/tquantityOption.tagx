@@ -1,0 +1,26 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:form="http://www.springframework.org/tags/form"
+>
+<form:option label=" " value="0" />
+<form:option label="1" value="1"/>
+<form:option label="2" value="2"/>
+<form:option label="3" value="3"/>
+<form:option label="4" value="4"/>
+<form:option label="5" value="5"/>
+<form:option label="6" value="6"/>
+<form:option label="7" value="7"/>
+<form:option label="8" value="8"/>
+<form:option label="9" value="9"/>
+<!-- 
+<option value="0"> </option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+ -->
+</jsp:root>

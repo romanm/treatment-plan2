@@ -1,0 +1,47 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+
+<c:choose>
+	<c:when test="${not empty schemaMtl }">
+	<!--
+		<c:set var="docName" value="${schemaMtl.docT.mtlO.task }" />
+	-->
+		<c:set var="docName" value="${schemaMtl.title}" />
+		<c:set var="paM" value="${schemaMtl.patientMtl}" />
+	</c:when>
+	<c:when test="${not empty conceptMtl }">
+		<c:set var="docName" value="${conceptMtl.docT.mtlO.protocol}" />
+		<c:set var="paM" value="${conceptMtl.patientMtl}" />
+	</c:when>
+	<c:when test="${not empty drugMtl }">
+		<c:set var="docName" value="${drugMtl.docT.mtlO.drug }" />
+	</c:when>
+	<c:when test="${not empty patientMtl and not empty patientMtl.tuboId}">
+		<c:set var="docName"><fmt:message key="ui_tumorboard"/> | </c:set>
+		<c:set var="paM" value="${patientMtl}" />
+	</c:when>
+	<c:when test="${not empty patientMtl }">
+		<c:set var="paM" value="${patientMtl}" />
+	</c:when>
+	<c:when test="${not empty explorerMtl }">
+		${explorerMtl.folderO.folder }
+	</c:when>
+	<c:when test="${not empty param.folder }">
+		<c:set var="docName">
+			<fmt:message key="ui_name" />-<fmt:message key="ui_explorer" />
+		</c:set>
+		<!--
+		<c:set var="docName">${param.folder}</c:set>
+		-->
+	</c:when>
+	<c:otherwise><fmt:message var="docName" key="ui_name" /></c:otherwise>
+</c:choose>
+<c:out value="${docName}"/>
+<c:if test="${not empty paM }">
+	<c:if test="${empty patientMtl}">- </c:if>
+	${paM.docT.mtlO.patient }, ${paM.docT.mtlO.forename }
+</c:if>
+<c:if test="${not empty flowExecutionUrl}">- <fmt:message key="ui_title_edit" /></c:if>
+</jsp:root>

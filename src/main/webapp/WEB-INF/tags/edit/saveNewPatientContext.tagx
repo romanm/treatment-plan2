@@ -1,0 +1,115 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<!-- 
+saveNewPatientContext
+<edit:newPatient />
+ -->
+
+<form:form id="f2" modelAttribute="flowObjCreator">
+	<form:hidden id="idf" path="idf" />
+	<form:hidden id="folder" path="folder" />
+	<table  class="new-patient">
+	<!-- 
+		<tr>
+			<th><fmt:message key="ui_secondName" /></th>
+			<th><fmt:message key="ui_firstName" /></th>
+			<th><fmt:message key="mtl_patient_sex" /></th>
+		</tr>
+	 -->
+		<tr>
+			<td>
+				<form:input path="newPatient.patient" cssStyle="width:137px" 
+				onkeypress="return checkLength2(event,this,13,1)" />
+				<c:out value="*" />
+				<form:errors path="newPatient.patient" cssClass="note"/>
+			</td>
+			<td>
+				<form:input path="newPatient.forename" cssStyle="width:137px" 
+				onkeypress="return checkLength2(event,this,13,1)" />
+				<c:out value="*" />
+				<form:errors path="newPatient.forename" cssClass="note"/>
+			</td>
+			<td class="warning gender" width="150px;">
+				<fmt:message var="mpsm" key="mtl_patient_sex_M" />
+				<fmt:message var="mpsf" key="mtl_patient_sex_F" />
+				<form:radiobutton path="newPatient.sex" value="M" label="${mpsm}" onchange="parentNode.className=''" />
+				<br />
+				<form:radiobutton path="newPatient.sex" value="F" label="${mpsf}" onchange="parentNode.className=''"/>
+				<c:out value="*" />
+				<form:errors path="newPatient.sex" cssClass="note"/>
+			</td>
+			<td >
+			<table>
+				<tr>
+					<td>
+						<form:select id="bdDay" path="day">
+						
+							<c:forEach begin="1" end="31" var="d">
+								<form:option value="${d}"/>
+							</c:forEach>
+						</form:select>
+					</td>
+					<td>
+						<form:select id="bdMonth" path="month">
+							<c:forEach begin="1" end="12" var="m">
+								<form:option value="${m}"/>
+							</c:forEach>
+						</form:select>
+					</td>
+					<td style="white-space: nowrap;">
+						<form:select id="bdYear" path="year" cssStyle="width:60px;">
+							<form:option value=" " />
+							<c:forEach begin="0" end="100" step="1" var="y">
+								<form:option value="${2011-y}"/>
+							</c:forEach>
+						</form:select>
+						<c:out value="*" />
+					</td>
+				</tr>
+				<tr class="small"><td>dd</td><td>mm</td><td>yyyy</td></tr>
+			</table>
+				<form:errors path="day" cssClass="note"/>
+			</td>
+		</tr>
+	</table>
+	<fieldset><legend><fmt:message key="ui_kasse" /></legend>
+		<form:input path="newPatient.insurance" />
+	</fieldset>
+	
+	<!-- 
+	<input type="submit" name="_eventId_save"		value="${ui_button_save}" class="save2"/>
+	<button onclick="cancelReload();" >${ui_button_cancel}</button>
+	<input type="submit" name="_eventId_save"		value="${ui_button_save}" src="${Save16gif}"/>
+	 -->
+	 <div class="footspace"></div>
+	<div style="float: right;">
+	<button type="submit" name="_eventId_save" ><img src="${Save16gif}" alt="Save"/> ${ui_button_save}</button>
+	<input type="button" onclick="cancelReload();"	value="${ui_button_cancel}" />
+	</div>
+</form:form>
+
+<spring:message code="error_invalid_patient_firstName"		var="errorMsg"/>
+<spring:message code="error_invalid_patient_secondName"		var="errorMsg2"/>
+<spring:message code="error_invalid_patient_secondName"		var="errorMsg3"/>
+<script type="text/javascript"><![CDATA[
+	createInputFieldWidget('newPatient.patient', '[A-Za-z]{1,13}',  '${errorMsg}');
+	createInputFieldWidget('newPatient.forename', '[A-Za-z]{1,13}',  '${errorMsg2}');
+	
+	createSelectWidget('bdDay');
+	createSelectWidget('bdMonth');
+	createSelectWidget('bdYear');
+	
+	dojo.ready(function(){
+		removeZeroAndRefocus('newPatient.patient', 'newPatient.forename');
+	});
+]]></script>
+
+</jsp:root>

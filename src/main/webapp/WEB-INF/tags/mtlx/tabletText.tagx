@@ -1,0 +1,24 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+<jsp:directive.attribute name="tabletT" type="com.qwit.domain.Tree" description=""/>
+<jsp:directive.attribute name="tabletO" type="com.qwit.domain.Tablet" description=""/>
+<c:if test="${empty tabletO }">
+	<c:set var="tabletO" value="${tabletT.mtlO }" />
+</c:if>
+
+<fmt:formatNumber pattern="##.###">${tabletO.value}</fmt:formatNumber>
+${tabletO.unit}
+<c:choose>
+	<c:when test="${tabletO.portion==4}">
+		<fmt:message key="mtl_tablet_divisible" />
+		(<fmt:message key="uiTablete1to4" />)
+	</c:when>
+	<c:when test="${tabletO.portion==2}">
+		<fmt:message key="mtl_tablet_divisible" />
+		(<fmt:message key="uiTablete1to2" />)
+	</c:when>
+</c:choose>
+
+</jsp:root>

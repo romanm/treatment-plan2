@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<!-- 
+content
+ -->
+<c:if test="${not empty patientMtl }">
+	<c:set var="noprint" value="noprint" />
+</c:if>
+<h2 class="${noprint}">
+<a href="schema-${owsSession.schemaPart}-${schemaMtl.docT.id}" >
+	<qhtm:spanSchemaName taskO="${schemaMtl.docT.mtlO}"/>
+</a></h2>
+
+<form:form id="f1" modelAttribute="schemaMtl">
+	<c:choose>
+		<c:when test="${empty owsSession.schemaPart or 'ed'==owsSession.schemaPart}">
+			<mtl:schemaTaskList blockT="${schemaMtl.docT}"/>
+		</c:when>
+		<c:when test="${'hour'==owsSession.schemaPart}">
+			<mtl:dayPlan />
+			<mtl:hourPlan />
+		</c:when>
+		<c:when test="${'plan'==owsSession.schemaPart}"><mtl:dayPlan /></c:when>
+		<c:when test="${'week'==owsSession.schemaPart}"><mtl:weekTable taskT="${schemaMtl.docT}" /></c:when>
+		<c:when test="${'month'==owsSession.schemaPart}"><mtl:monthTable /></c:when>
+		<c:when test="${'use'==owsSession.schemaPart}"><mtl:usePlan /></c:when>
+		<c:when test="${'prescription'==owsSession.schemaPart}"><mtl:prescription /></c:when>
+		<c:when test="${'changelog'==owsSession.schemaPart}"><mtl:changelog /></c:when>
+		<c:when test="${'info'==owsSession.schemaPart}">
+			<div style="-moz-column-count:2;-moz-column-gap:1.5em;text-align:justify;">
+				<mtl:alienNotice />
+			</div>
+		</c:when>
+		<c:otherwise>${part}</c:otherwise>
+	</c:choose>
+	<mtl:form1hidden />
+</form:form>
+
+</jsp:root>

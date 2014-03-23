@@ -1,0 +1,17 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+<jsp:directive.attribute name="part" description=""/>
+<c:choose>
+	<c:when test="${part=='week'}"><fmt:message key="uiChemoTherapyPlanFuchs"/></c:when>
+	<c:when test="${part=='plan'}"><fmt:message key="uiChemoTherapyPlan"/></c:when>
+	<c:when test="${part=='ht'}"><fmt:message key="uiHomeTablet"/></c:when>
+	<c:when test="${part=='hour'}"><fmt:message key="uiChemoTherapyPlanHour"/></c:when>
+	<c:when test="${part=='toxSheet'}"><fmt:message key="toxSheet"/></c:when>
+	<c:when test="${part=='use'}">Verwendung</c:when>
+	<c:when test="${part=='ed'}"><fmt:message key="uiTherapySchema"/></c:when>
+	<c:otherwise><fmt:message key="uiTherapySchema"/></c:otherwise>
+</c:choose>
+
+</jsp:root>

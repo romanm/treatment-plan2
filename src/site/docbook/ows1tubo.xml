@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+ "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book lang="de" >
+	<title>OWS1 Tumorboard Beschreibung.</title>
+	<bookinfo>
+		<author>
+			<personname>
+				<honorific>Dr.med</honorific>
+				<firstname>Roman</firstname><surname>Mishchenko</surname>
+			</personname>
+		</author>
+	</bookinfo>
+	<preface id="preface1">
+		<title>Vorwort</title>
+		<para>
+		Dieses Dokument ist die Beschreibung von
+			Funktionalität Tumorboard Modul in OncoWorkstation v.1
+		</para>
+	</preface>
+	<chapter id="ch_function"><title>Funktionalität</title>
+		<section>
+			<title>Einleitung</title>
+		<para>
+			OncoWorkstation v.1 Tumorboard oder ows1tumorboard
+			ist ein Komputerprogramm für 
+			<orderedlist>
+				<listitem>
+					<para>
+			Anmeldung ein Patient zu Tumorboard
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+					Begleitung Tumorboard relevantes Patient daten in Lauf 
+					des Tumorboard.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Speicherung gesammelten daten in Patient History.
+					</para>
+				</listitem>
+			</orderedlist>
+			<figure>
+				<title>Tumorboard Aussicht</title>
+				<graphic fileref="img/tubo1.png" format="PNG"/>
+			</figure>
+		</para>
+		</section>
+		<section><title>Rolen</title>
+			<para>
+			Tumorboard bedienung braucht zwei Rolen:
+				<orderedlist>
+					<listitem>
+						<para>
+							<literal>TUBO_DECLARE</literal>
+							-- Meldet Patient Tumorboard an.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<literal>TUBO_ADMIN</literal>
+							-- Begleitet Tumorboard bei Tumorboard Sitzung.
+						</para>
+					</listitem>
+				</orderedlist>
+				Nur <literal>TUBO_ADMIN</literal>
+				Benutzer hat rechte Empfehlung Feld und Tumorboard Spezialisten Feld zu ändern.
+				
+			</para>
+		</section>
+		<section><title>Funktionen</title>
+			<section><title>Anmeldung</title>
+				<para>
+				Eder Artzt in Klinik hat recht Patient zum Tumorboard anmelden.
+				<figure>
+					<title>Patient Tumorboard Anmelden</title>
+					<graphic fileref="img/tubo_declare.png" format="PNG"/>
+				</figure>
+				Datum drei nächste Tumorboarden wird zum auswahl gegeben. 
+				</para>
+			</section>
+			<section><title>Einrichtung</title>
+				<para>
+					Erstmal gibts Arzt an die anrichtung von welche Patient kommt.
+				</para>
+			</section>
+			<section><title>Anmeldung Arzt</title>
+				<para>
+				Die eingelogte Benutzer wird
+					Anmeldung Arzt
+					automatisch gespeichert.
+					Später bei Bedarf kann diese Feld gehendert werden.
+				</para>
+			</section>
+			<section><title>Tumorboard findet statt</title>
+				<para>
+					In Feld "Tumorboard findet statt"
+					wird Information gespeichert an Welche Etape
+					Des Behandlungsablauf Patient gerade Befindet. 
+					<figure>
+						<title>Mögliche Therapie Etape</title>
+						<graphic fileref="img/tubo_therapy_etape.png" format="PNG"/>
+					</figure>
+				</para>
+			</section>
+			<section><title>Diagnose</title>
+				<para>
+					Diagnose Dialog hat drei teilen. Diagnose selbst, 
+					Notice -freie Textfeld als Diagnose zusatzliche besreibung,
+					TNM Definition
+					<figure>
+						<title>Diagnose TNM-Dialog</title>
+						<graphic fileref="img/tubo_diagnose_tnm.png" format="PNG"/>
+					</figure>
+				</para>
+				<para>
+					Die gegebene Diagnose wird nicht in Tumorboard Dokument gespeichert,
+					sondern als normale Diagnose in Patient-History Dokument gespeichert.
+					Tumorboard-Dokuent behaltet nut referenz zu ihn.
+					<figure>
+						<title>Patient-Historie gespeicherte Diagnose Beispiel als XML und DB Object. </title>
+						<graphic fileref="img/tubo_diagnose_tnm_in_db.png" format="PNG"/>
+						<graphic fileref="img/tubo_diagnose_tnm_in_xml.png" format="PNG"/>
+					</figure>
+				</para>
+			</section>
+			<section><title>Allgemeinzustand ECOG</title>
+				<para>
+				Eine von 5 möglichen ECOG Zuschtenden
+					<itemizedlist>
+						<listitem>
+							<para>
+							0 Normale Leistungsfähigkeit
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+							1 Ambulante Betreuung, leichte Arbeiten möglich
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+							2 Weniger als 50% am Tag bettlägrig, Selbstversorgung möglich, aber nicht arbeitsfähig
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+							3 Mehr als 50% am Tag bettlägrig, begrenzte Selbstversorgung noch möglich
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+							4 Ständig bettlägrig
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+			</section>
+			<section><title>Text Felder </title>
+				<para>
+					Zu dem Tumorboard-Dokument gehöhren 
+					5 Felder mit textuele Information.
+					Das ist Kurzanamnese, Relev. Begleiterkrankungen, 
+					TumorMarker, CT- Befunde und Sonstige Befunde.
+				</para>
+			</section>
+			<section><title>Tumorboard Empfehlung </title>
+				<para>
+				Tumorboard Empfehlung Dialog enthaltet ein sehr besonderes ausgewehltes 
+				Information
+					<figure>
+						<title>Tumorboard Empfehlung Dialog. </title>
+						<graphic fileref="img/tubo_recommendation_form.png" format="PNG"/>
+					</figure>
+				</para>
+				<para>
+				Die ausgewehltes Format für speicherung Tumorboard-Empfehlung
+				in DB soll nicht unbedingt nachverfolgt werden.
+					<figure>
+						<title>Tumorboard Empfehlung in Browser und XML. </title>
+						<graphic fileref="img/tubo_recommendation_view.png" format="PNG"/>
+						<graphic fileref="img/tubo_recommendation_xml.png" format="PNG"/>
+					</figure>
+				</para>
+			</section>
+		</section>
+		<section><title>Zusatzliche Administrator Funktionen</title>
+			<para>
+				Tumorboard Admin definiert und ändert bei bedarf
+				<orderedlist>
+					<listitem>
+						<para>
+							<literal>Tag des Tumorboard</literal>
+							-- Tag in welche Tumorboard Stadt findet. 
+							z.B. Donnerstad
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<literal>Uhrzeit des Tumorboard</literal>
+							-- Wann Tumorboard Beginnt.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<literal>Raum des Tumorboard</literal>
+							-- Wo findet sie Stadt.
+						</para>
+					</listitem>
+				</orderedlist>
+			</para>
+		</section>
+	</chapter>
+</book>

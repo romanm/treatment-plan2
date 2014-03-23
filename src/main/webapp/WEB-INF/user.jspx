@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:security="http://www.springframework.org/security/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+	xmlns:view="urn:jsptagdir:/WEB-INF/tags/view"
+>
+
+<div id="headline">user</div>
+<div id="content">
+	<h2>
+		<a href="user=${userMtl.docT.id}">
+			<c:out value="${userMtl.docT.mtlO.title} ${userMtl.docT.mtlO.forename} ${userMtl.docT.mtlO.contactperson} " />
+		</a>
+	</h2>
+	<c:choose>
+		<c:when test="${'changeUserdata'==currentSWFState}"><mtl:userRegister/></c:when>
+			<c:when test="${'userAccess'==userPart}"><mtl:userAccess/></c:when>
+			<c:when test="${userPart=='changeId'}"><view:changeId/></c:when>
+			<c:when test="${userPart=='copyPatienten'}">
+				<view:copyPatienten/>
+			</c:when>
+		<c:otherwise>
+	<form:form id="f1" modelAttribute="userMtl">
+		<c:choose>
+			<c:when test="${empty userMtl }">Login ist nötig.</c:when>
+			<c:when test="${'changePassword'==currentSWFState}">
+				<mtl:userChangePersonalData/>
+			</c:when>
+			<c:when test="${userPart=='userCommon'}"><mtl:userCommon/></c:when>
+			<c:when test="${userPart=='user2station'}">
+				<view:user2station/>
+			</c:when>
+			<!-- 
+			<c:when test="${empty part or part=='userCommon'}"></c:when>
+			<c:when test="${'register'==currentSWFState}"><mtl:userRegister/></c:when>
+			 -->
+			<c:when test="${userPart=='userHistory'}"><mtl:userHistory/></c:when>
+			<c:when test="${userPart=='massMaintenance_drug'}"><mtl:userDrug/></c:when>
+			<c:when test="${userPart=='massMaintenance_notice'}"><mtl:userNotice/></c:when>
+			<c:when test="${userPart=='view3'}"><mtl:insertInFolder/></c:when>
+			<c:when test="${userPart=='drugRewrite'}"><view:drugRewrite/></c:when>
+			<c:otherwise><mtl:userView1 /></c:otherwise>
+		</c:choose>
+		<c:if test="${not empty userMtl }"><mtl:form1hidden /></c:if>
+	</form:form>
+		</c:otherwise>
+	</c:choose>
+</div>
+<div id="sidebar" >
+	<owsui:docToolbar />
+	<edit:panel />
+
+<!--
+	<mtl:nextSave />
+	<owsui:menuBarV>
+	</owsui:menuBarV>
+-->
+	<h2><fmt:message key="ui_title_views" /></h2>
+	<ul>
+		<li><qhtm:aView part="userCommon"><fmt:message key="ui_userCommon" /></qhtm:aView></li>
+		<li><qhtm:aView part="userAccess"><fmt:message key="ui_userAccess" /></qhtm:aView></li>
+		<li><a href="${flow}?id=${docMtl.docT.id}&amp;a=changePassword"> <fmt:message key="ui_userChangePassword" /></a></li>
+		<li><a href="${flow}?id=${docMtl.docT.id}&amp;a=changeUserdata"> <fmt:message key="ui_userChangeUserdata" /></a></li>
+		<li><qhtm:aView part="view1">Sicht 1</qhtm:aView></li>
+		<li><qhtm:aView part="userHistory">userHistory</qhtm:aView></li>
+		<li><fmt:message key="ui_massMaintenance" />
+			<ul>
+				<li><qhtm:aView part="drugRewrite">Ersetzen</qhtm:aView></li>
+				<li><qhtm:aView part="view3">In Verzeichnis hinzufügen</qhtm:aView></li>
+				<li><qhtm:aView part="massMaintenance_notice">Notize</qhtm:aView></li>
+				<li><qhtm:aView part="massMaintenance_drug">Medikamente</qhtm:aView></li>
+			</ul>
+		</li>
+		<security:authorize ifAllGranted="ROLE_SUPERVISOR">
+			<li>
+				Admin menu
+			<ul>
+				<li><qhtm:aView part="changeId">Change Id</qhtm:aView></li>
+				<li><qhtm:aView part="copyPatienten">copyPatienten</qhtm:aView></li>
+				<li><qhtm:aView part="user2station">user2station</qhtm:aView></li>
+			</ul>
+			</li>
+		</security:authorize>
+	</ul>
+</div>
+
+</jsp:root>

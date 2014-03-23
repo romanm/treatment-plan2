@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+	"-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+	"http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+		
+<tiles-definitions>
+	<!-- BEGIN ERROR MAIL TEST -->
+	<definition name="mailtest" extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/home.jspx" />
+	</definition>	
+	<!-- END ERROR MAIL TEST -->
+
+	<!-- BEGIN ERROR PAGE TEST -->
+	<definition name="exception" extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/home.jspx" />
+	</definition>
+	<definition name="error" extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/error.jspx" />
+	</definition>
+	<!-- END ERROR PAGE TEST -->
+	
+	<!-- BEGIN AMQP TEST -->
+	<definition name="startserver" extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/home.jspx" />
+	</definition>
+	<definition name="startclient" extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/home.jspx" />
+	</definition>
+	<definition name="send" extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/home.jspx" />
+	</definition>
+	<definition name="receive" extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/home.jspx" />
+	</definition>
+	<definition name="proxytest" extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/home.jspx" />
+	</definition>
+	<!-- END AMQP TEST -->
+	
+	<definition name="home" extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/home.jspx" />
+	</definition>
+
+	<!--  BEGIN PRINT -->
+ 	<definition name="print-schema-*-*"		extends="schemaxViewAndEdit"/>
+	<definition name="print-patient-*-*"	extends="patientxViewAndEdit"/>
+	<definition name="print-concept-*-*"	extends="conceptxViewAndEdit"/>
+	<definition name="print-drug-*-*"		extends="conceptxViewAndEdit"/>
+	<definition name="print-error"			extends="error"/>
+	<!-- END PRINT -->
+
+	<!-- BEGIN TUMORBOARDHOME -->
+	<definition name="patientDataSeekTbh"	extends="tumorboardhome">
+		<put-attribute name="body" >
+			<definition template="/WEB-INF/tumorboardhome.jspx" >
+				<put-attribute name="dialog"	value = "/WEB-INF/tubonewpatient/patientDataSeekTbh.jspx" />
+			</definition>
+		</put-attribute>
+	</definition>
+	<definition name="patientDataEditTbh"	extends="tumorboardhome">
+	</definition>
+	<definition name="beginDateTbh"			extends="tumorboardhome">
+		<put-attribute name="body" >
+			<definition template="/WEB-INF/tumorboardhome.jspx" >
+				<put-attribute name="dialog"	value = "/WEB-INF/tubonewpatient/beginDateTbh.jspx" />
+			</definition>
+		</put-attribute>
+	</definition>
+	<definition name="tumorboardhome"		extends="layoutx1">
+		<put-attribute name="body" >
+			<definition template="/WEB-INF/tumorboardhome.jspx" >
+				<put-attribute name="dialog"		value = "" />
+			</definition>
+		</put-attribute>
+	</definition>
+	<!-- END TUMORBOARDHOME -->
+	
+	<!-- BEGIN STATION -->
+	<definition name="station"				extends="stationViewAndEdit"/>
+	<definition name="stationViewAndEdit"	extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/station.jspx" />
+	</definition>
+	<!-- END STATION -->
+	
+	<!-- BEGIN PATIENT -->
+	<definition name="patient=*"			extends="patientxViewAndEdit"/>
+	<definition name="patient-*-*"			extends="patientxViewAndEdit"/>
+	<definition name="patient"				extends="patientxViewAndEdit"/>
+	<definition name="confirmDeleteNode"	extends="patientxViewAndEdit"/>
+	<definition name="framesetlayout=*"		extends="framesetlayout"/>
+	<definition name="fs2patient=*"			extends="fs2patientLayout"/>
+	<!-- depricated -->
+	<!-- 
+	<definition name="patientxViewAndEdit"	extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/patient.jspx" />
+	</definition>
+	 -->
+	<definition name="patientxViewAndEdit"	extends="layoutx1">
+		<put-attribute name="body" >
+			<definition template="/WEB-INF/pagebody.jspx">
+				<put-attribute name="content"	value = "/WEB-INF/patientflow/content.jspx" />
+				<put-attribute name="dialogs"	value = "/WEB-INF/patientflow/dialogs.jspx" />
+			</definition>
+		</put-attribute>
+	</definition>
+	<!-- END PATIENT -->
+
+	
+	<!-- BEGIN TUMOR BOARD -->
+	<definition name="tumorboard"		extends="tuboViewAndEdit"/>
+	<definition name="tuboDiagnoseEdit"	extends="tuboViewAndEdit"/>
+	<definition name="tuboNoticeEdit"	extends="tuboViewAndEdit"/>
+	<definition name="tuboViewAndEdit"	extends="layoutx1">
+		<put-attribute name="body"	value="/WEB-INF/tumorboard.jspx" />
+	</definition>
+	<!-- END TUMOR BOARD -->
+	
+	<!-- BEGIN THERAPY SCHEMA -->
+	<!-- depricated, see PRINT section -->
+	<definition name="schema/print"	extends="schemaxViewAndEdit"/>
+	<!-- 
+	<definition name="schema"		extends="schemaDrugEdit"/>
+	<definition name="schema=*"		extends="schemaxViewAndEdit"/>
+	<definition name="schema"		extends="schemaxViewAndEdit"/>
+	<definition name="schema/printAll"		extends="schemaxViewAndEdit">
+		<put-attribute name="body"	value="/WEB-INF/schemaPrintAll.jspx" />
+	</definition>
+	<definition name="beginDatex"		extends="schemaxViewAndEdit"/>
+	 -->
+	<definition name="schema=*"			extends="schemaxViewAndEdit"/>
+	<definition name="schema-*-*"		extends="schemaxViewAndEdit"/>
+	<definition name="patientDataEditx"	extends="schemaxViewAndEdit"/>
+	<definition name="patientDataSeekx"	extends="schemaxViewAndEdit"/>
+	<!-- 
+	<definition name="bsaDialog"		extends="schemaxViewAndEdit"/>
+	 -->
+	<definition name="schemaExprUse"	extends="schemaxViewAndEdit"/>
+	<definition name="chemoDoseMod"		extends="schemaxViewAndEdit"/>
+	<definition name="bsaSavex"			extends="schemaxViewAndEdit"/>
+	<definition name="durationx"		extends="schemaxViewAndEdit"/>
+	<definition name="cycleNrx"			extends="schemaxViewAndEdit"/>
+	<definition name="newDocx"			extends="schemaxViewAndEdit"/>
+	<definition name="newCycle"			extends="schemaxViewAndEdit"/>
+	<definition name="tabletDivisor"	extends="schemaxViewAndEdit"/>
+	<definition name="changeDocStatusx"	extends="schemaxViewAndEdit"/>
+	<definition name="newDrugObjectx"	extends="schemaxViewAndEdit"/>
+	<definition name="registryDrugObjectx"
+										extends="schemaxViewAndEdit"/>
+	<definition name="newDrugx"			extends="schemaxViewAndEdit"/>
+	<definition name="newLaborObjectx"	extends="schemaxViewAndEdit"/>
+	<definition name="newFindingObjectx"
+										extends="schemaxViewAndEdit"/>
+	<definition name="deleteModx"		extends="schemaxViewAndEdit"/>
+	<definition name="registryDrugx"	extends="schemaxViewAndEdit"/>
+	<definition name="confirmDrugx"		extends="schemaxViewAndEdit"/>
+	<!-- 
+	<definition name="schemaxViewAndEdit"	extends="layoutx1">
+		<put-attribute name="body"	value="/WEB-INF/schema.jspx" />
+	</definition>
+	 -->	
+	<definition name="schemaxViewAndEdit"	extends="layoutx1">
+		<put-attribute name="body" >
+			<definition template="/WEB-INF/pagebody.jspx">
+				<put-attribute name="content"	value = "/WEB-INF/schemaflow/content.jspx" />
+				<put-attribute name="dialogs"	value = "/WEB-INF/schemaflow/dialogs.jspx" />
+			</definition>
+		</put-attribute>
+	</definition>
+	<!-- END THERAPY SCHEMA -->
+	
+	<!-- BEGIN CONCEPT PROTOCOL STUDY -->
+	<definition name="concept=*"			extends="conceptxViewAndEdit" />
+	<definition name="concept"				extends="conceptxViewAndEdit" />
+	<definition name="armName"				extends="conceptxViewAndEdit" />
+	<definition name="defineSchemaVariant"	extends="conceptxViewAndEdit" />
+	<definition name="newConceptSchemax"	extends="conceptxViewAndEdit" />
+	<definition name="conceptxViewAndEdit"	extends="layoutx1">
+		<put-attribute name="body"	value="/WEB-INF/concept.jspx" />
+	</definition>
+	<!-- END CONCEPT PROTOCOL STUDY -->
+	
+	<!-- BEGIN INSTITUTE -->
+	<definition name="newStationUser"	extends="instituteViewAndEdit"/>
+	<definition name="newStation"		extends="instituteViewAndEdit"/>
+	<definition name="institute=*"		extends="instituteViewAndEdit"/>
+	<definition name="institute"		extends="instituteViewAndEdit"/>
+	<definition name="instituteViewAndEdit"	extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/institute.jspx" />
+	</definition>
+	<!-- END INSTITUTE -->
+	
+	<!-- BEGIN USER -->	
+	<definition name="user=*"	extends="userViewAndEditx"/>
+	<definition name="user"		extends="userViewAndEditx"/>
+	<definition name="userViewAndEditx"	extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/user.jspx" />
+	</definition>
+	<!-- END USER -->
+
+	<!-- BEGIN REGISTER USER -->	
+	<definition name="register"		extends="registerViewAndEdit"/>
+	<definition name="registerViewAndEdit"	extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/register.jspx" />
+	</definition>
+	<!-- END REGISTER USER -->
+	
+	<!-- BEGIN DRUG -->
+	<definition name="drug=*"			extends="drugxViewAndEdit"/>
+	<definition name="drug"				extends="drugxViewAndEdit"/>
+	<definition name="newDrugx"			extends="drugxViewAndEdit"/>
+	<definition name="newLaborx"		extends="drugxViewAndEdit"/>
+	<definition name="confirmDrugx"		extends="drugxViewAndEdit"/>
+	<definition name="drugNewTablet"	extends="drugxViewAndEdit"/>
+	<definition name="saveDrugName"		extends="drugxViewAndEdit"/>
+        <definition name="saveNewTrade"		extends="drugxViewAndEdit"/>
+	<definition name="registryDrugx"	extends="drugxViewAndEdit"/>
+	<definition name="drugxViewAndEdit"	extends="layoutx1">
+		<put-attribute name="body"	value="/WEB-INF/drug.jspx" />
+	</definition>
+	<!-- END DRUG -->
+	
+	<definition name="intro" extends="standardLayout">
+		<put-attribute name="body" value="/WEB-INF/intro.jsp" />
+	</definition>
+	
+	<!-- 
+	<definition name="login" extends="standardLayout">
+		<put-attribute name="body" value="/WEB-INF/login.jsp" />
+	</definition>
+	 -->
+	<definition name="login"	extends="layoutx1">
+		<put-attribute name="body" value="/WEB-INF/login.jspx" />
+	</definition>
+	
+	<definition name="logoutSuccess" extends="standardLayout">
+		<put-attribute name="body" value="/WEB-INF/logoutSuccess.jsp" />
+	</definition>
+	
+</tiles-definitions>

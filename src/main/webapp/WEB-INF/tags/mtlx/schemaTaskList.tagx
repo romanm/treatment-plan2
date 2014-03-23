@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+	<jsp:directive.attribute name="blockT" type="com.qwit.domain.Tree" required="true" description="The schema block tree object"/>
+
+<c:if test="${not empty schemaMtl}">
+	<qhtm:patientHead />
+</c:if>
+
+	<table class="header1" id="tableEd" border="0" style="width:100%">
+		<spring:eval var="noticeP" expression="jxp.var('notice').var('type','usageBlock_title')
+			.jxp(blockT).getPointer('childTs[tabName=$notice][mtlO/type=$type]')" />
+		<c:if test="${not empty noticeP }">
+			<caption>${noticeP.value.mtlO.notice}</caption>
+		</c:if>
+		<qhtm:theadTask thId="${blockT.id}"><mtl:planName blockT="${blockT}"/></qhtm:theadTask>
+		<spring:eval var="drugs" expression="jxp.childs(blockT, 'drug')" />
+		<c:forEach var="drug" items="${drugs}"><qhtm:tbodySchemaTaskList taskT="${drug.value}"/></c:forEach>
+		<tr><td colspan="7"><mtl:repetitionDay/></td></tr>
+
+		<spring:eval var="premedicationTaskP" expression="jxp.var('taskPremedication')
+			.jxp(blockT).getPointer('childTs[mtlO/task=$taskPremedication]')" />
+		<spring:eval var="taskPremedicationChilds"
+			expression="jxp.childs(docMtl.getInsideTask(blockT,'taskPremedication'), 'drug')" />
+		<c:if test="${not empty taskPremedicationChilds}">
+			<thead><tr class="dotted"><th class="select schema" id="premedication_${premedicationTaskP.value.id}">
+				<spring:message code="tag_task_taskPremedication" />
+			</th></tr></thead>
+			<c:forEach var="drugT" items="${taskPremedicationChilds}">
+				<qhtm:tbodySchemaTaskList taskT="${drugT.value}"/>
+			</c:forEach>
+		</c:if>
+
+		<spring:eval var="supportTaskP" expression="jxp.var('support')
+			.jxp(blockT).getPointer('childTs[mtlO/task=$support]')" />
+		<spring:eval var="supports" expression="jxp.var('support').var('drug').var('rqm').var('sup')
+		.jxpip(blockT,'childTs[mtlO/task=$support]/childTs[tabName=$drug
+ and not(childTs/childTs/mtlO/type=$rqm) and not(childTs/childTs/mtlO/type=$sup) ]')" />
+		<thead><tr class="dotted"><th class="select schema" id="support_${supportTaskP.value.id}">
+			<spring:message code="tag_task_support" />
+		</th></tr></thead>
+		<c:forEach var="drug" items="${supports}"><qhtm:tbodySchemaTaskList taskT="${drug.value}"/></c:forEach>
+		<spring:eval var="supports_sup" expression="jxp.var('task').var('support').var('drug').var('sup')
+		.jxpip(blockT,'childTs[tabName=$task][mtlO/task=$support]/childTs[tabName=$drug
+ and childTs/childTs/mtlO/type=$sup ]')" />
+		<c:forEach var="drug" items="${supports_sup}"><qhtm:tbodySchemaTaskList taskT="${drug.value}"/></c:forEach>
+
+		<spring:eval var="rqmDrugIP" expression="jxp.var('rqm').var('taskHomeTablet').jxpip(blockT,
+			'childTs[not(mtlO/task=$taskHomeTablet)]/childTs[childTs/childTs/mtlO/type=$rqm]')" />
+		<c:if test="${not empty rqmDrugIP}">
+			<thead><tr class="dotted"><th class="schema select" id="rqm_${supportTaskP.value.id}"><spring:message code="tag_task_demand" /></th></tr></thead>
+			<c:forEach var="drug" items="${rqmDrugIP}"><qhtm:tbodySchemaTaskList taskT="${drug.value}"/></c:forEach>
+		</c:if>
+
+		<spring:eval var="taskHomeTabletDrugsPI" expression="jxp.var('taskHomeTablet').var('drug')
+			.jxpip(blockT,'childTs[mtlO/task=$taskHomeTablet]/childTs[tabName=$drug]')" />
+		<c:if test="${not empty taskHomeTabletDrugsPI}">
+			<spring:eval var="taskHomeTabletP" expression="jxp.var('taskHomeTablet')
+					.jxp(blockT).getPointer('childTs[mtlO/task=$taskHomeTablet]')" />
+			<thead><tr class="dotted"><th class="schema select" id="ht_${taskHomeTabletP.value.id}">
+			<spring:message code="uiHomeTablet" /></th></tr></thead>
+			<c:forEach var="drug" items="${taskHomeTabletDrugsPI}"><qhtm:tbodySchemaTaskList taskT="${drug.value}"/></c:forEach>
+		</c:if>
+		<!-- newBlockGcsf -->
+		<spring:eval var="blockGcsfP" expression="jxp.var('gcsf')
+			.jxp(blockT).getPointer('childTs[mtlO/type=$gcsf]')" />
+		<c:if test="${not empty blockGcsfP.value}">
+			<thead><tr class="dotted"><th class="select schema" id="support_${blockGcsfP.value.id}">
+				<c:choose>
+					<c:when test="${not empty patientMtl }">
+						<qhtm:a idt="${blockGcsfP.value.id}">
+							<spring:message code="tag_task_gcsf" />
+						</qhtm:a>
+					</c:when>
+					<c:otherwise>
+						<spring:message code="tag_task_gcsf" />
+					</c:otherwise>
+				</c:choose>
+			</th></tr></thead>
+			<spring:eval var="drugs" expression="jxp.childs(blockGcsfP.value, 'drug')" />
+			<c:forEach var="drug" items="${drugs}"><qhtm:tbodySchemaTaskList taskT="${drug.value}"/></c:forEach>
+		</c:if>
+	</table>
+	<spring:eval var="exprs" expression="jxp.childs(blockT, 'expr')" />
+	<c:forEach var="expr" items="${exprs}">
+		<owsui:editExpr exprT="${expr.value}" />
+	</c:forEach>
+	
+	<c:if test="${not empty schemaMtl}">
+		<qhtm:footnotes />
+	</c:if>
+	<c:if test="${not empty schemaMtl and param.part!='all'}">
+		<mtl:alienNotice />
+	</c:if>
+
+</jsp:root>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<secured attributes="ROLE_USER" />
+	<persistence-context />
+
+	<var name="formUtil"	class="com.qwit.util.FormUtil" />
+	<input name="id"		type="int" required="true" />
+	<input name="idt"		type="int" />
+	<input name="idc"		type="int" />
+	<input name="a"			type="string" />
+
+	<on-start>
+		<evaluate expression="documentService.setFlushModeCommit()" />
+		<evaluate expression="documentService.makeInstituteMtl(id)"	result="flowScope.instituteMtl" />
+		<evaluate expression="instituteMtl.getDocT().getMtlO()"		result="flowScope.instituteO" />
+	</on-start>
+
+	<action-state id="handleAction">
+		<on-entry>
+			<evaluate expression="formUtil.logline('----handleAction--1--'+requestParameters.a)" />
+			<evaluate expression="instituteMtl.checkEditNodeId(requestParameters.idt,requestParameters.idc)" />
+		</on-entry>
+		<!-- 
+		<evaluate expression="instituteMtl.handleAction(requestParameters.a)"/>
+		 -->
+		<evaluate expression="handleAction.handleAction(instituteMtl,requestParameters.a)"/>
+		<transition on="deleteNode"		to="deleteNode" />
+		<transition on="pasteUser"	to="save">
+			<evaluate expression="documentService.user2institute(instituteMtl)" />
+		</transition>
+		<transition on="pasteStationFolder"	to="save">
+			<evaluate expression="copyPasteService.pasteStationFolder(instituteMtl)" />
+		</transition>
+		<transition on="pasteTrade"	to="save">
+			<evaluate expression="stationService.trade2institute(instituteMtl)" />
+		</transition>
+		<transition on="pasteFolder"	to="save">
+			<evaluate expression="formUtil.logline('----pasteFolder----save--1--'+requestParameters.idc)" />
+			<evaluate expression="documentService.folder2institute(instituteMtl)" />
+			<evaluate expression="formUtil.logline('----pasteFolder----save--2--'+requestParameters.idc)" />
+		</transition>
+		<transition on="paste"	to="instituteViewAndEdit">
+			<evaluate expression="formUtil.logline('----handleAction----paste--1--'+requestParameters.idc)" />
+			<evaluate expression="instituteMtl.paste()" />
+			<evaluate expression="formUtil.logline('--------paste--2--')" />
+		</transition>
+		<transition on="fromArchiv"		to="fromArchiv" />
+		<transition on="bsaFormula"		to="bsaFormula" />
+		<transition on="newStation"		to="newStation" />
+		<transition on="stationFax"		to="stationFax" />
+		<transition on="stationName"	to="stationFax" />
+		<transition on="newStationUser"	to="newStationUser" />
+		<transition on="signatureBlockNotice" to="signatureBlockNotice" />
+		<transition on="notice" to="signatureBlockNotice" />
+		<transition on="success"	to="instituteViewAndEdit" />
+		<on-exit>
+			<set name="instituteMtl.action"	value="null" />
+		</on-exit>
+	</action-state>
+
+	<action-state id="deleteNode">
+		<evaluate expression="deleteService.deleteEditNode(instituteMtl)" />
+		<transition on="success"	to="save" >
+			<evaluate expression="documentService.saveUserDoc(instituteMtl)" />
+		</transition>
+	</action-state>
+
+	<view-state id="instituteViewAndEdit" model="instituteMtl">
+		<binder>
+			<binding property="action" />
+			<binding property="idt" />
+			<binding property="idc" />
+		</binder>
+		<transition on="editStep"	to="handleAction" />
+		<transition on="save"		to="handleAction" >
+			<set name="instituteMtl.action"	value="'save'" />
+		</transition>
+	</view-state>
+	
+	<view-state id="stationFax" view="instituteViewAndEdit"  model="instituteO">
+		<binder>
+			<binding	property="institute" />
+			<binding	property="phone" />
+			<binding	property="fax" />
+		</binder>
+		<transition	on="save"		to="save" >
+			<evaluate expression="stationService.stationFaxSave(instituteMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="newStationUser" model="instituteMtl">
+		<binder>
+			<binding property="newStationUserForename" />
+			<binding property="newStationUserContactperson" />
+			<binding property="newStationUserLoginName" />
+		</binder>
+		<on-entry>
+			<evaluate expression="stationService.newStationUserEntry(instituteMtl)" />
+		</on-entry>
+		<transition on="exist" to="save" >
+			<evaluate expression="stationService.newStationUserExist(instituteMtl)" />
+		</transition>
+		<transition on="save"		to="save" >
+			<evaluate expression="stationService.newStationUserSave(instituteMtl)" />
+			<evaluate expression="formUtil.logline('....newStationUser...save.........'+id)" />
+		</transition>
+	</view-state>
+
+	<view-state id="newStation" model="instituteMtl">
+		<binder>
+			<binding property="newStation" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('....newStation...entry..1.......'+id)" />
+			<evaluate expression="stationService.newStationEntry(instituteMtl)" />
+			<evaluate expression="formUtil.logline('....newStation...entry..2.......'+id)" />
+		</on-entry>
+		<transition on="save"		to="save" >
+			<evaluate expression="formUtil.logline('....newStation...save..1.......'+id)" />
+			<evaluate expression="stationService.newStationSave(instituteMtl)" />
+			<evaluate expression="formUtil.logline('....newStation...save..2.......'+id)" />
+			<set name="id"	value="instituteMtl.idt" />
+		</transition>
+	</view-state>
+
+	<view-state id="fromArchiv" view="instituteViewAndEdit" model="instituteMtl">
+		<on-entry>
+			<set name="instituteMtl.idt"	value="idt" />
+		</on-entry>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.fromArchivSave(instituteMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="bsaFormula" view="instituteViewAndEdit" model="instituteMtl">
+		<binder>
+			<binding property="docT.mtlO.bsaformula" />
+		</binder>
+		<transition on="save" to="save">
+			<evaluate expression="formUtil.logline('.........bsaFormula...save...')" />
+		</transition>
+	</view-state>
+
+	<view-state id="signatureBlockNotice" view="instituteViewAndEdit" model="instituteMtl">
+		<binder>
+			<!-- Notice -->
+			<binding property="editNoticeC.notice" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('.........signatureBlockNotice...on-entry')" />
+			<evaluate expression="documentService.signatureBlockEntry(instituteMtl)" />
+			<evaluate expression="formUtil.logline('.........signatureBlockNotice...on-entry')" />
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="documentService.signatureBlockSave(instituteMtl)" />
+		</transition>
+	</view-state>
+
+	<end-state id="save"	view="externalRedirect:/institute=#{id}"	commit="true" />
+	<end-state id="cancel"	view="externalRedirect:/institute=#{id}" />
+
+	<global-transitions>
+		<transition on="cancel"		to="cancel" >
+			<set name="formUtil.mode"	value="''" />
+			<evaluate expression="instituteMtl.editStepCancel()" />
+		</transition>
+	</global-transitions>
+</flow>

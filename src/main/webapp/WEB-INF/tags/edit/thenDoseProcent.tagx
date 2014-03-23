@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+	<edit:ifThenElseIf />
+${docMtl.editNodeT }
+<form:form id="f2" modelAttribute="schemaMtl">
+		<span class="b">Prozentual Dosis</span>
+		<c:out value=" " />
+		<!--
+		<form:input path="editPvC.pvalue" id="procentPv" cssStyle="width:40px"/>
+		 name="procentInput" 
+		onclick="ruleProcent();"
+		 -->
+		<input type="text" value="${docMtl.editPvC.pvalue }" style="width:40px" onchange="ruleProcent();" id="inputProcent"/>
+</form:form>
+</jsp:root>

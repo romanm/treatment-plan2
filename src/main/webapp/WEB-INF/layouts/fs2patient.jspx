@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"	
+	xmlns:sql	="http://java.sun.com/jsp/jstl/sql"
+	xmlns:spring ="http://www.springframework.org/tags"
+	xmlns:security="http://www.springframework.org/security/tags"
+	xmlns:tiles	="http://tiles.apache.org/tags-tiles"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	>
+	<jsp:directive.page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" />
+	<jsp:output doctype-root-element="html" doctype-public="-//W3C//DTD XHTML 1.1//EN"
+		doctype-system="http://www.w3c.org/TR/xhtml11/DTD/xhtml11.dtd" />
+<html>
+<!-- 
+	<span style="font-size: 1.2em">Sie befinden sich in alte Databank Seite. Aktuele Arbeitsumgebung befindet sich hier - </span>
+	<h1>
+	Sie befinden sich in alte Databank Seite. Aktuele Arbeitsumgebung befindet sich hier - 
+	</h1>
+ -->
+	<h1>
+	Zurück zur aktuellen Arbeitsumgebung:
+	</h1>
+	<a href="patient=${patientO.id }" target="_top">
+		${patientO.forename }
+		${patientO.patient }
+	</a>
+</html>
+</jsp:root>

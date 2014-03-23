@@ -1,0 +1,99 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="drugT"	type="com.qwit.domain.Tree"	required="true"/>
+<jsp:directive.attribute name="ts"		type="com.qwit.domain.Ts"	required="true"/>
+
+<c:set var="dayT"	value="${ts.timesT.parentT}" />
+
+<c:set var="be" value="${fn:split(dayT.mtlO.abs,'-')}" />
+
+<c:set var="day2day">
+	<c:set var="upToDay" value="1" />
+	<c:forEach items="${schemaMtl.weekDayS}" var="d">
+		<c:choose>
+			<c:when test="${d==be[0]}">
+				<td> x </td>
+				<c:set var="upToDay" value="0" />
+			</c:when>
+			<c:when test="${d==be[1]}">
+				<c:if test="${upToDay>1}">
+				<!-- 
+					<td colspan="${upToDay-1}" style="background-color: #CCCCCC;"> bis </td>
+				 -->
+					<td colspan="${upToDay-1}"> bis </td>
+				</c:if>
+				<td> x </td>
+			</c:when>
+			<c:when test="${d>be[1] or be[0]>d}">
+				<td></td>
+			</c:when>
+		</c:choose>
+		<c:set var="upToDay" value="${upToDay+1}" />
+	</c:forEach>
+</c:set>
+
+<c:set var="mealSplit" value="false"/>
+<c:forEach items="${ts.timesT.childTs}" var="pvT">
+	<c:if test="${pvT.tabName=='pvariable'}">
+		<c:set var="pvC" value="${schemaMtl.classM[pvT.idClass]}"/>
+			<c:if test="${pvC.pvariable=='weekMealView'}">
+				<c:set var="mealSplit" value="true"/>
+			</c:if>
+	</c:if>
+</c:forEach>
+
+<spring:eval var="tsInDay" expression="schemaMtl.tsInDay(ts)" />
+<spring:eval var="tsInDaySize" expression="tsInDay.size()" />
+<spring:eval var="doseT" expression="jxp.getDose(drugT)"/>
+<c:choose>
+	<c:when test="${mealSplit and fn:contains(ts.timesT.mtlO.abs,'=')}">
+		<c:set var="first" value="true" />
+		<spring:eval var="mealKey" expression="jxp.mealKey(ts.timesT.mtlO.abs)" />
+		<c:forEach items="${mealKey}" var="k">
+			<tr>
+				<c:set var="t">
+					<fmt:message key="${k}" />
+					<mtl:malTableteSpan ts="${ts}"
+					mealPosition="${fn:indexOf(fn:replace(k,'uiMeal',''),'1')*2}" 
+					dose2Tablete="${schemaMtl.dose2Tablete}"/>
+					<c:if test="${first}"><owsui:editTime timeT="${ts.timesT}"/></c:if>
+				</c:set>
+				<qhtm:tdWeekDrug drugT="${drugT}" text="${t}" noNe="true"/>
+				${day2day}
+				<c:if test="${first}">
+					<qhtm:tdWeekDose doseT="${doseT}" ts="${ts}"/>
+					<qhtm:tdWeekDay drugT="${drugT}" ts="${ts}"/>
+				</c:if>
+			</tr>
+			<c:set var="first" value="false" />
+		</c:forEach>
+	</c:when>
+	<c:when test="${tsInDaySize>1}">
+		<c:forEach var="ts2" items="${tsInDay}" varStatus="stat">
+			<tr>
+				<qhtm:tdWeekDrug drugT="${drugT}" ts="${ts2}" />
+				${day2day}
+				<qhtm:tdWeekDose doseT="${doseT}" ts="${ts2}"/>
+				<c:if test="${stat.count==1}">
+					<qhtm:tdWeekDay drugT="${drugT}" ts="${ts2}"/>
+				</c:if>
+			</tr>
+		</c:forEach>
+	</c:when>
+	<c:otherwise>
+		<tr>
+			<qhtm:tdWeekDrug drugT="${drugT}" ts="${ts}" />
+			${day2day}
+			<qhtm:tdWeekDose doseT="${doseT}" ts="${ts}"/>
+			<qhtm:tdWeekDay drugT="${drugT}" ts="${ts}"/>
+		</tr>
+	</c:otherwise>
+</c:choose>
+</jsp:root>

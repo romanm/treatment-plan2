@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+>
+<jsp:directive.attribute name="doseT" type="com.qwit.domain.Tree" required="true" description="The dose tree object"/>
+<jsp:directive.attribute name="ts" type="com.qwit.domain.Ts" description="The dose ts object"/>
+<jsp:directive.attribute name="calculated" type="java.lang.Boolean" description="View not view calculated dose"/>
+
+<c:choose>
+	<c:when test="${doseT.idClass==null or empty doseT.mtlO.unit}">
+		<c:out value="${inputSymbol}"/>
+	</c:when>
+	<c:when test="${calculated and doseT.mtlO.unit=='AUC'}">
+		<c:out value="mg" />
+	</c:when>
+	<c:when test="${calculated and fn:indexOf(doseT.mtlO.unit,'/')>0}">
+		<c:out value="${fn:substringBefore(doseT.mtlO.unit,'/')}"/>
+	</c:when>
+	<c:otherwise>
+		<c:out value="${doseT.idClass!=null?doseT.mtlO.unit:''}"/>
+	</c:otherwise>
+</c:choose>
+
+<!--
+<c:if test="${'day'==doseT.mtlO.pro}">
+	<c:if test="${not empty ts}">
+		<spring:eval var="malInDay" expression="schemaMtl.malInDay(ts)" />
+		<c:if test="${malInDay>1 or fn:contains(ts.timesT.mtlO.abs,'=')}">
+			<c:set var="proDay" value=""/>
+		</c:if>
+	</c:if>
+</c:if>
+<fmt:message key="mtl_dose_pro_${doseT.mtlO.pro}"/>
+-->
+
+</jsp:root>

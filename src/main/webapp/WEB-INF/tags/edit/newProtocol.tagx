@@ -1,0 +1,91 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+		<form:form id="f2" modelAttribute="flowObjCreator">
+	<c:choose>
+		<c:when test="${'protocol'==explorerMtl.folderO.folder }">
+			<div class="red b">
+				<fmt:message key="ui_subdir_select"/>
+			</div>
+			<input id="c1" type="submit" name="_eventId_cancel"	value="${ui_button_OK}"/>
+			<input id="c2" type="submit" name="_eventId_cancel"	value="${ui_button_cancel}" />
+		</c:when>
+		<c:otherwise>
+	
+		<edit:updateProtocol />
+	
+	<!-- 
+	<table>
+		<tr><th><fmt:message key="ui_therapyName" />:</th>
+			<td>
+				<form:input id="newProtocol" path="newProtocol.protocol" cssStyle="width:130px"/>
+			</td>
+		</tr>
+	</table>
+		<input type="submit" name="_eventId_save"	value="${ui_button_save}"/>
+		<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}" />
+	 -->
+		<!-- 
+	<table>
+		<tr><th>
+			Name
+			<fmt:message key="ui_therapieProtocol" />
+		</th></tr>
+		<tr><td>
+			<form:input path="newProtocol.protocol" cssStyle="width:160px" onchange="protocol2schemaName(this)" />
+		</td><td>
+		</td></tr>
+		 -->
+		
+			<!-- 
+		<tr><th>Intention</th></tr>
+		<tr><td>
+			<fmt:message var="peop" key="mtl_protocol_intention_peop" />
+			<form:checkbox path="newProtocol.intentionRests" value="PEOP" label="${peop}" />
+			<br />
+			<fmt:message var="neo" key="mtl_protocol_intention_neo" />
+			<form:radiobutton path="newProtocol.intentionAdjuvant" value="neo" label="${neo}" />
+			<br />
+			<fmt:message var="adj" key="mtl_protocol_intention_adj" />
+			<form:radiobutton path="newProtocol.intentionAdjuvant" value="adj" label="${adj}" />
+			<br />
+			<fmt:message var="pal" key="mtl_protocol_intention_pal" />
+			<form:radiobutton path="newProtocol.intentionAdjuvant" value="pal" label="${pal}" />
+			<br />
+			<fmt:message var="kur" key="mtl_protocol_intention_kur" />
+			<form:checkbox path="newProtocol.intentionRests" value="KUR" label="${kur}" />
+			<br />
+			<fmt:message var="v1line" key="mtl_protocol_intention_1line" />
+			<form:radiobutton path="newProtocol.intentionLine" value="1line" label="${v1line}" />
+			<br />
+			<fmt:message var="v2line" key="mtl_protocol_intention_2line" />
+			<form:radiobutton path="newProtocol.intentionLine" value="2line" label="${v2line}" />
+			<br />
+			<fmt:message var="sal" key="mtl_protocol_intention_sal" />
+			<form:checkbox path="newProtocol.intentionRests" value="SAL" label="${sal}" />
+		</td></tr>
+			 -->
+		
+		<!-- 
+		<tr><th><fmt:message key="uiTherapySchema" /></th></tr>
+		<tr><td>
+			<form:input path="newProtocol.schemaName" cssStyle="width:160px" />
+		</td><td>
+		</td></tr>
+		<tr><th><fmt:message key="ui_cycleDauer" /></th></tr>
+		<tr><td>
+			<form:input path="newProtocol.duration" cssStyle="width:60px" />
+		</td><td>
+		</td></tr>
+	</table>
+		 -->
+	</c:otherwise>
+	</c:choose>
+		</form:form>
+
+</jsp:root>

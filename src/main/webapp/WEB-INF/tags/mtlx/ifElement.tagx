@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+	<jsp:directive.attribute name="exprT" type="com.qwit.domain.Tree" required="true" description="The if tree object"/>
+	<jsp:directive.attribute name="ruleActive" type="java.lang.Boolean" required="false" description="The if tree object"/>
+<span class="${ruleActive?'ruleActive':''}">
+
+<c:choose>
+	<c:when test="${empty exprT}"> ### </c:when>
+	<c:when test="${'expr'==exprT.tabName}">
+		<owsui:editExpr exprT="${exprT}"/>
+	</c:when>
+	<c:when test="${'day'==exprT.tabName}">
+		<mtl:day dayT="${exprT}"/>
+	</c:when>
+	<c:when test="${'dose'==exprT.tabName}">
+		<mtl:doseValue	doseT="${exprT}" />
+		<mtl:doseUnit	doseT="${exprT}" />
+		<mtl:doseApp	doseT="${exprT}" notInputSimbol="true"/>
+	</c:when>
+	<c:when test="${not empty exprT.ref}">
+		<mtl:ifElement exprT="${docMtl.tree[exprT.ref]}" />
+	</c:when>
+	<c:when test="${'pvariable'==exprT.tabName}">
+		<c:out value="${exprT.mtlO.pvalue}" />
+		<c:out value=" " />
+		<c:set var="eq1exprT" value="${exprT.parentT.parentT.childTs[0].childTs[0]}" />
+		<c:choose>
+			<c:when test="${'expr'==eq1exprT.tabName and'calcDose'==eq1exprT.mtlO.value}">
+			mg
+			</c:when>
+			<c:when test="${'yes_no'==exprT.mtlO.unit}"></c:when>
+			<c:when test="${not empty eq1exprT.mtlO.unit}">
+				<span class="small"><fmt:message key="mtl_expr_unit_${eq1exprT.mtlO.unit}"/></span>
+			</c:when>
+			<c:otherwise>${exprT.mtlO.unit}</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:when test="${'app'==exprT.tabName}">
+		<fmt:message key="uiTempo"/>
+		<c:out value=" " />
+		<owsui:editAppApp appT="${exprT}"/>
+	</c:when>
+	<c:when test="${'drug'==exprT.tabName}">
+		<c:out value="${exprT.mtlO.drug}" />
+		<spring:eval var="doseT" expression="jxp.getChild(exprT,'dose')" />
+		<c:out value=" " />
+		<mtl:doseValue	doseT="${doseT}" />
+		<mtl:doseUnit	doseT="${doseT}" />
+		<mtl:doseApp	doseT="${doseT}" notInputSimbol="true"/>
+		
+	</c:when>
+	<c:when test="${'labor'==exprT.tabName}"><mtl:laborUnit laborO="${exprT.mtlO}"/></c:when>
+	<c:when test="${'finding'==exprT.tabName}">
+		<mtl:message prefix="mtl_finding_finding_" key="${exprT.mtlO.finding}" />
+	</c:when>
+</c:choose>
+
+</span>
+
+</jsp:root>

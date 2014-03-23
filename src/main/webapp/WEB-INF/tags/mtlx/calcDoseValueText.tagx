@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0"
+	xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+>
+<jsp:directive.attribute name="doseT" type="com.qwit.domain.Tree" required="true" description="The dose tree object"/>
+<jsp:directive.attribute name="ts" type="com.qwit.domain.Ts"/>
+
+<c:choose>
+	<c:when test="${empty schemaMtl.calcDose[doseT] and not fn:contains(doseT.mtlO.unit,'/')}">
+		<fmt:formatNumber pattern="#.###">${doseT.mtlO.value}</fmt:formatNumber>
+	</c:when>
+	<c:when test="${not empty schemaMtl.calcDose[doseT]}">
+ 
+		<c:set var="x1" value="${schemaMtl.calcDoseR[doseT] *100}"/>
+		<c:set var="x2" value="${x1 / schemaMtl.calcDose[doseT]}"/>
+<!-- 
+		x1=${x1 }
+		x2=${x2}
+ -->
+		<c:set var="procent">
+			<fmt:formatNumber pattern="#.###" value="100.0"/>
+		</c:set>
+			<!--
+			<fmt:formatNumber pattern="#.###" value="${x2 }"/>
+			<fmt:formatNumber pattern="#.###">${schemaMtl.calcDoseR[doseT] *100 / schemaMtl.calcDose[doseT] }</fmt:formatNumber>
+			<fmt:formatNumber pattern="#.###">${schemaMtl.calcDoseR[doseT] *100 / schemaMtl.calcDose[doseT] - 100}</fmt:formatNumber>
+			-->
+		<c:set var="title">
+			<fmt:formatNumber pattern="##.###">${schemaMtl.calcDose[doseT]}</fmt:formatNumber> (${procent}%)
+		</c:set>
+		<c:set var="malCalcDose" value="${schemaMtl.calcDoseR[doseT]}" />
+		<c:if test="${not empty ts and 'day'==doseT.mtlO.pro}">
+			<c:set var="title">${title}. ${malCalcDose}/d</c:set>
+			<spring:eval var="malInDay" expression="schemaMtl.malInDay(ts)" />
+			<c:set var="malCalcDose" value="${malCalcDose/malInDay}" />
+		</c:if>
+		<span title="${title}">
+		<fmt:formatNumber pattern="#.###">${malCalcDose}</fmt:formatNumber></span>
+ <!-- 
+  -->
+	</c:when>
+	<c:otherwise>?____</c:otherwise>
+</c:choose>
+</jsp:root>

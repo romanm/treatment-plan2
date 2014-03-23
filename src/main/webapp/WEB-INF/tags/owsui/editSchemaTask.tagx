@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<jsp:directive.attribute name="taskT" type="com.qwit.domain.Tree" required="true" description="The drug|labor|... tree object"/>
+
+<c:choose>
+	<c:when test="${docMtl.idt==taskT.id}">
+		<c:choose>
+			<c:when test="${'tabletDivisor'==currentSWFState}">
+				<mtl:drug drugT="${taskT}"/>
+			</c:when>
+			<c:when test="${'drug'==taskT.tabName}">
+				<edit:inputdrug />
+				<!-- 
+				<form:input id="inputDrug" path="editDrugC.drug" cssStyle="width:120px"/>
+				<script type="text/javascript">
+					Spring.addDecoration(new Spring.ElementDecoration({
+						elementId : "inputDrug", widgetType : "dijit.form.ComboBox",
+						widgetAttrs :{
+							store : new dojo.data.ItemFileReadStore( {data :drugsListe}),
+							searchAttr : "name",
+							autocomplete : true,
+							required : true,
+							focusOnLoad: true,
+							trim : true,
+							invalidMessage : "Medikament Name"
+					}	}
+					));
+					dojo.addOnLoad(function(){
+						dijitFocus("inputDrug");
+					});
+				</script>
+				 -->
+				<c:set var="idt" value="${drugT.id}"/>
+				<c:if test="${drugT.parentT.tabName=='drug'}">
+					<c:set var="idt" value="${drugT.parentT.id}"/>
+				</c:if>
+			</c:when>
+		</c:choose>
+	</c:when>
+	<c:when test="${'notice'==taskT.tabName}">
+	</c:when>
+	<c:when test="${'labor'==taskT.tabName or 'finding'==taskT.tabName or 'notice'==taskT.tabName}">
+		<qhtm:a idt="${taskT.id}">${taskT.mtlO[taskT.tabName]}</qhtm:a>
+	</c:when>
+	<c:otherwise>
+		<qhtm:a idt="${taskT.id}"><mtl:drug drugT="${taskT}"/></qhtm:a>
+	</c:otherwise>
+</c:choose>
+</jsp:root>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<!-- 
+<c:if test="${docMtl.editNodeT.parentT.parentT.tabName=='drug'}">
+	<edit:linkBoard />
+</c:if>
+ -->
+
+<!-- 
+<c:if test="${!(empty owsSession.schemaPart or 'ed'==owsSession.schemaPart)}">
+	<owsui:timesHidden />
+</c:if>
+ -->
+
+<h3><fmt:message key="uiRelatively"/>:</h3>
+<!-- 
+	<span class="small">Dialog
+		<qhtm:a idt="${docMtl.idt}" action="timesRelativPanel1">A</qhtm:a>
+	oder
+		<qhtm:a idt="${docMtl.idt}" action="timesRelativPanel2">B</qhtm:a>
+	</span>
+ -->
+<c:choose>
+	<c:when test="${2==owsSession.timesRelativPanel}"><edit:relativPanel2 /></c:when>
+	<c:otherwise><edit:relativPanel1 /></c:otherwise>
+</c:choose>
+
+<h3><fmt:message key="ui_empty"/></h3>
+<div>
+<a onclick="dojo.byId('timesAbs').value='';dojo.byId('timesRef').value=0;dojo.byId('inputTimes').innerHTML='__:__';" 
+href="javascript:void(0);">
+	__:__
+</a>
+</div>
+
+<div style="float: right;"><fmt:message key="uiHour"/></div>
+<h3><fmt:message key="uiAbsolute"/></h3>
+<table>
+	<tbody>
+		<tr><edit:timesAbsTd b="8"	e="13"/></tr>
+		<tr><edit:timesAbsTd b="14"	e="19"/></tr>
+		<tr><edit:timesAbsTd b="20"	e="23"/><edit:timesAbsTd b="0" e="1"/></tr>
+		<tr><edit:timesAbsTd b="2"	e="7"/></tr>
+	</tbody>
+</table>
+
+<h3><fmt:message key="uiMeal"/></h3>
+<table>
+	<thead>
+		<tr class="dotted">
+			<th><label for="meals0"><fmt:message key="uiMeal1000"/></label></th>
+			<th><label for="meals2"><fmt:message key="uiMeal0100"/></label></th>
+			<th><label for="meals4"><fmt:message key="uiMeal0010"/></label></th>
+			<th><label for="meals6"><fmt:message key="uiMeal0001"/></label></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<c:set var="mealAbs" value="${fn:indexOf(docMtl.editTimesC.abs,'=')>0}" />
+			<c:set var="isMeal1000" value="${mealAbs and fn:substring(docMtl.editTimesC.abs,0,1)=='1'}" />
+			<c:set var="isMeal0100" value="${mealAbs and fn:substring(docMtl.editTimesC.abs,2,3)=='1'}" />
+			<c:set var="isMeal0010" value="${mealAbs and fn:substring(docMtl.editTimesC.abs,4,5)=='1'}" />
+			<c:set var="isMeal0001" value="${mealAbs and fn:substring(docMtl.editTimesC.abs,6,7)=='1'}" />
+			<td><label for="meals0">08:00</label>
+			<c:choose>
+				<c:when test="${isMeal1000}">
+			<input type="checkbox" value="0" id="meals0" onclick="meals();" checked=""/>
+				</c:when>
+				<c:otherwise>
+			<input type="checkbox" value="0" id="meals0" onclick="meals();" />
+				</c:otherwise>
+			</c:choose>
+			</td>
+			<td><label for="meals2">13:00</label>
+			<c:choose>
+				<c:when test="${isMeal0100}">
+			<input type="checkbox" value="2" id="meals2" onclick="meals();" checked=""/>
+				</c:when>
+				<c:otherwise>
+			<input type="checkbox" value="2" id="meals2" onclick="meals();" />
+				</c:otherwise>
+			</c:choose>
+			</td>
+			<td><label for="meals4">19:00</label>
+			<c:choose>
+				<c:when test="${isMeal0010}">
+			<input type="checkbox" value="4" id="meals4" onclick="meals();" checked=""/>
+				</c:when>
+				<c:otherwise>
+			<input type="checkbox" value="4" id="meals4" onclick="meals();" />
+				</c:otherwise>
+			</c:choose>
+			</td>
+			<td><label for="meals6">21:00</label>
+			<c:choose>
+				<c:when test="${isMeal0001}">
+			<input type="checkbox" value="6" id="meals6" onclick="meals();" checked=""/>
+				</c:when>
+				<c:otherwise>
+			<input type="checkbox" value="6" id="meals6" onclick="meals();" />
+				</c:otherwise>
+			</c:choose>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+
+<c:if test="${formUtil.part=='week'}">
+	<input type="checkbox" name="abc" checked="${docMtl.weekMealViewSplit?'checked':''}"
+		onchange="dojo.byId('weekMealViewSplit').value=dojo.byId('forWeekMealViewSplit').checked;"
+		id="forWeekMealViewSplit"/>
+	<label for="forWeekMealViewSplit">Geteilt anzeigen</label>
+</c:if>
+
+</jsp:root>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+	
+	<persistence-context />
+
+	<var name="formUtil"	class="com.qwit.util.FormUtil" />
+	<var name="registerUserForm"	class="com.qwit.util.RegisterUserForm" />
+	
+	<on-start>
+		<evaluate expression="documentService.setFlushModeCommit()" />
+		<!-- 
+		<evaluate expression="documentService.makeConceptMtl(id)" result="flowScope.conceptMtl" />
+		 -->
+		<evaluate expression="formUtil.logline('-------registerflow--------')" />
+	</on-start>
+
+	<action-state id="handleAction" >
+		<!-- 
+		<evaluate expression="requestParameters.a"/>
+		 -->
+		<evaluate expression="handleAction.handleAction(registerUserForm,requestParameters.a)"/>
+		<transition on="remindPassword"		to="remindPassword" />
+		<transition on="register"	to="register" />
+		<transition on="confirmAccount" to="confirmAccount" />
+		<transition on="successfullReg"	to="successfullRegistry" />
+		<on-exit>
+			<evaluate expression="formUtil.logline('--------on-exit--1')" />
+		</on-exit>
+	</action-state>
+
+	<action-state id="confirmAccount">
+		<on-entry>
+			<!-- interesting effect the line below changes the c-parameter in the adress line to confirmKey -->
+			<set name="flowScope.confirmKey"		value="requestParameters.c" />
+		</on-entry>
+		<evaluate expression="formUtil.logline('----------------confirmAccount--------------hash: '+confirmKey)" />
+		<evaluate expression="mailService.confirmAccount(confirmKey)" />
+		<transition on="valid" to="accountConfirmed">
+			<evaluate expression="deleteService.deleteAccountConfirmation(confirmKey)" />
+		</transition>	
+		<transition on="invalid" to="accountConfirmationDenied" />
+		<transition on="invalidConfirmKey" to="invalidConfirmKey" />
+		<transition on="resetPassword" to="resetPassword"/>
+	</action-state>
+	
+	<view-state id="register" model="registerUserForm" >
+		<binder>
+		<!-- 
+			<binding property="contactperson.forename" />
+		 -->
+			<binding property="firstName" />
+			<binding property="secondName" />
+			<binding property="userName" />
+			<binding property="email" />
+			<binding property="password" />
+			<binding property="passwordRetyped" />
+			<binding property="captchaAnswer" />
+		</binder>
+		<transition on="save"		to="save">
+			<evaluate expression="documentService.saveNewUser(registerUserForm)" />
+		</transition>
+	</view-state>
+
+	<view-state id="remindPassword" model="registerUserForm" view="register">
+		<binder>
+			<binding property="userName" />
+			<binding property="email" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('----------------remindPassword--------------')" />
+		</on-entry>
+		<transition on="sendPasswordReminder"		to="sendPasswordReminder">
+			<!-- Create new password and send to the user -->
+			<evaluate expression="documentService.createRemindedPassword(registerUserForm)" />
+		</transition>
+	</view-state>
+
+	<view-state id="resetPassword" model="registerUserForm" view="register">
+		<binder>			
+			<binding property="password" />
+			<binding property="passwordRetyped" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('-----------resetPassword-----------')" />
+		</on-entry>
+		<transition on="save"		to="saveResetPassword">
+			<evaluate expression="documentService.resetPassword(flowScope.confirmKey, registerUserForm.password)" />
+		</transition>
+	</view-state>
+
+	<!-- obsolete state -->
+	<view-state id="successfullRegistry" view="register">
+		<on-entry>
+			<evaluate expression="formUtil.logline('----successfulRegistry----')" />
+		</on-entry>
+	</view-state>
+	
+	<end-state id="sendPasswordReminder" view="redirect:/login?a=sendPasswordReminder"	commit="true" >
+		<on-entry>
+			<evaluate expression="formUtil.logline('----------------sendPasswordReminderregistration--------------')" />
+			<evaluate expression="mailService.sendPasswordReminder(registerUserForm)" />
+		</on-entry>
+	</end-state>
+	
+	<end-state id="save" view="redirect:/login?a=successfulRegistry"	commit="true" >
+		<on-entry>
+			<evaluate expression="formUtil.logline('----------------save registration--------------')" />
+			<!-- 
+			<evaluate expression="mailService.sendRegConfirmEmail(registerUserForm)" />
+			 -->
+		</on-entry>
+	</end-state>
+	
+	<end-state id="saveResetPassword" view="redirect:/login?a=saveResetPassword"	commit="true" >
+		<on-entry>
+			<evaluate expression="formUtil.logline('----------------saveResetPassword')" />
+		</on-entry>	
+	</end-state>
+
+	<end-state id="cancel"	view="externalRedirect:/user?part=#{formUtil.part}" />
+
+	<end-state id="accountConfirmed" view="redirect:/login?a=accountConfirmed" >
+		<on-entry>
+			<evaluate expression="formUtil.logline('----------------accountConfirmed--------------')" />
+		</on-entry>
+	</end-state>
+	
+	<end-state id="invalidConfirmKey" view="redirect:/login?a=invalidConfirmKey">
+		<on-entry>
+			<evaluate expression="formUtil.logline('----------------invalidConfirmKey--------------')" />
+		</on-entry>
+	</end-state>
+	
+	<end-state id="accountConfirmationDenied" view="redirect:/login?a=accountConfirmationDenied">
+		<on-entry>
+			<evaluate expression="formUtil.logline('----------------accountConfirmationDenied--------------')" />
+		</on-entry>
+	</end-state>
+
+</flow>

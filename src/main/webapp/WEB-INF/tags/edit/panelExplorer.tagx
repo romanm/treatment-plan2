@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<div id="toolbar" >
+	<c:if test="${not empty docMtl.idt and docMtl.idt!=0}"><owsui:next/></c:if>
+	<!--
+		<p>&#160;</p>
+	-->
+</div>
+<!-- 
+<edit:inSession />
+ -->
+<div class="invisibleWhite" id="session"><c:out value="." /></div>
+
+<fmt:message key="ui_seekFilter" var="ui_seekFilter" scope="application" />
+<c:choose>
+	<c:when test="${'newGeneric'==formUtil.mode}">
+		<edit:newGeneric />
+	</c:when>
+	<c:when test="${'saveNewLabor'==currentSWFState}">
+		<edit:newLabor />
+	</c:when>
+	<c:when test="${'importProtocol'==currentSWFState}">
+		<owsui:titlePane id="ep_1_${id}" title="${ui_title_dialog}" isOpened="${not empty urlFlow}">
+			<edit:importProtocol />
+		</owsui:titlePane>
+	</c:when>
+	<c:when test="${'importProtocolSynchron'==currentSWFState}">
+		<owsui:titlePane id="ep_1_${id}" title="${ui_title_dialog}" isOpened="${not empty urlFlow}">
+			<edit:importProtocolSynchron />
+		</owsui:titlePane>
+	</c:when>
+	<c:when test="${'renameFolder'==formUtil.mode}">
+		<owsui:titlePane id="ep_2_${id}" title="${ui_title_dialog}" isOpened="${not empty urlFlow}">
+			<edit:renameFolder />
+		</owsui:titlePane>
+	</c:when>
+	<c:when test="${'deleteFolder'==currentSWFState}">
+		<owsui:titlePane id="ep_3_${id}" title="${ui_title_dialog}" isOpened="${not empty urlFlow}">
+			<edit:deleteFolder />
+		</owsui:titlePane>
+	</c:when>
+	<c:when test="${'newFolder'==formUtil.mode}">
+		<owsui:titlePane id="ep_4_${id}" title="${ui_title_dialog}" isOpened="${not empty urlFlow}">
+			<edit:newFolder/>
+		</owsui:titlePane>
+	</c:when>
+	<!-- 
+	<c:when test="${'newProtocol'==formUtil.mode}">
+	<c:when test="${'saveNewProtocol'==currentSWFState}">
+	 -->
+	<c:when test="${'newProtocol'==currentSWFState}">
+		<owsui:titlePane id="ep_5_${id}" title="${ui_title_dialog}" isOpened="${not empty urlFlow}">
+			<edit:newProtocol/>
+		</owsui:titlePane>
+	</c:when>
+	<c:when test="${'patient'==explorerMtl.treeBreadcrumb[0].folder }"/>
+	<c:otherwise>
+
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

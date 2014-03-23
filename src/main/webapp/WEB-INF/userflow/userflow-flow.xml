@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<secured attributes="ROLE_USER" />
+	<persistence-context />
+
+	<var name="formUtil"			class="com.qwit.util.FormUtil" />
+	<var name="registerUserForm"	class="com.qwit.util.RegisterUserForm" />
+	<input name="id"				type="int" required="true" />
+	
+	<on-start>
+		<evaluate expression="documentService.setFlushModeCommit()" />
+			<evaluate expression="formUtil.logline('--------on-start--id '+id)" />
+		<evaluate expression="documentService.makeUserMtl(id)" result="flowScope.userMtl" />
+			<evaluate expression="formUtil.logline('--------on-start--'+requestParameters.part)" />
+		<evaluate expression="copyPatientDataService.createPatientCopyMap()" result="flowScope.patientCopyMap" />
+		<set name="formUtil.part"	value="requestParameters.part" />
+		<set name="userMtl.idt"		value="requestParameters.idt" />
+		<set name="userMtl.idc"		value="requestParameters.idc" />
+		<set name="userMtl.action"	value="requestParameters.a" />
+	</on-start>
+
+	<action-state id="handleAction" >
+		<on-entry>
+			<evaluate expression="formUtil.logline('----handleAction--1--'+requestParameters.a)" />
+			<evaluate expression="formUtil.logline('----handleAction--2--'+userMtl.getAction())" />
+		</on-entry>
+		<!-- 
+		<evaluate expression="userMtl.getAction()" />
+		<evaluate expression="userMtl.handleAction(requestParameters.a)"/>
+		 -->
+		<evaluate expression="handleAction.handleAction(userMtl,requestParameters.a)"/>
+		<transition on="success"		to="createEditObject" />
+		<transition on="copy"	to="userViewAndEditx">
+			<evaluate expression="formUtil.logline('----handleAction----copy--1--------')" />
+			<evaluate expression="userMtl.copy()" />
+			<evaluate expression="formUtil.logline('----handleAction----copy--2--------')" />
+			<evaluate expression="documentService.copy(userMtl, formUtil.getPart())" />
+			<evaluate expression="formUtil.logline('----handleAction----copy--3--------')" />
+			<!--
+			<set name="userCareSessionContainer.userCareSession.copyNodeT"	value="schemaMtl.copyNodeT" />
+			-->
+		</transition>
+		<transition on="pasteFolder"	to="save">
+			<evaluate expression="documentService.folder2institute(userMtl)" />
+		</transition>
+		<transition on="pasteUser2institute4admin"	to="save">
+			<evaluate expression="documentService.user2institute4admin(userMtl)" />
+		</transition>
+		<transition on="paste"	to="userViewAndEditx">
+			<evaluate expression="formUtil.logline('----handleAction----paste--1--'+requestParameters.idc)" />
+			<!-- 
+			<evaluate expression="userMtl.paste()" />
+			 -->
+			<evaluate expression="copyPasteService.paste(userMtl)" />
+			<evaluate expression="formUtil.logline('--------paste--2--')" />
+		</transition>
+		<transition on="rewrite"	to="save">
+			<evaluate expression="formUtil.logline('----userViewAndEdit----rewrite--1--'+requestParameters.idt)" />
+			<evaluate expression="documentService.rewriteElement(userMtl,requestParameters.idt)" />
+		</transition>
+		<transition on="save"		to="save">
+			<evaluate expression="formUtil.logline('--------save--')" />
+		</transition>
+		<transition on="copyPatienten"	to="copyPatienten" />
+		<transition on="changeUserdata"	to="changeUserdata" />
+		<transition on="changePassword"	to="changePassword" />
+		<on-exit>
+			<evaluate expression="formUtil.logline('--------on-exit--1')" />
+			<set name="userMtl.action"	value="null" />
+			<evaluate expression="formUtil.logline('--------on-exit--2'+requestParameters.part)" />
+			<evaluate expression="formUtil.logline('--------on-exit--2'+formUtil.part)" />
+		</on-exit>
+	</action-state>
+	
+	<action-state id="createEditObject">
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------createEditObject----------')" />
+			<evaluate expression="userMtl.setEditNodeT()" />
+		</on-entry>
+		<evaluate expression="userMtl.editNodeName" />
+		<transition on="success"	to="userViewAndEditx" />
+	</action-state>
+
+	<view-state id="userViewAndEditx" model="userMtl">
+		<binder>
+			<binding property="idc" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('----userViewAndEditx----entry----1')" />
+			<evaluate expression="formUtil.logline('----userViewAndEditx----entry----'+requestParameters.userNoticeType)" />
+		</on-entry>
+		<transition on="copy"	to="reviseEditNode">
+				<set name="userMtl.action"	value="'copy'" />
+		</transition>
+		<transition on="paste"	to="handleAction">
+			<set name="userMtl.action"	value="'paste'" />
+		</transition>
+		<transition on="insert">
+			<evaluate expression="formUtil.logline('----userViewAndEdit----insert--1--'+requestParameters.idt)" />
+			<evaluate expression="documentService.insert(userMtl,requestParameters.idt)" />
+		</transition>
+		<transition on="rewrite"	to="save">
+			<evaluate expression="formUtil.logline('----userViewAndEdit----rewrite--1--'+requestParameters.idt)" />
+			<evaluate expression="documentService.rewriteElement(userMtl,requestParameters.idt)" />
+		</transition>
+		<transition on="part">
+			<evaluate expression="formUtil.logline('----userViewAndEdit----part--1--')" />
+			<set name="formUtil.part"	value="requestParameters.part" />
+		</transition>
+		<transition on="editStep"	to="reviseEditNode" >
+			<evaluate expression="formUtil.logline('----userViewAndEdit----editStep--1--')" />
+		</transition>
+		<on-exit>
+			<evaluate expression="formUtil.logline('----userViewAndEditx----exit----')" />
+		</on-exit>
+	</view-state>
+
+	<view-state id="copyPatienten" model="registerUserForm" view="user">
+		<on-entry>
+			<evaluate expression="formUtil.logline('....copyPatienten..........entry....1.....')" />
+			<!-- 
+			<evaluate expression="copyPatientDataService.copyPatienten(userMtl)" />
+			 -->
+			<evaluate expression="copyPatientDataService.copyPatienten(patientCopyMap)" />
+			<evaluate expression="formUtil.logline('....copyPatienten..........entry....2.....')" />
+		</on-entry>
+		<transition on="update1patient">
+			<evaluate expression="formUtil.logline('....copyPatienten..........copy1patient......1...')" />
+			<!-- 
+			<evaluate expression="copyPatientDataService.update1patient(userMtl,requestParameters.ids)" result="flowScope.stM" />
+			 -->
+			<evaluate expression="copyPatientDataService.update1patient(userMtl,requestParameters.ids,patientCopyMap)"/>
+			<evaluate expression="formUtil.logline('....copyPatienten..........copy1patient......2...')" />
+		</transition>
+		<transition on="copy1patient">
+			<evaluate expression="formUtil.logline('....copyPatienten..........copy1patient......1...')" />
+			<evaluate expression="formUtil.logline('idt='+requestParameters.idt)" />
+			<evaluate expression="copyPatientDataService.copy1patient(userMtl,requestParameters.ids)" />
+			<evaluate expression="formUtil.logline('....copyPatienten..........copy1patient......2...')" />
+		</transition>
+		<transition on="cancel"		to="cancel">
+			<evaluate expression="formUtil.logline('....copyPatienten..........cancel.........')" />
+		</transition>
+	</view-state>
+
+	<view-state id="changeUserdata" model="registerUserForm" view="user">
+		<binder>
+			<binding property="title" />
+			<binding property="firstName" />
+			<binding property="secondName" />
+			<binding property="email" />
+			<binding property="userName" />
+		</binder>
+		<on-entry>
+			<evaluate expression="documentService.entryChangeUserdata(userMtl, registerUserForm)" />
+		</on-entry>
+		<transition on="save"		to="save">
+			<evaluate expression="documentService.saveChangeUserdata(userMtl, registerUserForm)" />
+		</transition>
+	</view-state>
+	
+	<view-state id="changePassword" model="userMtl" view="user">
+		<secured attributes="ROLE_USER" />
+		<binder>
+			<binding property="oldPass" />
+			<binding property="newPass" />
+			<binding property="newPassRetyped" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('-----------changePassword-----------')" />
+		</on-entry>
+		<transition on="save"		to="save">
+			<evaluate expression="documentService.changePassword(userMtl)" />
+		</transition>
+	</view-state>
+	
+	<action-state id="reviseEditNode">
+		<evaluate expression="userMtl.editNodeName" />
+		<transition on="success"	to="handleAction"/>
+	</action-state>
+
+	<end-state id="save"	view="externalRedirect:/user=#{userMtl.docT.id}"	commit="true" />
+	<end-state id="cancel"	view="externalRedirect:/user=#{userMtl.docT.id}" />
+
+</flow>

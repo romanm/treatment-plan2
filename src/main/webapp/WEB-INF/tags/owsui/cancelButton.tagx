@@ -1,0 +1,3 @@
+<jsp:root version="2.0" xmlns:jsp="http://java.sun.com/JSP/Page" >
+<input type="button" class="next" onclick="cancel();" value="${ui_button_cancel}"/>
+</jsp:root>

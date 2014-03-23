@@ -1,0 +1,1082 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	"
+>
+
+<!-- ATTENTION class="com.qwit.service.DbUpdate" p:date !!!ASCENDANT!!! -->
+<bean id="dbUpdate" class="com.qwit.service.DbUpdateContainer" init-method="dbupdate">
+	<property name="simpleJdbc" ref="simpleJdbc" />
+	<property name="dbUpdateL" ><list>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-05-02 04:04:08"><property name="sqlL"><list>
+			<value>UPDATE notice SET notice='' WHERE notice is null;</value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-05-02 04:04:09"><property name="sqlL"><list>
+			<value>UPDATE notice SET notice='' WHERE notice is null;</value>
+			<value>ALTER TABLE notice ALTER COLUMN notice SET DEFAULT '';</value>
+			<value>UPDATE notice SET type='' WHERE type is null;</value>
+			<value>ALTER TABLE notice ALTER COLUMN type SET DEFAULT '';</value>
+			<value>ALTER TABLE notice ALTER COLUMN type SET NOT NULL;</value>
+			<value>ALTER TABLE notice ALTER COLUMN notice SET NOT NULL;</value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-05-02 04:04:10"><property name="sqlL"><list>
+			<value>ALTER TABLE notice ALTER COLUMN b SET DEFAULT '';</value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-05-13 04:04:11"><property name="sqlL"><list>
+			<value>UPDATE task SET type='inside' WHERE type='inner'</value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-05-29 01:01:01"><property name="sqlL"><list>
+		<!-- 
+			<value>ALTER TABLE tree DROP CONSTRAINT idclass_tab_name;</value>
+			<value>ALTER TABLE tree DROP CONSTRAINT id_tab_name;</value>
+		 -->
+			<value>DELETE FROM tree WHERE id=815571 AND idclass=815510</value>
+			<value>SELECT 'UPDATE tree set tab_name=\''||t1.tab_name||'\' WHERE id='||t2.id
+from tree t1,tree t2 where t1.id=t2.idclass AND t1.tab_name!=t2.tab_name AND t1.id=t1.idclass
+			</value>
+			<value>ALTER TABLE tree ADD CONSTRAINT id_tab_name UNIQUE(id, tab_name)</value>
+			<value>ALTER TABLE tree ADD CONSTRAINT idclass_tab_name FOREIGN KEY (idclass, tab_name) 
+			REFERENCES tree (id, tab_name)</value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-05-29 01:01:03"><property name="sqlL"><list>
+			<value>ALTER TABLE times ADD tab_name varchar(5)</value>
+			<value>UPDATE times set tab_name ='times'</value>
+			<value>ALTER TABLE times ALTER column tab_name set not null</value>
+			<value>ALTER TABLE times ALTER column tab_name set default 'times'</value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-05-29 01:01:05"><property name="sqlL"><list>
+			<value>ALTER TABLE times ADD CONSTRAINT id_tab_name FOREIGN KEY (idtimes, tab_name) 
+			REFERENCES tree (id, tab_name)</value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-01 01:01:06"><property name="sqlL"><list>
+			<value>
+SELECT 'INSERT INTO tree (tab_name,id,did,iddoc,idclass) VALUES (\'notice\','||nextval('dbid')||','||idgeneric||','||idgeneric||','||n.idnotice||')'
+FROM tree t1,tree t2,drug,tree t3, tree t4,notice n WHERE t1.id=84626 AND t1.id=t2.did AND t2.id=t3.did  AND t3.id=t4.did AND t2.idclass=iddrug AND t4.idclass=n.idnotice
+			</value>
+		</list></property></bean>
+		
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-09 01:01:10"><property name="sqlL"><list>
+			<value> UPDATE checkitem SET type='' WHERE type is null </value>
+			<value> ALTER TABLE checkitem ALTER COLUMN type SET DEFAULT '' </value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-09 01:01:12"><property name="sqlL"><list>
+			<value> UPDATE checkitem SET checkitem='' WHERE checkitem is null </value>
+			<value> ALTER TABLE checkitem ALTER COLUMN type SET not null </value>
+			<value> ALTER TABLE checkitem ALTER COLUMN checkitem SET not null </value>
+		</list></property></bean>		
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-11 01:01:16"><property name="sqlL"><list>
+			<value> UPDATE document SET filename='' WHERE filename is null </value>
+			<value> ALTER TABLE document ALTER COLUMN filename SET not null </value>
+			<value> ALTER TABLE document ALTER COLUMN filename SET DEFAULT '' </value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-11 01:01:17"><property name="sqlL"><list>
+			<value> UPDATE document SET url='' WHERE url is null </value>
+			<value> ALTER TABLE document ALTER COLUMN url SET not null </value>
+			<value> ALTER TABLE document ALTER COLUMN url SET DEFAULT '' </value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-11 01:01:18"><property name="sqlL"><list>
+			<value> UPDATE checklist SET checklist='' WHERE checklist is null </value>
+			<value> UPDATE checklist SET type='' WHERE type is null </value>
+			<value> ALTER TABLE checklist ALTER COLUMN type SET not null </value>
+			<value> ALTER TABLE checklist ALTER COLUMN checklist SET not null </value>
+			<value> ALTER TABLE checklist ALTER COLUMN type SET DEFAULT '' </value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-11 01:01:19"><property name="sqlL"><list>
+			<value> UPDATE contactperson SET contactperson='' WHERE contactperson is null </value>
+			<value> UPDATE contactperson SET forename='' WHERE forename is null </value>
+			<value> ALTER TABLE contactperson ALTER COLUMN forename SET not null </value>
+			<value> ALTER TABLE contactperson ALTER COLUMN contactperson SET not null </value>
+			<value> ALTER TABLE contactperson ALTER COLUMN forename SET DEFAULT '' </value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-11 01:01:20"><property name="sqlL"><list>
+			<value> UPDATE document SET contenttype='' WHERE contenttype is null </value>
+			<value> ALTER TABLE document ALTER COLUMN contenttype SET not null </value>
+			<value> ALTER TABLE document ALTER COLUMN contenttype SET DEFAULT '' </value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-11 01:01:22"><property name="sqlL"><list>
+			<value> UPDATE document SET type='' WHERE type is null </value>
+			<value> ALTER TABLE document ALTER COLUMN type SET not null </value>
+			<value> ALTER TABLE document ALTER COLUMN type SET DEFAULT '' </value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-11 01:01:23"><property name="sqlL"><list>
+			<value> UPDATE document SET document='' WHERE document is null </value>
+			<value> ALTER TABLE document ALTER COLUMN document SET not null </value>
+			<value> ALTER TABLE document ALTER COLUMN document SET DEFAULT '' </value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-11 01:01:25"><property name="sqlL"><list>
+			<value>
+SELECT 
+'update tree set idclass='||d1.id||' where idclass='||d2.iddocument AS u1,
+'delete from document where iddocument='||d2.iddocument AS u2
+FROM (
+SELECT max(iddocument) AS id ,count(document) as c,document,filename,url,contenttype,type FROM document d1
+GROUP by document,filename,url,contenttype,type
+) d1, document d2 
+WHERE d1.document=d2.document AND d1.filename=d2.filename AND d1.url=d2.url 
+AND d2.contenttype=d1.contenttype AND d1.type=d2.type 
+AND d1.id!=d2.iddocument
+			</value>
+		</list></property></bean>
+		<bean class="com.qwit.service.DbUpdate" p:date="2010-06-11 01:01:26"><property name="sqlL"><list>
+			<value>
+ALTER TABLE document
+ ADD CONSTRAINT unqdocumenttype UNIQUE(document,filename,url,contenttype,type);
+			</value>
+		</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-06-12 01:01:26">
+		<property name="ifNotDbObj" value="SELECT * FROM folder WHERE folder='literature'"/>
+		<property name="sqlL"><list>
+			<value>SELECT 
+'INSERT INTO tree (id,tab_name,did,idclass,iddoc) VALUES ('||nextval('dbid')||',\'folder\','||f1.idfolder||','||currval('dbid')||','||t1.iddoc||')' AS n1,
+'INSERT INTO folder (idfolder,folder,fdid,reada,writea) VALUES ('||currval('dbid')||',\'literature\','||f1.idfolder||',32,32)' AS n2,
+'INSERT INTO history (idhistory,mdate,idauthor) VALUES ('||currval('dbid')||',\''||now()||'\','||idauthor||')' AS n3
+FROM folder f1,tree t1,history WHERE f1.folder='folder' AND t1.id=f1.idfolder AND t1.id=idhistory
+			</value>
+		</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-06-12 01:01:28">
+		<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_type='PRIMARY KEY' and table_name='tree'"/>
+		<property name="sqlL"><list>
+			<value>ALTER TABLE tree ADD CONSTRAINT tree_pkey PRIMARY KEY(id);</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-06-12 01:02:27">
+		<property name="ifNotDbObj" value="select * from information_schema.table_constraints where table_name='literature'"/>
+		<property name="sqlL"><list>
+			<value>
+			CREATE TABLE literature
+(
+  idliterature integer NOT NULL,
+  title varchar(200) NOT NULL DEFAULT '',
+  authors varchar(200) NOT NULL DEFAULT '',
+  spring varchar(200) NOT NULL DEFAULT '',
+  springtype varchar(30) NOT NULL DEFAULT '',
+  page integer,
+  year integer,
+  CONSTRAINT literature_pkey PRIMARY KEY (idliterature),
+  CONSTRAINT idliterature FOREIGN KEY (idliterature)
+      REFERENCES tree (id) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT unqliterature UNIQUE (title, authors, spring, springtype)
+  )
+			</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-06-12 01:02:28"><property name="sqlL"><list>
+	<value>ALTER TABLE literature ADD column url varchar(100)</value>
+	<value> ALTER TABLE literature ALTER COLUMN url SET not null </value>
+	<value> ALTER TABLE literature ALTER COLUMN url SET DEFAULT '' </value>
+</list></property></bean>
+
+<bean class="com.qwit.service.DbUpdate" p:date="2010-06-22 01:01:32"><property name="sqlL"><list>
+	<value>delete from tree where id in (
+	select id from tree left join owuser on id=idowuser
+	where tab_name='owuser' and idowuser is null)
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-06-24 01:01:33"><property name="sqlL"><list>
+	<value>update tree set tab_name='personrole' where tab_name='Personrole'</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-07-18 01:01:34"><property name="sqlL"><list>
+	<value>ALTER TABLE literature DROP CONSTRAINT unqliterature</value>
+	<value>ALTER TABLE literature
+		ADD CONSTRAINT unqliterature UNIQUE(title, authors, spring, springtype,page,year,url)
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-07-26 01:01:35"><property name="sqlL"><list>
+	<value>
+	CREATE TABLE persistent_logins (
+		username VARCHAR(64) NOT NULL, 
+		series VARCHAR(64) PRIMARY KEY, 
+		token VARCHAR(64) NOT NULL, 
+		last_used TIMESTAMP NOT NULL)
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-09-10 01:14:02">
+		<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id_author_idtree' "/>
+		<property name="sqlL"><list>
+			<value>ALTER TABLE history ADD CONSTRAINT id_author_idtree FOREIGN KEY (idauthor)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION
+</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-09-10 01:14:04">
+		<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id_ref' "/>
+		<property name="sqlL"><list>
+			<value>ALTER TABLE tree ADD CONSTRAINT id_ref FOREIGN KEY (ref)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION
+</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-09-10 01:14:05">
+		<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id_idclass' "/>
+		<property name="sqlL"><list>
+			<value>ALTER TABLE tree ADD CONSTRAINT id_idclass FOREIGN KEY (idclass)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE NO ACTION
+</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-09-10 01:14:06">
+		<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id_iddoc' "/>
+		<property name="sqlL"><list>
+			<value>ALTER TABLE tree ADD CONSTRAINT id_iddoc FOREIGN KEY (iddoc)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-09-10 01:14:07">
+		<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='idclass_tab_name' "/>
+		<property name="sqlL"><list>
+			<value>ALTER TABLE tree ADD CONSTRAINT idclass_tab_name FOREIGN KEY (idclass, tab_name)
+				REFERENCES tree (id, tab_name) MATCH SIMPLE
+				ON UPDATE NO ACTION ON DELETE NO ACTION
+</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-09-10 01:14:10">
+		<property name="sqlL"><list>
+			<value>delete from tree where id in (
+select t1.id from tree t1 left join tree t2 on t1.did=t2.id where t2.id is null)
+			</value> 
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-09-10 01:14:11">
+		<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id_did' "/>
+		<property name="sqlL"><list>
+			<value>delete from tree where id in (
+select t1.id from tree t1 left join tree t2 on t1.did=t2.id where t2.id is null)
+			</value> 
+			<value>ALTER TABLE tree ADD CONSTRAINT id_did FOREIGN KEY (did) 
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+			</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-09-13 01:14:12">
+		<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id_idtrg' "/>
+		<property name="sqlL"><list>
+			<value>ALTER TABLE interdbnode  ADD CONSTRAINT id_idtrg FOREIGN KEY (idtrg)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+			</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-09-13 01:16:01">
+		<property name="sqlL"><list>
+			<value>alter table folder drop constraint idinstitute</value>
+			<value>ALTER TABLE folder ADD CONSTRAINT folderinstitute_idinstitute 
+				FOREIGN KEY (institute) REFERENCES institute(idinstitute)
+			</value>
+</list></property></bean>
+
+<bean class="com.qwit.service.DbUpdate" p:date="2010-09-13 01:22:02">
+	<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='idhistory' "/>
+	<property name="sqlL"><list>
+		<value>delete from history where idhistory in (
+	select idhistory from history left join tree on id=idhistory
+	where id is null)
+		</value>
+		<value>ALTER TABLE history ADD CONSTRAINT idhistory FOREIGN KEY (idhistory)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE;
+		</value>
+	</list></property>
+</bean>
+
+<bean class="com.qwit.service.DbIndexes" p:date="2010-09-14 01:01:01">
+	<property name="mtlTreeL"><list>
+		<value>app</value>
+		<value>biomaterial</value>
+		<value>bpath</value>
+</list></property>
+<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id?' "/>
+	<property name="sqlL"><list>
+		<value>ALTER TABLE ? ADD CONSTRAINT id? FOREIGN KEY (id?)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE;
+		</value>
+		</list></property>
+</bean>
+<bean class="com.qwit.service.DbIndexes" p:date="2010-09-14 01:02:01">
+	<property name="mtlTreeL"><list>
+		<value>checklist</value>
+		<value>checkitem</value>
+		<value>contactperson</value>
+		<value>context</value>
+</list></property>
+<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id?' "/>
+	<property name="sqlL"><list>
+		<value>ALTER TABLE ? ADD CONSTRAINT id? FOREIGN KEY (id?)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE;
+		</value>
+		</list></property>
+</bean>
+<bean class="com.qwit.service.DbIndexes" p:date="2010-09-14 01:03:01">
+	<property name="mtlTreeL"><list>
+		<value>day</value>
+		<value>dose</value>
+		<value>drug</value>
+		<value>diagnose</value>
+		<value>doc</value>
+		<value>document</value>
+		<value>expr</value>
+</list></property>
+<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id?' "/>
+	<property name="sqlL"><list>
+		<value>ALTER TABLE ? ADD CONSTRAINT id? FOREIGN KEY (id?)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE;
+		</value>
+		</list></property>
+</bean>
+<bean class="com.qwit.service.DbIndexes" p:date="2010-09-14 01:04:01">
+	<property name="mtlTreeL"><list>
+		<value>feedback</value>
+		<value>finding</value>
+		<value>institute</value>
+		<value>labor</value>
+		<value>lc</value>
+		<value>mr</value>
+</list></property>
+<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id?' "/>
+	<property name="sqlL"><list>
+		<value>ALTER TABLE ? ADD CONSTRAINT id? FOREIGN KEY (id?)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE;
+		</value>
+		</list></property>
+</bean>
+<bean class="com.qwit.service.DbIndexes" p:date="2010-09-18 01:04:01">
+	<property name="mtlTreeL"><list>
+		<value>notice</value>
+		<value>owuser</value>
+		<value>patient</value>
+		<value>personrole</value>
+		<value>position</value>
+		<value>protocol</value>
+		<value>pvariable</value>
+</list></property>
+<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id?' "/>
+	<property name="sqlL"><list>
+		<value>ALTER TABLE ? ADD CONSTRAINT id? FOREIGN KEY (id?)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE;
+		</value>
+		</list></property>
+</bean>
+<bean class="com.qwit.service.DbIndexes" p:date="2010-09-19 01:02:01">
+	<property name="mtlTreeL"><list>
+		<value>studyarm</value>
+		<value>studygroup</value>
+		<value>symptom</value>
+		<value>task</value>
+		<value>tablet</value>
+		<value>times</value>
+		<value>tnm</value>
+		<value>ts</value>
+		<value>vardate</value>
+	</list></property>
+	<property name="ifNotDbObj" value="select * from information_schema.table_constraints where constraint_name='id?' "/>
+	<property name="sqlL"><list>
+		<value>ALTER TABLE ? ADD CONSTRAINT id? FOREIGN KEY (id?)
+				REFERENCES tree (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE;
+		</value>
+	</list></property>
+</bean>
+
+<bean class="com.qwit.service.DbUpdate" p:date="2010-09-19 01:06:01">
+	<property name="sqlL"><list>
+		<value>DROP INDEX IF EXISTS id_tree</value>
+		<value>DROP INDEX IF EXISTS did_tree</value>
+		<value>DROP INDEX IF EXISTS idclass_tree</value>
+		<value>DROP INDEX IF EXISTS iddoc_tree</value>
+		<value>DROP INDEX IF EXISTS ref_tree</value>
+		<value>DROP INDEX IF EXISTS id_tree_idx</value>
+		<value>DROP INDEX IF EXISTS did_tree_idx</value>
+		<value>DROP INDEX IF EXISTS idclass_tree_idx</value>
+		<value>DROP INDEX IF EXISTS iddoc_tree_idx</value>
+		<value>DROP INDEX IF EXISTS ref_tree_idx</value>
+		<value>CREATE INDEX id_tree_idx ON tree USING hash (id)</value>
+		<value>CREATE INDEX did_tree_idx ON tree USING hash (did)</value>
+		<value>CREATE INDEX idclass_tree_idx ON tree USING hash (idclass)</value>
+		<value>CREATE INDEX ref_tree_idx ON tree USING hash (ref)</value>
+		<value>CREATE INDEX iddoc_tree_idx ON tree USING hash (iddoc)</value>
+</list></property></bean>
+
+
+<bean class="com.qwit.service.DbIndexes" p:date="2010-09-19 01:07:01">
+	<property name="mtlTreeL"><list>
+		<value>app</value>
+		<value>biomaterial</value>
+		<value>bpath</value>
+		<value>checklist</value>
+		<value>checkitem</value>
+		<value>contactperson</value>
+		<value>context</value>
+		<value>day</value>
+		<value>dose</value>
+		<value>drug</value>
+		<value>diagnose</value>
+		<value>doc</value>
+		<value>document</value>
+		<value>expr</value>
+		<value>feedback</value>
+		<value>finding</value>
+		<value>institute</value>
+		<value>labor</value>
+		<value>lc</value>
+		<value>mr</value>
+		<value>notice</value>
+		<value>owuser</value>
+		<value>patient</value>
+		<value>personrole</value>
+		<value>position</value>
+		<value>protocol</value>
+		<value>pvariable</value>
+		<value>studyarm</value>
+		<value>studygroup</value>
+		<value>symptom</value>
+		<value>task</value>
+		<value>tablet</value>
+		<value>times</value>
+		<value>tnm</value>
+		<value>ts</value>
+		<value>vardate</value>
+</list></property>
+	<property name="sqlL"><list>
+		<value>DROP INDEX IF EXISTS id?_idx</value>
+		<value>CREATE INDEX id?_idx ON ?  USING hash (id?)</value>
+		<!-- 
+		<value>CREATE INDEX id?_idx ON ? (id?)</value>
+		 -->
+		</list></property>
+</bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-10-06 01:01:02">
+		<property name="sqlL"><list>
+			<value>ALTER TABLE users
+ADD CONSTRAINT username_owuser_owuser FOREIGN KEY (username)
+REFERENCES owuser (owuser) ON UPDATE CASCADE ON DELETE CASCADE
+			</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-10-06 01:01:03">
+		<property name="ifYesDbObj" value="select * from information_schema.table_constraints where constraint_name='username' "/>
+		<property name="sqlL"><list>
+			<value>ALTER TABLE users DROP CONSTRAINT username</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-10-06 01:01:05">
+		<property name="ifYesDbObj" value="select * from information_schema.table_constraints where constraint_name='fk_authorities_users' "/>
+		<property name="sqlL"><list>
+			<value>ALTER TABLE authorities DROP CONSTRAINT fk_authorities_users</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-10-06 01:01:06">
+		<property name="sqlL"><list>
+			<value>ALTER TABLE authorities 
+			ADD CONSTRAINT fk_authorities_users FOREIGN KEY (username) 
+			REFERENCES users (username) ON UPDATE cascade ON DELETE CASCADE
+			</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-10-20 01:01:04"><property name="sqlL"><list>
+	<value>update expr set value='' where value is null</value>
+	<value>update expr set type='' where type is null</value>
+	<value>update expr set unit='' where unit is null</value>
+	<value>select 
+'update tree set idclass='||e1.idexpr||' where idclass='||e2.idexpr AS u1,
+'delete from expr where idexpr='||e2.idexpr AS u2
+from (
+select min(idexpr) as idexpr, count(expr),expr,value,unit,type from expr 
+group by expr,value,unit,type) e1, expr e2
+where e1.expr=e2.expr and e1.value=e2.value and e1.unit=e2.unit and e1.type=e2.type
+and e1.idexpr!=e2.idexpr</value>
+	<value> ALTER TABLE expr ADD CONSTRAINT expr_unq UNIQUE(expr,value,unit,type) </value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-10-20 01:01:05"><property name="sqlL"><list>
+	<value>ALTER TABLE expr ALTER COLUMN expr SET NOT NULL</value>
+	<value>ALTER TABLE expr ALTER COLUMN value SET NOT NULL</value>
+	<value>ALTER TABLE expr ALTER COLUMN unit SET NOT NULL</value>
+	<value>ALTER TABLE expr ALTER COLUMN type SET NOT NULL</value>
+	<value>ALTER TABLE expr ALTER COLUMN expr SET DEFAULT ''</value>
+	<value>ALTER TABLE expr ALTER COLUMN value SET DEFAULT ''</value>
+	<value>ALTER TABLE expr ALTER COLUMN unit SET DEFAULT ''</value>
+	<value>ALTER TABLE expr ALTER COLUMN type SET DEFAULT ''</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-18 01:01:01"><property name="sqlL"><list>
+		<value> DELETE FROM authorities </value>
+		<value> DELETE FROM users </value>
+		<value> INSERT INTO users (username,password) SELECT owuser,pword FROM owuser</value>
+		<value> INSERT INTO authorities (username, authority)
+	SELECT owuser,'ROLE_SUPERVISOR' FROM owuser WHERE position('d' in owview)>0
+		</value>
+		<value> INSERT INTO authorities (username, authority)
+	SELECT owuser,'ROLE_USER' FROM owuser WHERE position('t' in owview)>0
+		</value>
+		<value> INSERT INTO authorities (username, authority)
+	SELECT owuser,'ROLE_THERAPY' FROM owuser WHERE position('c' in owview)>0
+		</value>
+	</list></property>
+</bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-21 01:01:01">
+		<property name="ifYesDbObj" value="select * from information_schema.table_constraints where constraint_name='owuser_users_username' "/>
+		<property name="sqlL"><list>
+			<value>ALTER TABLE owuser DROP CONSTRAINT owuser_users_username</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-21 01:01:02"><property name="sqlL"><list>
+		<value>ALTER TABLE owuser
+		ADD CONSTRAINT owuser_users_username FOREIGN KEY (owuser)
+		REFERENCES users (username) MATCH SIMPLE
+		ON UPDATE CASCADE ON DELETE CASCADE
+		</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-21 01:01:04">
+		<property name="sqlL"><list>
+			<value>ALTER TABLE owuser DROP CONSTRAINT owuser_users_username</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-21 01:01:05">
+		<property name="sqlL"><list>
+			<value>
+SELECT 'insert into tree (id,idclass,tab_name,did,iddoc) VALUES ('||nextval('dbid')||','||currval('dbid')||',\'owuser\','||idinstitute||','||idinstitute||')' AS i1
+, 'insert into owuser (idowuser,owuser,pword) values('||currval('dbid')||',\'i_'||idinstitute||'\',\''||md5('institute')||'\')' AS i3 
+FROM institute
+-- , 'insert into users (username,password) values (\'i_'||idinstitute||'\',\''||md5('institute')||'\')' AS i2
+			</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-21 01:01:06">
+		<property name="sqlL"><list>
+			<value>SELECT 
+'insert into users (username,password) values (\''||owuser||'\',\''||pword||'\')' AS i2
+FROM owuser left join users on owuser=username
+where username is null
+			</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-23 01:01:02">
+		<property name="variableInt1" value="SELECT idowuser FROM owuser where owuser='admin'" />
+		<property name="sqlL"><list>
+			<value>CREATE TABLE url (
+	idurl int4 NOT NULL,
+	url VARCHAR(50)  NOT NULL DEFAULT '',
+	text VARCHAR(50) NOT NULL DEFAULT '',
+CONSTRAINT idurl FOREIGN KEY (idurl)
+	REFERENCES tree (id) MATCH SIMPLE
+	ON UPDATE NO ACTION ON DELETE CASCADE,
+CONSTRAINT url_text_unique UNIQUE (url, text)
+)		</value>
+		<value>SELECT 'insert into tree (id,idclass,tab_name,did) VALUES ('||nextval('dbid')||','||currval('dbid')||',\'folder\','||idfolder||')' AS i1
+, 'insert into folder (idfolder,folder,fdid) values('||currval('dbid')||',\'url\','||idfolder||')' AS i2 
+, 'insert into history (idhistory,idauthor,mdate) values ('||currval('dbid')||',variableInt1,\''||now()||'\')' AS i3
+FROM folder where folder='folder'
+		</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-23 01:01:04"><property name="sqlL"><list>
+		<value>ALTER TABLE literature ADD COLUMN volume character varying(30)</value>
+		<value>update literature set volume=''</value>
+		<value>ALTER TABLE literature ALTER COLUMN volume SET NOT NULL</value>
+		<value>ALTER TABLE literature ALTER COLUMN volume SET DEFAULT ''</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-23 01:01:06"><property name="sqlL"><list>
+	<value>ALTER TABLE literature DROP CONSTRAINT unqliterature</value>
+	<value>ALTER TABLE literature
+		ADD CONSTRAINT unqliterature UNIQUE(title, authors, spring, springtype, page, year,volume, url);
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-23 01:01:07"><property name="sqlL"><list>
+	<value>alter table literature add page2 varchar(20)</value>
+	<value>update literature set page2=page</value>
+	<value>alter table literature drop column page</value>
+	<value>alter table literature add page varchar(20)</value>
+	<value>update literature set page=page2</value>
+	<value>alter table literature drop column page2</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-26 01:01:07"><property name="sqlL"><list>
+	<value>UPDATE times SET apporder=''	WHERE apporder	IS NULL</value>
+	<value>UPDATE times SET relunit=''	WHERE relunit	IS NULL</value>
+	<value>UPDATE times SET visual=9	WHERE visual	IS NULL</value>
+	<value> SELECT
+'UPDATE tree SET idclass='||t1.idtimes||' WHERE idclass='||t2.idtimes AS u1,
+'DELETE FROM times WHERE idtimes='||t2.idtimes AS u2
+   FROM (
+SELECT MIN(idtimes) AS idtimes, apporder,visual,relunit,relvalue FROM times
+GROUP BY apporder,visual,relunit,relvalue ) t1, times t2
+WHERE t1.apporder=t2.apporder AND t1.visual=t2.visual AND t1.relunit=t2.relunit AND t1.relvalue=t2.relvalue
+AND t1.idtimes!=t2.idtimes AND t2.abs IS NULL
+	</value>
+	<value>UPDATE times SET abs=''		WHERE abs		IS NULL</value>
+	<value> SELECT
+'UPDATE tree SET idclass='||t1.idtimes||' WHERE idclass='||t2.idtimes AS u1,
+'DELETE FROM times where idtimes='||t2.idtimes AS u2
+   FROM (
+SELECT MIN(idtimes) AS idtimes,abs, apporder,visual,relunit FROM times
+GROUP BY abs,apporder,visual,relunit) t1, times t2
+WHERE t1.abs=t2.abs AND t1.apporder=t2.apporder AND t1.visual=t2.visual AND t1.relunit=t2.relunit 
+ AND t1.idtimes!=t2.idtimes 
+	</value>
+	<value>UPDATE times SET relvalue=0	WHERE relvalue	IS NULL</value>
+	<!-- 
+	 -->
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-11-26 01:01:08"><property name="sqlL"><list>
+	<value>ALTER TABLE times ALTER COLUMN abs SET NOT NULL</value>
+	<value>ALTER TABLE times ALTER COLUMN abs SET DEFAULT ''</value>
+	<value>ALTER TABLE times ALTER COLUMN apporder SET NOT NULL</value>
+	<value>ALTER TABLE times ALTER COLUMN relunit SET NOT NULL</value>
+	<value>ALTER TABLE times ALTER COLUMN relvalue SET NOT NULL</value>
+	<value>ALTER TABLE times ALTER COLUMN apporder SET DEFAULT ''</value>
+	<value>ALTER TABLE times ALTER COLUMN relunit SET DEFAULT ''</value>
+	<value>ALTER TABLE times ALTER COLUMN relvalue SET DEFAULT 0</value>
+	<value>ALTER TABLE times ALTER COLUMN visual SET DEFAULT 9</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-12-12 01:01:01"><property name="sqlL"><list>
+	<value>
+CREATE TABLE noderole (
+idnode INTEGER NOT NULL,
+username VARCHAR(50) NOT NULL,
+read BIT(1) NOT NULL DEFAULT '1',
+write BIT(1) NOT NULL DEFAULT '1',
+CONSTRAINT noderole_idnode_tree_id FOREIGN KEY (idnode) REFERENCES tree (id) ON DELETE CASCADE,
+CONSTRAINT noderole_username_users_username FOREIGN KEY (username) REFERENCES users (username) ON DELETE CASCADE
+)
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-12-12 01:01:02"><property name="sqlL"><list>
+	<value>
+	SELECT 'INSERT INTO noderole (idnode,username) VALUES ('||idfolder||',\''||owuser||'\')'
+	FROM folder f, institute,tree t1,owuser
+	WHERE f.institute=idinstitute AND t1.did=idinstitute AND t1.id=idowuser
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-12-12 01:01:03"><property name="sqlL"><list>
+	<value>
+	ALTER TABLE noderole ADD CONSTRAINT noderole_idnode_username PRIMARY KEY (idnode,username)
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-12-13 01:01:04"><property name="sqlL"><list>
+	<value>
+SELECT 'INSERT INTO tree (id,tab_name,did,iddoc,idclass) 
+VALUES ('||nextval('dbid')||',\'institute\','||idfolder||','||currval('dbid')||','||currval('dbid')||');' i1,
+'INSERT INTO institute (idinstitute,institute) VALUES ('||currval('dbid')||',\'all\');' i2,
+'INSERT INTO history (idhistory,mdate,idauthor) VALUES ('||currval('dbid')||',\''||now()||'\','||idauthor||');' i3
+FROM folder,history WHERE folder='institute' AND idfolder=idhistory
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-12-13 01:01:05"><property name="sqlL"><list>
+	<value>
+SELECT 'insert into tree (id,idclass,tab_name,did,iddoc) VALUES ('||nextval('dbid')||','||currval('dbid')||',\'owuser\','||idinstitute||','||idinstitute||')' AS i1
+, 'insert into owuser (idowuser,owuser,pword) values('||currval('dbid')||',\'i_'||idinstitute||'\',\''||md5('institute')||'\')' AS i3 
+FROM institute LEFT JOIN (
+SELECT * FROM tree t1,owuser
+WHERE t1.id=idowuser) t1
+ON idinstitute=t1.did 
+WHERE t1.id is null
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-12-13 01:01:06"><property name="sqlL"><list>
+	<value>
+UPDATE owuser SET owuser ='all' WHERE idowuser IN (
+SELECT o1.idowuser FROM owuser o1, tree t1, institute  i1
+where t1.did=i1.idinstitute and t1.id=idowuser and i1.institute = 'all')
+	</value>
+	<value>
+	SELECT 'INSERT INTO users (username,password) VALUES (\''||owuser||'\',\''||pword||'\')' FROM owuser LEFT JOIN users ON owuser=username
+WHERE username IS NULL
+	</value>
+	<value>SELECT 'INSERT INTO noderole (idnode,username) VALUES ('||f2.idfolder||',\'all\')'
+FROM folder f1,folder f2 where f1.idfolder=f2.fdid and f1.folder='folder'
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-12-17 01:01:01"><property name="sqlL"><list>
+	<!-- USERS UPDATE -->
+	<value>
+	SELECT 'INSERT INTO users (username,password) VALUES (\''||owuser||'\',\''||pword||'\')' FROM owuser LEFT JOIN users ON owuser=username
+WHERE username IS NULL
+	</value>
+	<value>SELECT 'INSERT INTO authorities (username, authority) VALUES (\''||owuser||'\',\'ROLE_USER\')' AS i1 FROM owuser 
+LEFT JOIN authorities ON owuser=username
+WHERE position('i_' in owuser)=0 and owuser!='all' AND POSITION('t' IN owview)>0
+AND username IS NULL
+	</value>
+	<value>SELECT 'INSERT INTO authorities (username, authority) VALUES (\''||owuser||'\',\'ROLE_THERAPY\')' AS i1 FROM owuser 
+LEFT JOIN authorities ON owuser=username
+WHERE position('i_' in owuser)=0 AND owuser!='all' and POSITION('c' IN owview)>0
+AND username IS NULL
+	</value>
+	<value>SELECT 'INSERT INTO authorities (username, authority) VALUES (\''||owuser||'\',\'ROLE_SUPERVISOR\')' AS i1 FROM owuser 
+LEFT JOIN authorities ON owuser=username
+WHERE position('i_' in owuser)=0 AND owuser!='all' AND POSITION('d' IN owview)>0
+AND username IS NULL
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-12-26 01:01:01">
+	<property name="ifNotDbObj" value="
+SELECT * FROM folder f1,folder f0 
+WHERE f0.idfolder=f1.fdid AND f1.folder='trash' AND f0.folder='protocol'"/>
+	<property name="sqlL"><list>
+	<value>SELECT 
+'INSERT INTO tree (id,tab_name,did,idclass,iddoc) VALUES ('||nextval('dbid')||',\'folder\','||f1.idfolder||','||currval('dbid')||','||t1.iddoc||')' AS n1,
+'INSERT INTO folder (idfolder,folder,fdid,reada,writea) VALUES ('||currval('dbid')||',\'trash\','||f1.idfolder||',32,32)' AS n2,
+'INSERT INTO history (idhistory,mdate,idauthor) VALUES ('||currval('dbid')||',\''||now()||'\','||idauthor||')' AS n3
+FROM folder f0, folder f1,tree t1,history WHERE f0.folder='folder' AND  f1.folder='protocol' AND f0.idfolder=f1.fdid AND t1.id=f1.idfolder AND t1.id=idhistory
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-12-27 01:01:02"><property name="sqlL"><list>
+	<value>SELECT 
+'INSERT INTO tree (id,tab_name,did,idclass,iddoc) VALUES ('||nextval('dbid')||',\'protocol\','||f1.idfolder||','||currval('dbid')||','||currval('dbid')||')' AS n1,
+'INSERT INTO history (idhistory,mdate,idauthor) VALUES ('||currval('dbid')||',\''||now()||'\','||idauthor||')' AS n2,
+'INSERT INTO protocol (idprotocol,protocol) VALUES ('||currval('dbid')||',\'trash\')' AS n3
+FROM folder f0, folder f1,tree t1,history WHERE f0.folder='protocol' AND  f1.folder='trash' AND f0.idfolder=f1.fdid AND t1.id=f1.idfolder AND t1.id=idhistory
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-12-27 01:01:03"><property name="sqlL"><list>
+	<value>SELECT 
+'INSERT INTO tree (id,tab_name,did,iddoc) VALUES ('||nextval('dbid')||',\'definition\','||p1.idprotocol||','||p1.idprotocol||')' AS n1
+FROM folder f1,protocol p1,tree t1 WHERE f1.folder='trash' AND p1.protocol='trash'  and t1.id=p1.idprotocol and f1.idfolder=t1.did
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2010-12-27 01:01:05"><property name="sqlL"><list>
+	<value>
+	CREATE OR REPLACE VIEW supnull AS
+	SELECT t1.id, t1.did, count(t2.did) AS cnt
+	FROM tree t1
+	LEFT JOIN ( SELECT tree.id, tree.tab_name, tree.did, tree.idclass,
+	tree.ref, tree.iddoc, tree.sort, tree.ttype
+	FROM tree) t2 ON t2.did = t1.id, task
+	WHERE task= 'support'AND t1.idclass = task.idtask
+	GROUP BY t2.did, t1.id, t1.did;
+	</value>
+	<value>
+	CREATE OR REPLACE VIEW patient_protocol_task AS
+	SELECT t1_patient.id AS patient_id, t4_patient_protocol.id AS protocol_id,
+	t4_patient_protocol.idclass AS protocol_idclass, t2_patient_task.id AS
+	patient_task_id, t2_patient_task.ref AS task_id,
+	t2_patient_task.idclass AS task_idclass
+	FROM tree t1_patient, tree t2_patient_task, tree t3_task_protocol, tree
+	t4_patient_protocol
+	WHERE t2_patient_task.did = t1_patient.id AND t1_patient.tab_name::text =
+	'patient'::text AND t2_patient_task.tab_name::text = 'task'::text AND
+	t3_task_protocol.tab_name::text = 'protocol'::text AND
+	t4_patient_protocol.tab_name::text = 'protocol'::text AND
+	t2_patient_task.id = t3_task_protocol.did AND t4_patient_protocol.id =
+	t3_task_protocol.ref AND t4_patient_protocol.did = t1_patient.id;
+	</value>
+	<value>
+	CREATE OR REPLACE VIEW report AS
+	SELECT patient.patient, patient.forename, protocol.protocol, task.task, a.ts
+	AS "time", a.drug, COALESCE(b.value2, a.value) AS value, a.unit
+	FROM patient, protocol, task, patient_protocol_task, ( SELECT
+	t_pvariable.ref, ts.ts, drug.drug, dose.value, dose.unit, ts.idts
+	FROM tree t_pvariable, pvariable, tree t_drug, drug, tree t_dose, dose,
+	tree t_ts, ts
+	WHERE t_pvariable.idclass = pvariable.idpvariable AND
+	pvariable.pvariable::text = 'fixdate'::text AND t_drug.idclass =
+	drug.iddrug AND t_drug.did = t_pvariable.id AND t_dose.idclass =
+	dose.iddose AND t_dose.did = t_drug.id AND t_ts.idclass = ts.idts AND
+	t_ts.did = t_drug.id) a
+	LEFT JOIN ( SELECT dose.value AS value2, ts.idts
+	FROM tree t_pvariable, pvariable, tree t_drug, drug, tree t_dose, dose,
+	tree t_ts, ts
+	WHERE t_pvariable.idclass = pvariable.idpvariable AND
+	pvariable.pvariable::text = 'fixdate'::text AND t_drug.idclass =
+	drug.iddrug AND t_drug.did = t_pvariable.id AND t_dose.idclass =
+	dose.iddose AND t_dose.did = t_ts.id AND t_ts.idclass = ts.idts AND
+	t_ts.did = t_drug.id) b ON a.idts = b.idts
+	WHERE patient_protocol_task.task_id = a.ref AND
+	patient_protocol_task.patient_id = patient.idpatient AND
+	patient_protocol_task.protocol_idclass = protocol.idprotocol AND
+	patient_protocol_task.task_idclass = task.idtask;
+	</value>
+	<value>DROP VIEW supnull</value>
+	<value>DROP VIEW report</value>
+	<value>DROP VIEW patient_protocol_task</value>
+	<value>ALTER TABLE task ALTER task TYPE character varying(100)</value>
+	<value>
+	CREATE OR REPLACE VIEW supnull AS
+	SELECT t1.id, t1.did, count(t2.did) AS cnt
+	FROM tree t1
+	LEFT JOIN ( SELECT tree.id, tree.tab_name, tree.did, tree.idclass,
+	tree.ref, tree.iddoc, tree.sort, tree.ttype
+	FROM tree) t2 ON t2.did = t1.id, task
+	WHERE task= 'support'AND t1.idclass = task.idtask
+	GROUP BY t2.did, t1.id, t1.did;
+	</value>
+	<value>
+	CREATE OR REPLACE VIEW patient_protocol_task AS
+	SELECT t1_patient.id AS patient_id, t4_patient_protocol.id AS protocol_id,
+	t4_patient_protocol.idclass AS protocol_idclass, t2_patient_task.id AS
+	patient_task_id, t2_patient_task.ref AS task_id,
+	t2_patient_task.idclass AS task_idclass
+	FROM tree t1_patient, tree t2_patient_task, tree t3_task_protocol, tree
+	t4_patient_protocol
+	WHERE t2_patient_task.did = t1_patient.id AND t1_patient.tab_name::text =
+	'patient'::text AND t2_patient_task.tab_name::text = 'task'::text AND
+	t3_task_protocol.tab_name::text = 'protocol'::text AND
+	t4_patient_protocol.tab_name::text = 'protocol'::text AND
+	t2_patient_task.id = t3_task_protocol.did AND t4_patient_protocol.id =
+	t3_task_protocol.ref AND t4_patient_protocol.did = t1_patient.id;
+	</value>
+	<value>
+	CREATE OR REPLACE VIEW report AS
+	SELECT patient.patient, patient.forename, protocol.protocol, task.task, a.ts
+	AS "time", a.drug, COALESCE(b.value2, a.value) AS value, a.unit
+	FROM patient, protocol, task, patient_protocol_task, ( SELECT
+	t_pvariable.ref, ts.ts, drug.drug, dose.value, dose.unit, ts.idts
+	FROM tree t_pvariable, pvariable, tree t_drug, drug, tree t_dose, dose,
+	tree t_ts, ts
+	WHERE t_pvariable.idclass = pvariable.idpvariable AND
+	pvariable.pvariable::text = 'fixdate'::text AND t_drug.idclass =
+	drug.iddrug AND t_drug.did = t_pvariable.id AND t_dose.idclass =
+	dose.iddose AND t_dose.did = t_drug.id AND t_ts.idclass = ts.idts AND
+	t_ts.did = t_drug.id) a
+	LEFT JOIN ( SELECT dose.value AS value2, ts.idts
+	FROM tree t_pvariable, pvariable, tree t_drug, drug, tree t_dose, dose,
+	tree t_ts, ts
+	WHERE t_pvariable.idclass = pvariable.idpvariable AND
+	pvariable.pvariable::text = 'fixdate'::text AND t_drug.idclass =
+	drug.iddrug AND t_drug.did = t_pvariable.id AND t_dose.idclass =
+	dose.iddose AND t_dose.did = t_ts.id AND t_ts.idclass = ts.idts AND
+	t_ts.did = t_drug.id) b ON a.idts = b.idts
+	WHERE patient_protocol_task.task_id = a.ref AND
+	patient_protocol_task.patient_id = patient.idpatient AND
+	patient_protocol_task.protocol_idclass = protocol.idprotocol AND
+	patient_protocol_task.task_idclass = task.idtask;
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-01-12 01:01:01"><property name="sqlL"><list>
+	<value>
+SELECT 'INSERT INTO tree (id,tab_name,did,iddoc,idclass) 
+VALUES ('||nextval('dbid')||',\'expr\','||f1.idfolder||','||currval('dbid')||','||currval('dbid')||');' i1,
+'INSERT INTO expr (idexpr,expr,value,type) VALUES ('||currval('dbid')||',\'functionCall\',\'drugInput\',\'int\');' i2,
+'INSERT INTO history (idhistory,mdate,idauthor) VALUES ('||currval('dbid')||',\''||now()||'\','||idauthor||');' i3
+FROM folder f1,folder f0,history WHERE f1.folder='expr' AND f1.idfolder=idhistory AND f0.idfolder=f1.fdid AND f0.folder='folder'
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-01-13 01:01:01"><property name="sqlL"><list>
+	<value>
+SELECT 'INSERT INTO tree (id,tab_name,did,iddoc,idclass) 
+VALUES ('||nextval('dbid')||',\'expr\','||f1.idfolder||','||currval('dbid')||','||currval('dbid')||');' i1,
+'INSERT INTO expr (idexpr,expr,value,type) VALUES ('||currval('dbid')||',\'functionCall\',\'calcDose\',\'double\');' i2,
+'INSERT INTO history (idhistory,mdate,idauthor) VALUES ('||currval('dbid')||',\''||now()||'\','||idauthor||');' i3
+FROM folder f1,folder f0,history WHERE f1.folder='expr' AND f1.idfolder=idhistory AND f0.idfolder=f1.fdid AND f0.folder='folder'
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-01-14 01:01:02">
+		<property name="sqlL"><list>
+			<value>
+	CREATE TABLE confirmaccount
+	(
+	username varchar (50) NOT NULL,
+	createdon timestamp NOT NULL,
+	confirmkey varchar (50) NOT NULL,
+	CONSTRAINT username_pkey PRIMARY KEY (username),
+	CONSTRAINT username_fkey FOREIGN KEY (username)
+	REFERENCES users (username) MATCH FULL ON UPDATE CASCADE ON DELETE CASCADE
+	)
+			</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-01-18 01:01:01">
+		<property name="sqlL"><list>
+			<value>
+	CREATE TABLE ivariable
+	(
+		idivariable integer NOT NULL,
+		ivariable character varying(100) NOT NULL DEFAULT '',
+		ivalue int NOT NULL ,
+		CONSTRAINT ivariable_pkey PRIMARY KEY (idivariable),
+		CONSTRAINT id_idivariable FOREIGN KEY (idivariable)
+		REFERENCES tree (id) ON UPDATE CASCADE ON DELETE CASCADE,
+		CONSTRAINT unqivariableivalue UNIQUE (ivariable, ivalue)
+	)		</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-01-19 01:01:02"><property name="sqlL"><list>
+	<value>	ALTER TABLE confirmaccount ADD COLUMN remindpassword BIT</value>
+	<value>	ALTER TABLE confirmaccount alter COLUMN remindpassword SET DEFAULT BIT'0' </value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-01-20 01:01:01"><property name="sqlL"><list>
+	<value>SELECT 
+'INSERT INTO tree (id,tab_name,did,idclass,iddoc) VALUES ('||nextval('dbid')||',\'folder\','||f1.idfolder||','||currval('dbid')||','||t1.iddoc||')' AS n1,
+'INSERT INTO folder (idfolder,folder,fdid,reada,writea) VALUES ('||currval('dbid')||',\'ivariable\','||f1.idfolder||',32,32)' AS n2,
+'INSERT INTO history (idhistory,mdate,idauthor) VALUES ('||currval('dbid')||',\''||now()||'\','||idauthor||')' AS n3
+FROM folder f1,tree t1,history WHERE f1.folder='folder' AND t1.id=f1.idfolder AND t1.id=idhistory
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-02-09 01:01:02"><property name="sqlL"><list>
+	<value>ALTER TABLE day ALTER COLUMN newtype type varchar(15)</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-02-10 01:01:01"><property name="sqlL"><list>
+	<value>ALTER TABLE "day" DROP CONSTRAINT check_newtype;</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-03-01 01:01:01"><property name="sqlL"><list>
+	<value>UPDATE task SET duration=1 WHERE duration is null;</value>
+	<value>ALTER TABLE task ALTER COLUMN duration SET DEFAULT 1;</value>
+	<value>ALTER TABLE task ALTER COLUMN duration SET NOT NULL;</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-03-07 01:01:01"><property name="sqlL"><list>
+	<value>DROP INDEX IF EXISTS did_tree_idx</value>
+	<value>DROP INDEX IF EXISTS id_tree_idx</value>
+	<value>DROP INDEX IF EXISTS idclass_tree_idx</value>
+	<value>DROP INDEX IF EXISTS iddoc_tree_idx</value>
+	<value>DROP INDEX IF EXISTS ref_tree_idx</value>
+	<value>CREATE INDEX did_tree_idx ON tree USING hash (did)</value>
+	<value>CREATE INDEX id_tree_idx ON tree USING hash (id)</value>
+	<value>CREATE INDEX idclass_tree_idx ON tree USING hash (idclass)</value>
+	<value>CREATE INDEX iddoc_tree_idx ON tree USING hash (iddoc)</value>
+	<value>CREATE INDEX ref_tree_idx ON tree USING hash (ref)</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-03-08 01:01:01"><property name="sqlL"><list>
+	<value>ALTER TABLE noderole DROP CONSTRAINT noderole_username_users_username</value>
+	<value>ALTER TABLE noderole ADD CONSTRAINT noderole_username_users_username FOREIGN KEY (username)
+		REFERENCES users (username) MATCH SIMPLE
+		ON UPDATE CASCADE ON DELETE CASCADE</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-04-19 01:01:01"><property name="sqlL"><list>
+	<value> SELECT 'UPDATE tree SET idclass='||d2.iddose||' WHERE idclass='||d1.iddose||' AND id!='||d1.iddose AS u1,
+	'DELETE FROM tree WHERE id='||d1.iddose AS d2
+	FROM dose d1,dose d2 WHERE d1.value=d2.value AND d1.app=d2.app
+	AND d1.pro=d2.pro AND d1.type=d2.type
+	AND d1.unit='mg/m2' AND d2.unit='mg/m²'	
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-04-19 01:01:04"><property name="sqlL"><list>
+	<value> UPDATE dose SET unit='mg/m²' WHERE unit='mg/m2' </value>
+	<value> UPDATE dose SET unit='microg/m²' WHERE unit='microg/m2' </value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-04-19 01:01:06"><property name="sqlL"><list>
+	<value> SELECT 'UPDATE tree SET idclass='||d2.iddose||' WHERE idclass='||d1.iddose u1,
+'DELETE FROM tree WHERE id='||d1.iddose u2 FROM dose d1, dose d2
+WHERE d1.iddose!=d2.iddose
+AND d1.value=d2.value
+AND d1.app=d2.app
+AND d1.pro=d2.pro
+AND d1.type=d2.type
+AND d1.unit='ml/m2'
+AND d2.unit='ml/m²'</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-04-19 01:01:07"><property name="sqlL"><list>
+	<value> UPDATE dose SET unit='ml/m²' WHERE unit='ml/m2' </value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-06-05 01:01:02"><property name="sqlL"><list>
+	<value>ALTER TABLE noderole ADD COLUMN admin bit(1)</value>
+	<value>UPDATE noderole SET admin='0'</value>
+	<value>ALTER TABLE noderole ALTER COLUMN admin SET NOT NULL</value>
+	<value>ALTER TABLE noderole ALTER COLUMN admin SET DEFAULT B'0'</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-06-13 16:40:02"><property name="sqlL"><list>
+	<value>ALTER TABLE noderole ALTER COLUMN write SET DEFAULT B'0'</value>
+</list></property></bean>
+<!-- 
+false idea
+<bean class="com.qwit.service.DbUpdate" p:date="2011-06-19 01:01:04"><property name="sqlL"><list>
+	<value>ALTER TABLE task ADD column idvariant integer</value>
+	<value> UPDATE task SET idvariant=to_number(cyclename,'999999999')
+	WHERE char_length(cyclename)>0 AND char_length(translate(cyclename,'1234567890',''))=0
+	</value>
+	<value> UPDATE task SET idvariant=idtask WHERE cyclename IS NULL </value>
+	<value> SELECT 
+'UPDATE task SET idvariant='||ta2.idtask||' WHERE idtask='||ta1.idtask AS u1
+FROM task ta1,task ta2
+WHERE ta1.cyclename=ta2.task AND ta1.idtask!=ta2.idtask
+	</value>
+	<value> SELECT 
+'UPDATE task SET idvariant='||ta2.idtask||' WHERE idtask='||ta1.idtask AS u1
+FROM task ta1,task ta2
+WHERE ta1.cyclename=ta2.task AND ta1.idtask=ta2.idtask
+	</value>
+	<value> UPDATE task SET idvariant=idtask WHERE idvariant IS NULL </value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-06-19 01:01:05"><property name="sqlL"><list>
+	<value>
+		ALTER TABLE task ADD CONSTRAINT idvariant_idtask FOREIGN KEY (idvariant) REFERENCES task(idtask)
+	</value>
+</list></property></bean>
+ -->
+<bean class="com.qwit.service.DbUpdate" p:date="2011-06-20 01:01:02"><property name="sqlL"><list>
+	<value> SELECT 'UPDATE task set cyclename=\''||ta1.cyclename||'\' WHERE idtask='||ta2.idtask u1
+FROM task ta1, tree t2,task ta2,
+(SELECT min(idtask), t3.iddoc
+FROM tree t0,tree t1,tree t2,tree t3, task
+WHERE t0.id=1263295 AND t0.id=t1.did AND t1.id=t2.did AND t3.iddoc=t2.id AND t3.id=idtask AND type!='pause'
+GROUP BY t3.iddoc) t1
+WHERE t1.min=ta1.idtask AND t2.id=ta2.idtask AND t1.iddoc=t2.iddoc AND t1.min!=t2.id
+AND ta2.type!='pause'
+AND ta1.cyclename!=ta2.cyclename
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-06-28 01:01:01"><property name="sqlL"><list>
+	<value>UPDATE institute SET bsaformula='dubois'</value>
+	<value>ALTER TABLE institute ALTER COLUMN bsaformula SET DEFAULT 'dubois';</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-09-08 01:01:01"><property name="sqlL"><list>
+	<value>
+SELECT 'update tree set idclass='||t1.idclass||' where id='||t2.id||';' u1 FROM tree t1,patient,task ta1,tree t2, task ta2
+WHERE t1.did=idpatient
+AND t1.idclass=ta1.idtask 
+AND t2.id=t1.ref AND t2.idclass=ta2.idtask
+AND ta2.type='pause' AND t1.idclass!=t2.idclass
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-09-09 01:01:02"><property name="sqlL"><list>
+	<value>
+SELECT 'UPDATE tree SET idclass=1295160 WHERE id='||t2.id u1,'UPDATE tree SET idclass=1295160 WHERE id='||t1.id u2 
+from tree t1,patient,task ta1,tree t2, task ta2
+WHERE t1.did=idpatient
+AND t1.idclass=ta1.idtask 
+AND t2.id=t1.ref AND t2.idclass=ta2.idtask
+AND ta2.type='pause'
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-09-12 01:01:02"><property name="sqlL"><list>
+<!-- delete status copy where authorname = 123 -->
+	<value>
+DELETE FROM tree WHERE id IN (
+SELECT t3.id FROM tree t1,tree t2,tree t3,pvariable p,history h,owuser o
+ WHERE t1.did=1267536
+ AND t2.iddoc=t1.id AND t2.id=t2.idclass
+ AND t3.ref=t2.idclass AND t3.idclass=p.idpvariable
+ AND t3.id=h.idhistory AND h.idauthor=o.idowuser
+ AND (o.owuser='cwegner' OR o.owuser='rfuchs' OR o.owuser='roman')
+ )
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-11-13 01:01:02"><property name="sqlL"><list>
+	<value>
+	SELECT 'UPDATE tree SET idclass=1274663 WHERE id='||t3.id AS u1
+FROM tree t1,tree t2,patient,task,tree t3
+WHERE t1.id=t2.did AND t1.id=idpatient AND t3.id=t2.ref AND t3.idclass=idtask AND type='pause'
+AND t1.id=1368025
+	</value>
+	<value>
+	SELECT 'UPDATE tree SET idclass=1295160 WHERE id='||t3.id AS u1
+FROM tree t1,tree t2,patient,task,tree t3
+WHERE t1.id=t2.did AND t1.id=idpatient AND t3.id=t2.ref AND t3.idclass=idtask AND type='pause'
+AND t1.id=1387926
+	</value>
+</list></property></bean>
+<bean class="com.qwit.service.DbUpdate" p:date="2011-12-01 01:01:01"><property name="sqlL"><list>
+<!-- Capecitabin Tableten Function löschen -->
+	<value>SELECT 
+'DELETE FROM tree WHERE id='||t3.id AS u1
+FROM tree t1,drug d1,tree t2,tree t3,tablet
+,tree t0,tree t01,tree t02, folder f03,tree t03
+WHERE 
+f03.folder='G.I.Tumoren' AND f03.idfolder=t03.id AND
+t02.did=t03.id AND t02.id=t01.did AND t01.id=t0.iddoc AND
+t3.did=t2.id AND t3.idclass=idtablet AND
+t0.id=t0.idclass AND
+t2.did=t1.id AND t2.tab_name='dose' AND
+t0.idclass=t1.iddoc AND
+t1.idclass=iddrug AND d1.idgeneric=11594
+	</value>
+	<value>SELECT 
+'DELETE FROM tree WHERE id='||t3.id AS u1
+FROM tree t1,drug  d1,tree t2,tree t3,expr
+,tree t0,tree t01,tree t02, folder f03,tree t03
+WHERE 
+f03.folder='G.I.Tumoren' AND f03.idfolder=t03.id AND
+t02.did=t03.id AND t02.id=t01.did AND t01.id=t0.iddoc AND
+t3.did=t2.id AND t3.idclass=idexpr AND value='SteroidDayDose' AND
+t0.id=t0.idclass AND
+t2.did=t1.id AND t2.tab_name='dose' AND
+t0.idclass=t1.iddoc AND
+t1.idclass=iddrug AND d1.idgeneric=11594
+	</value>
+</list></property></bean>
+<!-- 
+<bean class="com.qwit.service.DbUpdate" p:date="2011-08-01 01:01:03"><property name="sqlL"><list>
+	<value>
+	SELECT 'DELETE FROM tree WHERE idclass='||idtask||' AND iddoc='||t1.id d1 
+FROM tree t0, tree t1,tree t2 , task
+where t0.did=1263295
+and t0.id=t1.did
+and t2.iddoc=t1.id
+and idtask=t2.id
+and type='pause'
+	</value>
+</list></property></bean>
+ -->
+
+<!-- END -->
+	</list></property>
+</bean>
+
+</beans>

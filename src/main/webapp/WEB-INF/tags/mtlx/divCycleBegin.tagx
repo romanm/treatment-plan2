@@ -1,0 +1,40 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<!--
+<div style="float: right;">
+<div>
+-->
+	<mtl:schemaCycleNr/>
+	<c:out value="; " />
+	<fmt:message key="ui_begin" />
+	<c:out value=" Tag 1=" />
+	<c:choose>
+		<c:when test="${not empty patientMtl }">
+			<qhtm:a idt="${patientMtl.docT.id}" action="beginDateCycleNrUpdate">
+			<!-- 
+				<fmt:formatDate value="${schemaMtl.ofDate.mdate}" type="both"
+					dateStyle="short" timeStyle="short" />
+			 -->
+			 <b>
+				<fmt:formatDate value="${schemaMtl.ofDate.mdate}" 
+					dateStyle="short" />
+			 </b>
+			</qhtm:a>
+		</c:when>
+		<c:otherwise>
+			<fmt:formatDate value="${schemaMtl.ofDate.mdate}" type="both"
+				dateStyle="short" timeStyle="short" />
+		</c:otherwise>
+	</c:choose>
+	<c:out value="; " />
+<!-- 
+</div>
+ -->
+
+</jsp:root>

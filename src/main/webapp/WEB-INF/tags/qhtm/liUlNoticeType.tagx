@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+	<jsp:directive.attribute name="noticeType" required="true" />
+	<jsp:directive.attribute name="iteratePointers" type="java.util.Iterator" />
+
+<spring:eval var="supNoticeIP"
+	expression="jxp.var('notice').var('type',noticeType)
+	.jxpip(docMtl.getDocT(),'childTs[tabName=$notice][mtlO/type=$type]')" />
+<c:if test="${not empty iteratePointers}">
+	<c:set var="supNoticeIP" value="${iteratePointers}" />
+</c:if>
+<spring:eval var="hasNext" expression="supNoticeIP.hasNext()" />
+<c:set var="mapDrug" value="${schemaMtl.nTypeDrugNoticeMObjMObjM[noticeType]}" />
+<c:if test="${not empty mapDrug or hasNext}">
+	<spring:eval var="noticeP" expression="jxp
+		.jxp(docMtl.getDocT()).getPointer('childTs[mtlO/type=$type]')" />
+	<c:choose>
+		<c:when test="${not empty noticeP.value}">
+			<qhtm:liNoticeType noticeType="${noticeType}" firstT="${noticeP.value}" />
+		</c:when>
+		<c:otherwise>
+			<li class="b select taskNotice" id="dv_5">
+				<fmt:message key="mtl_notice_type_${noticeType}"/>
+			</li>
+		</c:otherwise>
+	</c:choose>
+	<ul>
+		<c:forEach var="supNoticeP" items="${supNoticeIP}">
+			<c:if test="${'totalsdose'==noticeType}">
+				<li>
+					<mtl:maxDose noticeT="${supNoticeP.value}"/>
+				</li>
+			</c:if>
+			<li id="li_${supNoticeP.value.id}" class="select taskNotice">
+				<owsui:editNotice noticeT="${supNoticeP.value}" editWithType="${true}"/>
+			</li>
+		</c:forEach>
+		<mtl:noticeFromDrug mapDrug="${mapDrug}"/>
+	</ul>
+</c:if>
+
+<c:if test="${'literature'==noticeType}">
+	<spring:eval var="literatureIP" expression="jxp.var('literature').jxpip(docMtl.getDocT(),
+		'childTs[tabName=$literature]')" />
+	<spring:eval var="hasNext" expression="literatureIP.hasNext()" />
+	<c:if test="${hasNext}">
+		<spring:eval var="noticeP" expression="jxp
+			.jxp(docMtl.getDocT()).getPointer('childTs[tabName=$literature]')" />
+		<qhtm:liNoticeType noticeType="${noticeType}" firstT="${noticeP.value}" />
+		<ul>
+			<c:forEach var="literatureP" items="${literatureIP}">
+				<li id="li_${literatureP.value.id}" class="select taskNotice">
+					<owsui:editLiterature tree="${literatureP.value}"/>
+				</li>
+			</c:forEach>
+		</ul>
+	</c:if>
+</c:if>
+
+</jsp:root>

@@ -1,0 +1,14 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+
+<jsp:directive.attribute name="id" required="true" description="id"/>
+<jsp:directive.attribute name="iconClass" description="iconClass"/>
+<div id="${id}">
+	<div id="${id}_menu"><jsp:doBody /></div>
+	<fmt:message key="ui_popupMenuItem_${id}" var="pmi_msg"/>
+	<script type="text/javascript">menu("${id}_menu");
+	popupMenuItem("${id}","${pmi_msg}", "${iconClass}");</script>
+</div>
+</jsp:root>

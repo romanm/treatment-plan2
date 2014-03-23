@@ -1,0 +1,43 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="doseT" type="com.qwit.domain.Tree" required="true" description="The dose tree object"/>
+<jsp:directive.attribute name="patientDoseProcentT" type="com.qwit.domain.Tree" required="true" description="patientDoseProcentT"/>
+
+<span class="warning small">!</span>
+<qhtm:tag name="span" prefix="dm_" tree="${patientDoseProcentT}">
+<c:set var="noticeModT"	value="${patientDoseProcentT.parentT.parentT.parentT.parentT}"/>
+
+<c:if test="${'day'==patientDoseProcentT.parentT.parentT.tabName}">
+	<c:set var="noticeModT"	value="${patientDoseProcentT.parentT.parentT.parentT.parentT.parentT}"/>
+	<c:set var="dayT"	value="${patientDoseProcentT.parentT.parentT}"/>
+	${dayT.mtlO.abs} Tag
+</c:if>
+(<strike><fmt:formatNumber pattern="##.###">${doseT.mtlO.value}</fmt:formatNumber> ${doseT.mtlO.unit}
+	<c:if test="${schemaMtl.idt==doseT.id}">
+		=${schemaMtl.calcDose[doseT]}<mtl:doseUnit doseT="${doseT}" calculated="true"/>
+	</c:if>
+</strike>
+<c:forEach var="p" items="${patientDoseProcentT.childTs }">
+	<c:set var="patientDoseProcenDoseT" value="${p}"/>
+</c:forEach>
+<c:choose>
+	<c:when test="${not empty patientDoseProcenDoseT }">
+		${patientDoseProcenDoseT.mtlO.value}
+	</c:when>
+	<c:otherwise>${patientDoseProcentT.mtlO.pvalue}%</c:otherwise>
+</c:choose>
+)
+
+<c:choose>
+	<c:when test="${empty noticeModT.mtlO.notice}">?</c:when>
+	<c:when test="${noticeModT.mtlO.notice=='Automatisch'}"><span title="${noticeModT.mtlO.notice}">!A!</span></c:when>
+	<c:otherwise>${noticeModT.mtlO.notice}</c:otherwise>
+</c:choose>
+</qhtm:tag>
+<span class="warning small">!</span>
+</jsp:root>

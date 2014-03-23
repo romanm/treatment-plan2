@@ -1,0 +1,53 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="tree" type="com.qwit.domain.Tree" required="true"/>
+
+<c:choose>
+	<c:when test="${not empty docMtl.editLiteratureO and docMtl.idt==tree.id}">
+		<form:errors path="*"/>
+		<fmt:message key="tag_literature_title"/>
+		<!-- 
+		<form:input path="editLiteratureO.title" />
+		 -->
+		<form:textarea path="editLiteratureO.title" cssStyle="width:350px"/>
+		<fmt:message key="tag_literature_authors"/>
+		<form:textarea path="editLiteratureO.authors" cssStyle="width:350px"/>
+		<!-- 
+		<form:input path="editLiteratureO.authors" />
+		 -->
+		<br/>
+		<fmt:message key="tag_literature_springtype_book" var="book"/>
+		<fmt:message key="tag_literature_springtype_jornal" var="jornal"/>
+		<form:select path="editLiteratureO.springtype" >
+			<form:option label=" " value=" "/>
+			<form:option label="${book}" value="book"/>
+			<form:option label="${jornal}" value="jornal"/>
+		</form:select>
+		<form:input path="editLiteratureO.spring" /><br/>
+		<fmt:message key="tag_literature_year"/><form:input path="editLiteratureO.year" />
+		<fmt:message key="tag_literature_volume"/><form:input path="editLiteratureO.volume" />
+		<fmt:message key="tag_literature_page"/><form:input path="editLiteratureO.page" /><br/>
+		url <form:input path="editLiteratureO.url" />
+		<div style="float: right;">
+			<owsui:next/>
+		</div>
+	</c:when>
+	<c:otherwise>
+		<qhtm:a idt="${tree.id}"><mtl:literatureText literatureO="${tree.mtlO}" /></qhtm:a>
+		<c:if test="${not empty tree.mtlO.url}">
+			<br/>
+			<a href="${tree.mtlO.url}" target="_blank">${tree.mtlO.url}</a>
+		</c:if>
+		
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

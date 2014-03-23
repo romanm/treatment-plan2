@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+
+<jsp:output omit-xml-declaration="yes"/>
+
+<c:set var="toolbarId" value="schemaToolbar" />
+<c:set var="saveButtonId" value="Save" />
+
+<owsui:toolbar id="${toolbarId}">
+	<owsui:dropDownButton id="menu">
+		<c:set var="iddoc" value="${docMtl.docT.id}"/>
+		<c:choose>
+		<c:when test="${not empty explorerMtl and 'labor'==explorerMtl.folderTypeName}">
+				<owsui:menuItemLinkClick idt="${iddoc}" id="newLabor"/>
+			</c:when>
+			<c:when test="${not empty explorerMtl and 'drug'==explorerMtl.folderTypeName}">
+				<owsui:menuItemLinkClick idt="${iddoc}" id="newGeneric"/>
+			</c:when>
+			<c:when test="${not empty explorerMtl and explorerMtl.isConceptFolder}">
+				<owsui:menuItemLinkClick idt="${iddoc}" id="newProtocol"/>
+				<owsui:menuItemLinkClick idt="${iddoc}" id="importProtocol"/>
+			</c:when>
+			<c:when test="${not empty explorerMtl and explorerMtl.isPatientFolder}">
+			<!-- 
+				<owsui:menuItemLinkClick idt="${iddoc}" id="newPatient"/>
+			 -->
+				<owsui:menuItemLinkClick idt="${explorerMtl.folderO.id}" id="newPatient"/>
+			</c:when>
+			<c:when test="${not empty instituteMtl}">
+					<owsui:menuItemLinkClick idt="${iddoc}" id="newStation"/>
+				<c:if test="${'roman'==pageContext.request.userPrincipal.name}">
+					<owsui:menuItemLinkClick idt="${iddoc}" id="newStationUser"/>
+				</c:if>
+					<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="signatureBlock"/>
+			</c:when>
+			<c:when test="${not empty conceptMtl}">
+				<owsui:menuItemLinkClick idt="${iddoc}" id="newSchema"/>
+				<owsui:menuItemLinkClick idt="${iddoc}" id="editConceptNameAndO"/>
+				<owsui:menuItemLinkClick idt="${iddoc}" id="defineSchemaVariant"/>
+				<owsui:menuSeparator id="ans2"/>
+				<owsui:menuItemLinkClick idt="${iddoc}" id="newChoose"/>
+			</c:when>
+			<c:otherwise>
+				<c:if test="${not empty schemaMtl}"><c:set var="blockId" value="${iddoc}"/></c:if>
+				<c:if test="${not empty drugMtl.blockId}"><c:set var="blockId" value="${drugMtl.blockId}"/></c:if>
+				<c:if test="${not empty blockId}">
+					<owsui:menuItemLinkClick idt="${blockId}" id="newDrug"/>
+					<owsui:menuItemLinkClick idt="${blockId}" id="newSupportDrug"/>
+					<owsui:menuItemLinkClick idt="${blockId}" id="newOnDemandDrug"/>
+					<!-- 
+					<owsui:menuItemLinkClick idt="${blockId}" id="drugGruppe"/>
+					 -->
+				</c:if>
+				<c:if test="${not empty drugMtl}">
+					<owsui:menuItemLinkClick idt="${iddoc}" id="newTrade"/>
+					<owsui:menuItemLinkClick idt="${iddoc}" id="editDrugName"/>
+					<owsui:menuItemLinkClick idt="${blockId}" id="newBlock"/>
+					<owsui:menuItemLinkClick idt="${blockId}" id="newBlockGcsf"/>
+					<owsui:menuItemLinkClick idt="${blockId}" id="newTablet"/>
+					<owsui:menuItemLinkClick idt="${blockId}" id="newLiterature"/>
+					<owsui:popupMenuItem id="addNotice" iconClass="noteIcon">
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="labor"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="scriteria"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="bre"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="tda"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="gcsf"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="tubo_advice"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="radiotherapy"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="port"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="dreductionHematoTox"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="dreduction"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="toxicity"/>'${ui_button_save}'
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="totalsdose"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="interaction"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="paravasat"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="literature"/>
+						<owsui:menuSeparator id="ans1"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="notice"/>
+					</owsui:popupMenuItem>
+					<owsui:popupMenuItem id="addExtra">
+						<owsui:menuItemLinkClick idt="${iddoc}" id="importSchema"/>
+					</owsui:popupMenuItem>
+				</c:if>
+				<c:if test="${not empty schemaMtl}">
+					<owsui:popupMenuItem id="addNotice" iconClass="noteIcon">
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="labor"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="scriteria"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="bre"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="tda"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="gcsf"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="tubo_advice"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="radiotherapy"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="port"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="dreductionHematoTox"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="dreduction"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="toxicity"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="totalsdose"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="interaction"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="paravasat"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="literature"/>
+						<owsui:menuSeparator id="ans1"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" asuffix="Notice" id="notice"/>
+					</owsui:popupMenuItem>
+					<c:if test="${empty schemaMtl.patientMtl }">
+						<owsui:menuItemLinkClick idt="${blockId}" id="newBlockGcsf"/>
+						<owsui:menuItemLinkClick idt="${blockId}" id="newLiterature"/>
+						<owsui:menuSeparator id="ans2"/>
+						<owsui:menuItemLinkClick idt="${blockId}" id="changeDocStatus"/>
+						<owsui:menuItemLinkClick idt="${blockId}" id="editSchemaProperty"/>
+						<!-- 
+						<owsui:menuItemLinkClick idt="${blockId}" id="editSchemaNameAndO"/>
+						 -->
+						<div id="mi_editConceptNameAndO"><fmt:message key="ui_menuItemLink_editConceptNameAndO"/></div>
+						<script type="text/javascript">
+							menuItem("mi_editConceptNameAndO",		"",	function(){
+								conceptName(${schemaMtl.docT.docT.id});
+							})
+						</script>
+						<!-- 
+						<owsui:menuSeparator id="ans3"/>
+						<owsui:menuItemLinkClick idt="${blockId}" id="newDoc"/>
+						 -->
+					</c:if>
+					<c:if test="${not empty schemaMtl.patientMtl }">
+						<owsui:menuSeparator id="ans3p"/>
+						<owsui:menuItemLinkClick idt="${blockId}" id="tabletDivisor"/>
+						<owsui:menuItemLinkClick idt="${blockId}" id="newCycle"/>
+						<owsui:menuItemLinkClick idt="${blockId}" id="schemaRewrite"/>
+					</c:if>
+				</c:if>
+				<c:if test="${not empty patientMtl }">
+					<owsui:menuItemLinkClick idt="${blockId}" id="editPatient"/>
+					<owsui:menuSeparator id="ans4p"/>
+					<owsui:menuItemLinkClick idt="${blockId}" id="moveStation"/>
+					<owsui:menuSeparator id="ans5p"/>
+					<owsui:menuItemLinkClick idt="${blockId}" id="archivPatient"/>
+				</c:if>
+				<owsui:menuSeparator id="ans4"/>
+				<c:if test="${not empty schemaMtl or not empty drugMtl.blockId}">
+					<owsui:popupMenuItem id="settings">
+						<c:set var="id" value="sameDayTogether" />
+						<div id="mi_${id}"><fmt:message key="ui_menuItemLink_${id}"/></div>
+						<span id="mi_${id}Link"><qhtm:a idt="${idt}" action="${id}" /></span>
+						<script type="text/javascript">
+							checkedMenuItemLinkClick("mi_${id}","${iconClass}","${owsSession.sameDayTogether}");</script>
+					</owsui:popupMenuItem>
+					<owsui:popupMenuItem id="addExtra">
+						<owsui:menuItemLinkClick idt="${iddoc}" id="importSchema"/>
+						<owsui:menuSeparator id="extraSep1"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" id="newLabor"/>
+						<owsui:menuItemLinkClick idt="${iddoc}" id="newFinding"/>
+					</owsui:popupMenuItem>
+				</c:if>
+			</c:otherwise>
+		</c:choose>
+	</owsui:dropDownButton>
+	<owsui:toolbarSeparator id="dts1"/>
+	<span  style="float:left;">
+		<c:set var="docId" value="${docMtl.docT.id}" />
+		<c:choose>
+			<c:when test="${not empty patientMtl.tuboId}">
+				<c:set var="docId" value="${docMtl.tuboId}"/>
+			</c:when>
+			<c:when test="${not empty explorerMtl}">
+				<c:set var="docId" value="${explorerMtl.folderO.id}"/>
+			</c:when>
+		</c:choose>
+				<!-- 
+		<c:set var="url2" value="${url1}=${docId }"></c:set>
+				<c:set var="url2" value="${url1}?id=${docId}"></c:set>
+				 -->
+		<c:choose>
+		<!-- ??patient??
+			<c:when test="${'schema'==url1 or 'patient'==url1 }">
+		 -->
+			<c:when test="${'schema'==url1}">
+				<c:set var="url2" value="${url1}-${owsSession.schemaPart}-${docId }"></c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="url2" value="${url1}=${docId }"></c:set>
+			</c:otherwise>
+		</c:choose>
+		<!-- 
+		<a id="reload" href="${url1}?id=${docId}">
+		 -->
+		<a id="reload" href="${url2}">
+			<fmt:message var="uiReload" key="uiReload" />
+			<c:url var="src_url" value="/resources/images/refresh.png" />
+			<img src="${src_url}" title="${uiReload}"/>
+			<span class="small">${uiReload}</span>
+		</a>
+	</span>
+	<!-- 
+	<span>
+	 -->
+	<span style="float:left;">
+		<c:choose>
+			<c:when test="${not empty docMtl.idt and docMtl.idt!=0 and (docMtl.currentId>0 or schemaMtl.patientMtl.currentId>0)}">
+			<!-- 
+			 	<c:set var="onclick">dojo.byId('toOnClickForSave').click();dojo.byId('editSave').click();</c:set>
+			 -->
+				<c:set var="onclick2">, ['toOnClickForSave', 'editSave']</c:set>
+			</c:when>
+			<c:when test="${(empty docMtl.idt or docMtl.idt==0) and (docMtl.currentId>0 or schemaMtl.patientMtl.currentId>0)}">
+				<!--
+				<c:set var="onclick">dojo.byId('editSave').click();</c:set>
+				-->
+				<c:set var="onclick2">, ['editSave']</c:set>
+			</c:when>
+		</c:choose>
+
+		<script type="text/javascript">
+			addToolbarButton('${saveButtonId}', '${ui_button_save}' ${onclick2});
+		</script>
+		
+		<c:choose>
+			<c:when test="${empty onclick2 }">
+					<!-- 
+				<button type="submit" disabled="disabled">
+					<c:url var="save_png" value="/resources/images/save.png" />
+					<img src="${save_png}" title="${ui_button_save}"/>
+					${ui_button_save}
+				</button>
+					-->
+					<!--
+				<input type="button" disabled="disabled" value="&#160;&#160;&#160;${ui_button_save}" class="save" title="${ui_button_save}"/>
+					class="save toolbar-icon" title="${ui_button_save}"/>
+					 -->
+					 <!-- 
+					  -->
+					<script type="text/javascript">
+						disableToolBarButton('${saveButtonId}', true);
+					</script>
+			</c:when>
+			<c:otherwise>
+					<script type="text/javascript">
+						disableToolBarButton('${saveButtonId}', false);
+					</script>
+					<!-- 
+				<input type="button" onclick="${onclick}" value="&#160;&#160;&#160;${ui_button_save}" class="save" title="${ui_button_save}"/>
+					class="save toolbar-icon" title="${ui_button_save}"/>
+					 -->
+			</c:otherwise>
+		</c:choose>
+	</span>
+</owsui:toolbar>
+
+</jsp:root>

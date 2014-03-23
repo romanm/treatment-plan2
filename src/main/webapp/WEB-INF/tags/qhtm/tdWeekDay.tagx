@@ -1,0 +1,37 @@
+<td xmlns:jsp="http://java.sun.com/JSP/Page" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+class="nowrap">
+<jsp:directive.attribute name="drugT"	type="com.qwit.domain.Tree"	required="true"/>
+<jsp:directive.attribute name="ts"		type="com.qwit.domain.Ts"	required="true"/>
+
+	<spring:eval var="dayS" expression="jxp.childs(drugT,'day')" />
+	<c:forEach items="${dayS}" var="dayP">
+		<c:set var="dayT" value="${dayP.value}"/>
+		<qhtm:tag name="span" prefix="sp_" tree="${dayT}">
+			<owsui:editDay dayT="${dayT}" />
+		</qhtm:tag>
+	</c:forEach>
+	<c:set var="tDays" value="" />
+	<c:set var="appNr" value="${schemaMtl.appNr}" />
+	<c:forEach begin="2" end="${appNr}" var="subTaskNr">
+		<spring:eval var="dayS" expression="jxp.childs(drugT,'day')" />
+		<c:forEach items="${dayS}" var="dayP">
+			<c:set var="dayC" value="${dayP.value.mtlO}" />
+			<c:choose>
+				<c:when test="${fn:contains(dayC.abs,'-')}"></c:when>
+				<c:otherwise>
+					<c:forEach items="${fn:split(dayC.abs,',')}" var="abs1">
+						<c:set var="tDays">${tDays}, ${abs1+schemaMtl.schemaC.duration*(subTaskNr-1)}</c:set>
+					</c:forEach>
+				</c:otherwise>
+			</c:choose>
+		</c:forEach>
+	</c:forEach>
+	${tDays}
+</td>

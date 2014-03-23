@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:spring="http://www.springframework.org/tags"
+>
+<jsp:directive.attribute name="chooseT"	type="com.qwit.domain.Tree" required="true" description=""/>
+<spring:eval var="activArm" expression="jxp.activeArm(chooseT)"/>
+
+<c:choose>
+	<c:when test="${not empty activArm}">
+		<div>${activArm.mtlO.arm}</div>
+	</c:when>
+	<c:otherwise>
+		<fieldset><legend class="select" id="c_${chooseT.id}" >
+					<fmt:message key="mtl_choice"/></legend>
+			<c:forEach var="arm" items="${chooseT.childTs}">
+				<c:if test="${'pvariable'!=arm.tabName}">
+					<div style="float: left;" class="select arm" id="ar_${arm.id }" >
+					<!-- 
+					<div style="float: left;">
+					 -->
+					<owsui:titlePane id="arm_${arm.id}" title="${conceptMtl.classM[arm.idClass].arm}">
+					<c:choose>
+						<c:when test="${empty arm.childTs}">
+							<div id="a_${arm.id}" class="select">
+								..
+							</div>
+						</c:when>
+						<c:otherwise>
+							<mtl:conceptBlock blockT="${arm}" />
+						</c:otherwise>
+					</c:choose>
+					<!-- 
+					<c:forEach items="${arm.childTs}" var="armEl">
+						<c:choose>
+							<c:when test="${armEl.tabName=='choice'}"><mtl:choose chooseT="${armEl}"/></c:when>
+							<c:when test="${armEl.tabName=='checklist'}">
+								<div class="checklist">
+									<img src="../../images/Preferences16.gif"/>
+									${conceptMtl.classM[armEl.idClass].checklist}
+								</div>
+							</c:when>
+							<c:when test="${armEl.tabName=='task'}">
+								<mtl:conceptSchema schemaT="${armEl}" conceptMtl="${conceptMtl}" />
+							</c:when>
+							<c:otherwise>${armEl.id}:${armEl.tabName}</c:otherwise>
+						</c:choose>
+					</c:forEach>
+					<mtl:startNewCycle schemaTparent="${arm}" />
+					 -->
+					</owsui:titlePane>
+					</div>
+				</c:if>
+			</c:forEach>
+		</fieldset>
+		<!-- 
+		<table>
+			<tr>
+				<c:forEach items="${chooseT.childTs}" var="arm">
+				<c:if test="${arm.tabName!='pvariable'}">
+					<td>
+					<owsui:titlePane id="arm_${arm.id}" title="${conceptMtl.classM[arm.idClass].arm}">
+					<c:forEach items="${arm.childTs}" var="armEl">
+						<c:choose>
+							<c:when test="${armEl.tabName=='choice'}"><mtl:choose chooseT="${armEl}"/></c:when>
+							<c:when test="${armEl.tabName=='checklist'}">
+								<div class="checklist">
+									<img src="../../images/Preferences16.gif"/>
+									${conceptMtl.classM[armEl.idClass].checklist}
+								</div>
+							</c:when>
+							<c:when test="${armEl.tabName=='task'}">
+								<mtl:conceptSchema schemaT="${armEl}" conceptMtl="${conceptMtl}" />
+							</c:when>
+							<c:otherwise>${armEl.id}:${armEl.tabName}</c:otherwise>
+						</c:choose>
+					</c:forEach>
+					</owsui:titlePane>
+					</td>
+				</c:if>
+				</c:forEach>
+			</tr>
+		</table>
+		 -->
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

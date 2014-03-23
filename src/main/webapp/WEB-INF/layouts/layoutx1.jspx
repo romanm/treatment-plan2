@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"	
+	xmlns:sql	="http://java.sun.com/jsp/jstl/sql"
+	xmlns:spring ="http://www.springframework.org/tags"
+	xmlns:security="http://www.springframework.org/security/tags"
+	xmlns:tiles	="http://tiles.apache.org/tags-tiles"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	>
+	<jsp:directive.page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" />
+	<jsp:output doctype-root-element="html" doctype-public="-//W3C//DTD XHTML 1.1//EN"
+		doctype-system="http://www.w3c.org/TR/xhtml11/DTD/xhtml11.dtd" />
+	<!-- 
+	<html>
+	 -->
+	<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=8" />
+		<spring:url value="/images/favicon.ico" var="favicon" />
+		<link rel="SHORTCUT ICON" href="${favicon}" />
+		<title><mtl:siteTitle/></title>
+		<fmt:setLocale value="de" scope="session" />
+		<spring:url value="/resources/dijit/themes/tundra/tundra.css" var="tundra_url"/>
+		<link rel="stylesheet" type="text/css" href="${tundra_url}" />
+	
+		<spring:url value="/resources/styles/ows2.print2.css" var="ows2_print_css_url"/>
+		<c:choose>
+			<c:when test="${isPrintSite}">
+				<link rel="stylesheet" type="text/css" href="${ows2_print_css_url}" />
+			</c:when>
+			<c:otherwise>
+				<spring:url value="/resources/styles/ows2.css" var="ows2_screen_css_url"/>
+				<link rel="stylesheet" type="text/css" media="screen" href="${ows2_screen_css_url}" />
+				<link rel="stylesheet" type="text/css" media="print" href="${ows2_print_css_url}" />
+			</c:otherwise>
+		</c:choose>
+		
+		<script type="text/javascript"> 
+			// Note: this must be done before dojo loads!!!
+			var djConfig = new Object(); 
+			var theLocale = getLocale(); // this function is responsible to determine
+			                            // the appropriate locale
+			djConfig.locale = theLocale; 
+			
+			function getLocale()
+			{
+				return 'de';
+			}
+		</script> 
+		
+		<spring:url value="/resources/dojo/dojo.js" var="dojo_url"/>
+		<!-- 
+		<spring:url value="/resources/dojo-1.7.1/dojo/dojo.js" var="dojo_url"/>
+		 -->
+		<script src="${dojo_url}" type="text/javascript" >
+			<!-- //required for FF3 and Opera -->
+		</script>
+		
+		<spring:url value="/resources/spring/Spring.js" var="spring_url"/>
+		<script src="${spring_url}" type="text/javascript">
+			<!-- //required for FF3 and Opera -->
+		</script>
+		<spring:url value="/resources/spring/Spring-Dojo.js" var="spring_dojo_url"/>
+		<script src="${spring_dojo_url}" type="text/javascript">
+			<!-- //required for FF3 and Opera -->
+		</script>
+		<spring:url value="/resources/js/ows.js" var="ui_js_url"/>
+		<script src="${ui_js_url}" type="text/javascript">
+			<!-- //required for FF3 and Opera -->
+		</script>
+		<!-- qit variable -->
+		<c:set var="editSperre" value="false" scope = "application" />
+		<!-- 
+		<c:set var="editSperre" value="true" scope = "application" />
+			false	- is default value
+			true	- for Johanisplatz DB in St.Georg for example 
+		-->
+		<c:set			value="###"			var="inputSymbol"	scope="application" />
+		<c:set var="ifHtml" scope="application">
+			<b><fmt:message key="mtl_expr_expr_if" />:<c:out value=" "/></b></c:set>
+		
+		<c:set var="rsaquo" scope="application"><strong style="color: black;">›</strong></c:set>
+		<c:set var="lsaquo" scope="application"><strong style="color: black;">&#x02039;</strong></c:set>
+		
+		<spring:message code="ui_title_dialog"	var="ui_title_dialog"	scope="application"/>
+		<spring:message code="ui_button_calculation"	var="ui_button_calculation"	scope="application"/>
+		<spring:message code="ui_button_save"	var="ui_button_save"	scope="application"/>
+		<spring:message code="ui_button_OK"		var="ui_button_OK"		scope="application"/>
+		<spring:message code="ui_button_cancel"	var="ui_button_cancel"	scope="application"/>
+		<spring:url var="scheme_server_port"	
+		value="${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}"
+															scope="application"/>
+		<!-- 
+		<spring:url var="explorer_url"	value="explorer/explorer"/>
+		 -->
+		<spring:url var="Save16gif"     value="/images/Save16.gif"  scope="application"/>
+		<spring:url var="explorer_url1"	value="explorer"	scope="application" />
+		<spring:url var="explorer_url"	value="explorer"	scope="application" />
+		<spring:url var="concept_url"	value="concept"		scope="application" />
+		<spring:url var="patient_url"	value="patient"		scope="application" />
+		<spring:url var="drug_url"		value="drug"		scope="application" />
+		<spring:url var="schema_url"	value="schema"		scope="application" />
+		<spring:url var="tumorboard_url"
+										value="tumorboard"	scope="application" />
+		<spring:url var="user_url"		value="/user"	scope="application"/>
+		
+		<sql:setDataSource var="owsDbSource" driver="org.postgresql.Driver" dataSource="jdbc/ows"
+															scope="application" />
+		<c:set var="urlFlow" value="${fn:substringAfter(flowExecutionUrl,'?')}"
+															scope="request"/>
+		<c:set var="isFlow" value="${not empty flowExecutionUrl}"
+															scope="request"/>
+		<c:set var="flowUrl" value="${scheme_server_port}${flowExecutionUrl}"
+															scope="request"/>
+		<c:set var="flowName" value="${fn:substringBefore(flowExecutionUrl,'?')}"	scope="request"/>
+		<c:set var="flowName" value="${fn:substringAfter(flowName,'/')}"	scope="request"/>
+		<c:set var="flowName" value="${fn:substringAfter(flowName,'/')}"	scope="request"/>
+
+		<c:choose>
+			<c:when test="${not empty param.part}">
+				<c:set var="part" value="${param.part}"		scope="request" /></c:when>
+			<c:when test="${not empty formUtil}">
+				<c:set var="part" value="${formUtil.part}"	scope="request" /></c:when>
+		</c:choose>
+		<c:set var="owsSession" value="${sessionScope['scopedTarget.owsSession']}"
+															scope="session" />
+		<c:set var="care" value="${docMtl.userCare}"		scope="session"/>
+
+		<mtl:requestVariablen />
+		
+	<script type="text/javascript">
+		var urlFlow="${urlFlow}";
+		var isFlow=false;
+		<c:if test="${not empty param.adddrug}">
+			var drugsListe = ${explorerMtl.formUtil.jsonDrugs};
+		</c:if>
+		<c:if test="${not empty flowExecutionUrl and (fn:contains(flowExecutionUrl,'schemaflow') or fn:contains(flowExecutionUrl,'drugflow'))}">
+			isFlow=true;
+			<c:if test="${not empty flowExecutionUrl and fn:contains(flowExecutionUrl,'schema')}">
+			</c:if>
+				var drugsListe = ${formUtil.jsonDrugs};
+				console.log(drugsListe);
+				var doseUnitsListe = ${formUtil.jsonDoseUnit};
+				var doseAppListe = ${formUtil.jsonDoseApp};
+				var laborListe = ${formUtil.jsonLabor};
+				var findingListe  = ${formUtil.jsonFinding};
+			<c:if test="${not empty flowExecutionUrl and (fn:contains(flowExecutionUrl,'schema8') or fn:contains(flowExecutionUrl,'drugflow') ) }">
+				var symptomsListe = ${formUtil.jsonSymptoms};
+			</c:if>
+		</c:if>
+		dojo.require("dojo.data.ItemFileReadStore");
+		dojo.require("dijit._editor.plugins.LinkDialog");
+		dojo.require("dojox.editor.plugins.PasteFromWord");
+		dojo.require("dojox.editor.plugins.TablePlugins");
+		dojo.require("dijit._editor.plugins.ViewSource");
+		
+		//we have an older version of dojo thus the below one isnt there, can we update dojo?
+		//dojo.require("dijit.tree.dndSource");
+		dojo.require("dijit._tree.dndSource");
+		dojo.addOnLoad(function(){init();});
+		dojo.addOnLoad(function(){moveMenuItems();});
+		dojo.require("dojo.cookie");
+		
+		var docId='${docMtl.docT.id}';
+		console.log(docId);
+		//var url1="schemaflow";
+		var url1="${flow}";
+		<c:if test="${not empty explorerMtl}">
+			url1="explorerflow";
+			docId='${explorerMtl.folderO.id}';
+		</c:if>
+		//<c:if test="${not empty patientMtl}">url1="patientflow";</c:if>
+		//<c:if test="${not empty conceptMtl}">url1="conceptflow";</c:if>
+		//<c:if test="${not empty drugMtl}">url1="drugflow";</c:if>
+		//<c:if test="${not empty userMtl}">url1="userflow";</c:if>
+		var cpCopyHelp='<spring:message code="cpCopyHelp"/>';
+		var cpCopyNull='<spring:message code="cpCopyNull"/>';
+		var part='${part}';
+	
+	</script>
+	
+	<!-- Add Firebug for debugging in IE  
+	<script type="text/javascript" src="https://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js">
+	 -->
+	<script type="text/javascript">
+		<!-- //required for FF3 and Opera -->
+	</script>
+		
+	<!-- 
+	<style>
+	  @import "resources/dojox/editor/plugins/resources/css/PasteFromWord.css";
+	</style>
+	<style type="text/css">
+		@import "";
+	</style>
+	 -->
+
+	<spring:url value="resources/styles/editorPlugins.css" var="editorplugin_table_url"/>
+	<link rel="stylesheet" type="text/css" href="${editorplugin_table_url}" />
+	<spring:url value="resources/dojox/editor/plugins/resources/css/PasteFromWord.css" var="editorplugin_pw_url"/>
+	<link rel="stylesheet" type="text/css" href="${editorplugin_pw_url}" />
+
+	<security:authorize ifAllGranted="ROLE_ADMINSTATION">
+		<c:set var="isAdmin" value="${true}" scope="request"/>
+	</security:authorize>
+	<security:authorize ifAllGranted="ROLE_SUPERVISOR">
+		<c:set var="isAdmin" value="${true}" scope="request"/>
+	</security:authorize>
+
+</head>
+<body class="tundra spring" onmouseup="javascript:setCookiePageYOffset();">
+	<jsp:useBean id="jxp" class="com.qwit.service.JXPathBean" scope="session"/>
+	<jsp:useBean id="sparser" class="com.qwit.util.StringParser" scope="session"/>
+	<jsp:setProperty name="jxp" property="treeManager" value="${docMtl}" />
+	<div id="top">
+		<security:authorize ifAllGranted="ROLE_USER">
+			<c:if test="${pageContext.request.userPrincipal != null}">
+				<spring:message code="ui_welcome"/>,
+				<a href="${user_url}">${pageContext.request.userPrincipal.name}</a>
+			</c:if>
+			|
+			<spring:url value="/logout" var="logout_url"/>
+			<a href="${logout_url}"><spring:message code="ui_logout"/></a>
+		</security:authorize>
+		<security:authorize ifAllGranted="ROLE_ANONYMOUS">
+			<spring:url value="/login" var="login_url"/>
+			<a href="${login_url}"><spring:message code="ui_login"/></a>
+			|
+			<spring:url value="/registerflow?a=register" var="registry_url"/>
+			<a href="${registry_url}"><spring:message code="ui_login_registry"/></a>
+		</security:authorize>
+	</div>
+	
+	<qhtm:header />
+
+	<tiles:insertAttribute name="body" />
+	<hr class="clear" />
+	<ul class="metalinks">
+		<li><a href="#top" title="zum Seitenanfang"><span>nach oben</span></a></li>
+	</ul>
+	<div id="footer">
+		<div class="center small">
+			While using this site, you agree to have read and accepted our terms of use and privacy policy.
+			<br />
+			<a href="http://www.oncoworkstation.de/oifa/spring/h/index#"><fmt:message key="ui_privacyPolicy"/></a> - 
+			<a href="http://www.oncoworkstation.de/oifa/spring/h/index#"><fmt:message key="ui_termsOfUse"/></a> - 
+			<a href="http://www.oncoworkstation.de/oifa/spring/h/index#"><fmt:message key="ui_impressum"/></a> - 
+			<spring:url var="homeUrl" value="/home"></spring:url>
+			<a href="${homeUrl}"><fmt:message key="ui_homepage"/></a>
+			<br />
+			&#169; 2010 <a href="${owsContextPath}/home"><spring:message code="ui_name" /></a> Company. All rights reserved.
+		</div>
+	</div>
+	<c:choose>
+		<c:when test="${'all'==part }"/>
+		<c:otherwise>
+	<owsui:contextMenu />
+		</c:otherwise>
+	</c:choose>
+</body>
+</html>
+
+</jsp:root>

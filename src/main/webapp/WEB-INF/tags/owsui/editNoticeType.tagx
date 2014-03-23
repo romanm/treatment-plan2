@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="noticeT" type="com.qwit.domain.Tree" required="true" description="The notice tree object"/>
+
+<c:choose>
+	<c:when test="${not empty docMtl.editNoticeC and docMtl.idt==noticeT.id}">
+		<fmt:message key="ui_chooseCommentGroup" />:
+		<c:set var="myValue" value="${docMtl.editNoticeC.type}"/>
+		<c:set var="prefix" value="mtl_notice_type_"/>
+		<form:select path="editNoticeC.type">
+			<c:choose>
+				<c:when test="${'day'==noticeT.parentT.tabName}">
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="rqm"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="sup"/>
+				</c:when>
+				<c:when test="${'dose'==noticeT.parentT.tabName}"></c:when>
+				<c:otherwise>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="labor"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="scriteria"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="bre"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="tda"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="tubo_advice"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="radiotherapy"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="port"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="dreductionHematoTox"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="dreduction"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="toxicity"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="totalsdose"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="interaction"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="paravasat"/>
+			<qhtm:option prefix="${prefix}" myValue="${myValue}" value="literature"/>
+		<c:if test="${not empty drugMtl}">
+				<qhtm:option prefix="${prefix}" myValue="${myValue}" value="usageBlock_title"/>
+		</c:if>
+				</c:otherwise>
+			</c:choose>
+			<qhtm:option prefix="${prefix}"  myValue="${myValue}" value=""/>
+		</form:select>
+	</c:when>
+	<c:when test="${empty noticeT.mtlO.type}"></c:when>
+	<c:otherwise>
+		<qhtm:a idt="${noticeT.id}"><fmt:message key="mtl_notice_type_${noticeT.mtlO.type}"/></qhtm:a>
+	</c:otherwise>
+</c:choose>
+</jsp:root>

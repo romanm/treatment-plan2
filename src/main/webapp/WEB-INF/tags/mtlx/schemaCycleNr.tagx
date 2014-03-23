@@ -1,0 +1,43 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="pschemaT" type="com.qwit.domain.Tree" description="The task tree object"/>
+<jsp:directive.attribute name="cycleNr" />
+
+<c:choose>
+	<c:when test="${not empty cycleNr}">
+	<!--
+		<sub><fmt:message key="mtl_expr_value_cycleNr" />${cycleNr}</sub>
+	-->
+		<sub><fmt:message key="mtl_expr_value_cycleNr" />${cycleNr}</sub>
+	</c:when>
+	<c:when test="${not empty pschemaT}">
+	<spring:eval var="cycleNr" expression="jxp.var('cycle')
+		.jxp(pschemaT).getPointer('childTs/mtlO[ivariable=$cycle]/ivalue
+		|childTs/mtlO[pvariable=$cycle]/pvalue').getValue()" />
+			<sub><fmt:message key="mtl_expr_value_cycleNr" />${cycleNr}</sub>
+	</c:when>
+	<c:when test="${not empty patientMtl}">
+		<qhtm:a idt="${patientMtl.docT.id}" action="beginDateCycleNrUpdate">
+		<b>
+			${schemaMtl.cycleNr}
+			<fmt:message key="mtl_expr_value_cycle" />
+		</b>
+			<!-- 
+			<fmt:message key="mtl_expr_value_cycleNr" />${schemaMtl.cycleNr}
+			 -->
+		</qhtm:a>
+	</c:when>
+	<c:otherwise>
+	<!-- 
+		<sub><fmt:message key="mtl_expr_value_cycleNr" />${schemaMtl.cycleNr}</sub>
+		<fmt:message key="mtl_expr_value_cycleNr" />${schemaMtl.cycleNr}
+	 -->
+		${schemaMtl.cycleNr}
+		<fmt:message key="mtl_expr_value_cycle" />
+	</c:otherwise>
+</c:choose>
+</jsp:root>

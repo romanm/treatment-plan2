@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<secured attributes="ROLE_USER" />
+	<persistence-context />
+
+	<var name="formUtil"	class="com.qwit.util.FormUtil" />
+	<var name="list"		class="java.util.ArrayList" />
+	<input name="id"		type="int" required="true" />
+	<input name="idt"		type="int" />
+	<input name="idc"		type="int" />
+	<input name="a"			type="string" />
+	<input name="part"		type="string" />
+	<input name="search"	type="string" />
+
+	<on-start>
+		<evaluate	expression="documentService.setFlushModeCommit()" />
+		<evaluate	expression="explorerService.makeExplorerMtl(id, search)"	result="flowScope.explorerMtl" />
+		<set name="explorerMtl.action"		value="requestParameters.a" />
+		<!-- 
+		<evaluate	expression="documentService.makeexplorerMtl(id)"	result="flowScope.explorerMtl" />
+		<set name="explorerMtl.idt"			value="requestParameters.idt" />
+		<set name="explorerMtl.tsNr"			value="requestParameters.tsNr" />
+		<set name="explorerMtl.idc"			value="requestParameters.idc" />
+		<set name="explorerMtl.modDay"		value="requestParameters.modDay" />
+		<set name="formUtil.part"			value="requestParameters.part" />
+		<set name="formUtil.jsonDrugs"		value="documentService.getJsonDrugs()" />
+		<set name="formUtil.jsonDoseUnit"	value="documentService.getJsonDoseUnit()" />
+		<set name="formUtil.jsonDoseApp"	value="documentService.getDoseApp()" />
+		<set name="formUtil.jsonLabor"		value="documentService.getJsonLabors()" />
+		<set name="formUtil.jsonLaborUnits"	value="documentService.getJsonLaborUnits()" />
+		<set name="formUtil.jsonFinding"	value="documentService.getJsonFindings()" />
+		<set name="formUtil.jsonFindingUnits"	value="documentService.getJsonFindingUnits()" />
+		 -->
+	</on-start>
+
+	<action-state id="handleAction">
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------handleAction-----on-entry---getAction-'+explorerMtl.getAction())" />
+			<evaluate expression="formUtil.logline('--------handleAction-----on-entry---getIdt-'+explorerMtl.getIdt())" />
+		</on-entry>
+		<evaluate expression="explorerMtl.getAction()"/>
+		<evaluate expression="explorerMtl.isNewEdit()"/>
+		
+		<transition on="patientData" to="patientDataSeekTbh">
+			<evaluate expression="formUtil.logline('--------handleAction-----patientData----')" />
+			<set name="formUtil.mode" value="'patientData'"/>
+			<set name="explorerMtl.isPatientData" value="true"/>
+			<evaluate expression="explorerMtl.openEditPatient()" />
+		</transition>
+		<transition on="beginDate" to="beginDateTbh">
+			<set name="explorerMtl.idt"	value="requestParameters.idt" />
+			<evaluate expression="documentService.addSessionPatient(explorerMtl)" />
+			<set name="formUtil.mode"	value="'beginDate'" />
+		</transition>
+		<transition on="save"		to="save">
+			<evaluate expression="documentService.saveSchemaNative(explorerMtl)" />
+		</transition>
+		<transition on="yes"		to="createEditObject"/>
+		<transition on="no"			to="schemaxViewAndEdit">
+			<evaluate expression="explorerMtl.setEditNodeT()" />
+		</transition>
+		<transition on="success"	to="createEditObject" />
+		<on-exit>
+			<set name="explorerMtl.action"	value="null" />
+		</on-exit>
+	</action-state>
+
+	<!-- Schema from template replace -->
+	<view-state id="patientDataEditTbh" model="explorerMtl">
+		<binder>
+			<!-- Patient -->
+			<binding property="editPatientC.patient" />
+			<binding property="editPatientC.forename" />
+			<binding property="editPatientC.sex" />
+			<binding property="bdate" required="true"/>
+		</binder>
+		<transition on="save" to="save">
+			<evaluate expression="documentService.saveChangePatient(explorerMtl)" />
+		</transition>
+		<transition on="cancel" to="schemaxViewAndEdit"/>
+	</view-state>
+	<view-state id="patientDataSeekTbh" model="explorerMtl">
+		<binder>
+			<!-- Patient -->
+			<binding property="editPatientC.patient" />
+			<binding property="editPatientC.forename" />
+			<!-- 
+			<binding property="editPatientC.birthdate" />
+			<binding property="bdate" converter="shortDate" required="true"/>
+			 -->
+			<binding property="editPatientC.sex" />
+			<binding property="bdate" required="true"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------patientDataSeekx-----patientData----')" />
+		</on-entry>
+		<on-render>
+			<evaluate expression="documentService.seekPatient(explorerMtl)" />
+		</on-render>
+		<transition on="newPatient" to="beginDateTbh">
+			<evaluate expression="explorerMtl.setNewPatient(documentService.getFolder('patient'))" />
+			<set name="formUtil.mode"	value="'beginDate'" />
+		</transition>
+		<transition on="use" to="beginDateTbh">
+			<set name="explorerMtl.idt"	value="requestParameters.idt" />
+			<evaluate expression="documentService.addSessionPatient(explorerMtl)" />
+			<set name="formUtil.mode"	value="'beginDate'" />
+		</transition>
+		<transition on="seek"/>
+	</view-state>
+	<view-state id="beginDateTbh" model="explorerMtl">
+		<binder>
+			<binding property="bdate" required="true"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="explorerMtl.editStepPatient()" />
+		</on-entry>
+		<transition on="save" to="save2patient">
+			<evaluate expression="formUtil.logline('--------save2patient----------1'+explorerMtl.getBdate())" />
+			<evaluate expression="formUtil.logline('--------save2patient----------1')" />
+			<evaluate expression="documentService.saveSchema2Patient(explorerMtl)" />
+			<evaluate expression="formUtil.logline('--------save2patient----------2')" />
+		</transition>
+	</view-state>
+
+	<!-- Schema from template replace -->
+	
+	<end-state id="save"			commit="true" view="externalRedirect:/schema?id=#{id}&amp;part=#{formUtil.part}" />
+	<end-state id="saveNewDoc"		commit="true" view="externalRedirect:/schema?id=#{formUtil.newTaskT.id}" />
+	<end-state id="save2patient"	commit="true" view="externalRedirect:/schema?id=#{explorerMtl.idt}" />
+	<end-state id="cancel"			view="externalRedirect:/schema?id=#{id}&amp;part=#{formUtil.part}" />
+
+</flow>

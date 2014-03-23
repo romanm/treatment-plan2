@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<!-- Appenders -->
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%L\t…%20.20c.%M()\t- %m%n" />
+			<!-- 
+			<param name="ConversionPattern" value="%L [%20.20c.%M()]\t- %m%n" />
+			<param name="ConversionPattern" value="%L\t%c.%M() - %m%n" />
+			<param name="ConversionPattern" value="%L\t%-5p: %c.%M() - %m%n" />
+			<param name="ConversionPattern" value="%L\t%-5p: %c.%M()\n - %m%n" />
+			<param name="ConversionPattern" value="%L\t%-5p: %c - %m%n" />
+			 -->
+		</layout>
+	</appender>
+
+		<!-- 
+		<param name="File" value="logs/qwit.log" />
+		<param name="File" value="../webapps/WebCatStruts/WEB-INF/log/LifeCare_WebCat.log" />
+		 -->
+		 <!-- 
+		  -->
+	<appender name="filelogger" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+		<param name="File" value="${catalina.home}/logs/ows.log" />
+		<param name="Append" value="true"/>
+		<param name="Threshold" value="DEBUG"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{HH:mm:ss:SSS} - %p - %C{1} - %m%n"/>
+		</layout>
+	</appender>
+
+	<!-- smpt appender - log fatal errors -->
+	<!-- 
+	<appender name="emailToAdmin" class="org.apache.log4j.net.SMTPAppender">
+	  <param name="BufferSize" value="512" />
+	  <param name="SMTPHost" value="smtp.gmail.com:465" />
+	  <param name="From" value="qwit7@krankenhaus.com" />
+	  <param name="To" value="sk07sk@googlemail.com, roman.mishchenko@googlemail.com" />
+	  <param name="Subject" value="QWIT7 on Krankenhaus.com" />
+	  <layout class="org.apache.log4j.PatternLayout">
+	    <param name="ConversionPattern"
+	      value="[%d{ISO8601}]%n%n%-5p%n%n%c%n%n%m%n%n" />
+	  </layout>
+	  <filter class="org.apache.log4j.varia.LevelRangeFilter">
+	    <param name="LevelMin" value="error" />
+	    <param name="LevelMax" value="fatal" />
+	  </filter>
+	</appender>
+	 -->
+	
+<!--
+	<logger name="org.springframework.beans"> <level value="warn" /> </logger> 
+	<logger name="org.springframework.binding"> <level value="debug" /> </logger> 
+	<logger name="org.springframework.jdbc"> <level value="warn" /> </logger> 
+	<logger name="org.springframework.transaction"> <level value="warn" /> </logger> 
+	<logger name="org.springframework.orm"> <level value="warn" /> </logger> 
+	<logger name="org.springframework.web"> <level value="debug" /> </logger> 
+	<logger name="org.springframework.webflow"> <level value="debug" /> </logger>
+-->
+	<logger name="com.qwit"> 
+		<level value="debug" /> 
+		<!-- TODO sreibt zwei mal in consol. 
+		<appender-ref ref="console" />
+		 -->
+	</logger>
+	<!-- 
+	 -->
+	<logger name="com.qwit.filelogger"> 
+		<level value="warn" /> 
+		<appender-ref ref="filelogger" />
+	</logger>
+	
+	<!-- Root Logger -->
+	<root>
+		
+		<priority value="warn" />
+		<appender-ref ref="console" />
+		<!-- 
+		<appender-ref ref="emailToAdmin" />
+		 -->
+	</root>
+	
+</log4j:configuration>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<form:form id="pdf" modelAttribute="explorerMtl">
+	<form:select path="bdate" size="3">
+		<c:set var="tuboTime" value="${owsSession.tumorboardDate}"/>
+		<fmt:formatDate var="mdy" value="${tuboTime.time}" pattern="MM-dd-yyyy" />
+		<option value="${mdy}" selected="selected">
+			<fmt:formatDate value="${tuboTime.time}" dateStyle="short" />
+			<fmt:formatDate value="${tuboTime.time}" pattern=" (EE)" />
+		</option>
+		<spring:eval var="tuboTime" expression="jxp.addDay2calendar(tuboTime,7)"></spring:eval>
+		<fmt:formatDate var="mdy" value="${tuboTime.time}" pattern="MM-dd-yyyy" />
+		<form:option value="${mdy }" >
+			<fmt:formatDate value="${tuboTime.time}" dateStyle="short" />
+			<fmt:formatDate value="${tuboTime.time}" pattern=" (EE)" />
+		</form:option>
+		<spring:eval var="tuboTime" expression="jxp.addDay2calendar(tuboTime,7)"></spring:eval>
+		<fmt:formatDate var="mdy" value="${tuboTime.time}" pattern="MM-dd-yyyy" />
+		<form:option value="${mdy }" >
+			<fmt:formatDate value="${tuboTime.time}" dateStyle="short" />
+			<fmt:formatDate value="${tuboTime.time}" pattern=" (EE)" />
+		</form:option>
+	</form:select>
+	<form:errors path="*"/>
+	<div>
+		<input type="submit" id="bdSave"	name="_eventId_save"	value="${ui_button_save}"/>
+		<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}"/>
+	</div>
+</form:form>
+
+</jsp:root>

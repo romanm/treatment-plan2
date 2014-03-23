@@ -1,0 +1,42 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+>
+
+<form:form id="f2" modelAttribute="flowObjCreator">
+	<form:errors path="*"/>
+	<form:hidden id="idf" path="idf" />
+	<form:hidden id="folder" path="folder" />
+	<table>
+		<tr><th><fmt:message key="ui_secondName" /> </th><td><form:input path="newPatient.patient" cssStyle="width:137px" /></td></tr>
+		<tr><th><fmt:message key="ui_firstName" /> </th><td><form:input path="newPatient.forename" cssStyle="width:137px" /></td></tr>
+		<tr><th><fmt:message key="ui_gender" /></th>
+			<td>
+				<form:radiobutton path="newPatient.sex" value="M" />
+				<form:radiobutton path="newPatient.sex" value="F" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<div class="b">
+					<fmt:message key="ui_birthday" />
+				</div>
+				<form:input path="bdate" cssStyle="width:137px" />
+				<script type="text/javascript">	Spring.addDecoration(new Spring.ElementDecoration({
+					elementId : "bdate",	widgetType : "dijit.form.DateTextBox",
+					widgetAttrs : { datePattern : "MM-dd-yyyy", required : true }
+				}));
+				</script>
+				<!--
+					widgetAttrs : { datePattern : "dd.MM.yyyy", required : true }
+				 -->
+			</td>
+		</tr>
+		<tr><th></th>
+			<td> <input type="submit" name="_eventId_save"		value="${ui_button_save}"/> </td>
+		</tr>
+	</table>	
+</form:form>
+
+</jsp:root>

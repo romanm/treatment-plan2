@@ -1,0 +1,33 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="ts"		type="com.qwit.domain.Ts" required="true"/>
+<jsp:directive.attribute name="dose2Tablete"	type="com.qwit.model.Dose2Tablete" required="true"/>
+<jsp:directive.attribute name="mealPosition"	type="java.lang.Integer"/>
+
+<c:set var="dayT"	value="${ts.timesT.parentT}" />
+<c:set var="drugT"	value="${dayT.parentT}" />
+<spring:eval var="timesT" expression="jxp.child(dayT,'times',1)" />
+<fmt:formatNumber var="em" pattern="#">${mealPosition/2+1}</fmt:formatNumber>
+<c:set var="mal" value="${fn:length(fn:replace(fn:replace(fn:substring(timesT.mtlO.abs,0,mealPosition),'=',''),'0',''))+1}" />
+
+<c:set var="drugMalTabletML"	value="${dose2Tablete.drugMalTabletML[drugT]}" />
+
+<c:if test="${not empty drugMalTabletML}">
+	<spring:eval var="malTabletL" expression="drugMalTabletMS.get(malPosition)" />
+	<c:forEach var="m" varStatus="s"	items="${malTabletL}">
+		<c:if test="${m>0}">
+			<c:if test="${not s.first and m>0 }">, </c:if>
+		${m}
+		x
+		<fmt:formatNumber pattern="####">${dose2Tablete.drugTableteM[drugT][s.count-1].value}</fmt:formatNumber>
+		</c:if>
+	</c:forEach>
+</c:if>
+</jsp:root>

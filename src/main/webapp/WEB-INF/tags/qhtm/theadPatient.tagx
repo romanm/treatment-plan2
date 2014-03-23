@@ -1,0 +1,39 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="colspan" type="java.lang.Integer" required="true" description="colspan"/>
+
+<!--
+<c:if test="${not empty patientMtl or not empty schemaMtl }">
+<tr style="border: 1px solid black;text-align: left;">
+	<td colspan="${colspan}">
+		<c:choose>
+			<c:when test="${not empty patientMtl}">
+				<div style="float: right;"><spring:message code="ui_doctorSignature" />: _______</div>
+				<div>
+					<qhtm:aPatientName />
+					<fmt:message key="ui_diagnose"/>: 
+					<spring:eval var="diagnoseT" expression="jxp.diagnoseT(patientMtl)" />
+					<c:set var="diagnoseC" value="${patientMtl.classM[diagnoseT.idClass]}" />
+					${diagnoseC.diagnose}
+				</div>
+				<div style="float: right;"><spring:message code="ui_nurseShift" /></div>
+				<qhtm:divOldBsa />
+			</c:when>
+			<c:otherwise>
+				<qhtm:a idt="${schemaMtl.docT.id}" action="patientData">
+					<mtl:patientName />
+				</qhtm:a>
+			</c:otherwise>
+		</c:choose>
+	</td>
+</tr>
+</c:if>
+-->
+
+</jsp:root>

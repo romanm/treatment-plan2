@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="logicT" type="com.qwit.domain.Tree"
+	required="true" description="The expr tree object"/>
+<c:set var="eq1exprT" value="${logicT.childTs[0].childTs[0]}" />
+<c:choose>
+	<c:when test="${'expr'==eq1exprT.tabName and fn:contains(eq1exprT.mtlO.value,'forBegin')}">
+		<fmt:message key="mtl_expr_value_${eq1exprT.mtlO.value }" />
+		<c:forEach var="drugT" items="${eq1exprT.childTs}">
+			<c:out value=" " />
+			<mtl:drug drugT="${drugT}"/>
+		</c:forEach>
+	</c:when>
+	<c:when test="${'equality'==logicT.mtlO.expr}">
+		<mtl:ifElement exprT="${logicT.childTs[0].childTs[0]}" />
+		${logicT.mtlO.value}
+		<mtl:ifElement exprT="${logicT.childTs[1].childTs[0]}" />
+	</c:when>
+	<c:when test="${'andOrExpr'==logicT.mtlO.expr}">
+		<c:forEach var="equalityT" items="${logicT.childTs}" varStatus="stat">
+			<mtl:ifElement exprT="${equalityT.childTs[0].childTs[0]}"/>
+			${equalityT.mtlO.value}
+			<mtl:ifElement exprT="${equalityT.childTs[1].childTs[0]}" />
+		</c:forEach>
+	</c:when>
+</c:choose>
+</jsp:root>

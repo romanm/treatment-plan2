@@ -1,0 +1,25 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+
+<c:choose>
+	<c:when test="${'setIntensivDay'==currentSWFState}"/>
+	<c:when test="${'bsaDialog'==currentSWFState}"/>
+	<c:when test="${'schemaExprUse'==currentSWFState}"/>
+	<c:when test="${'chemoDoseMod'==currentSWFState}"/>
+	<c:when test="${'changeDocStatus'==formUtil.mode}"/>
+	<c:when test="${docMtl.idt==docMtl.docT.id}"/>
+	<c:when test="${'dose'==docMtl.editNodeT.tabName}"/>
+	<c:otherwise>
+		<c:if test="${'notice'==docMtl.editNodeT.tabName }">
+			<c:set var="beforeClick">setNotice();</c:set>
+		</c:if>
+		<owsui:cancelButton />
+		<input type="button" class="next" value="${ui_button_OK}"
+			onclick="${beforeClick}dojo.byId('reviseNode').click();" />
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

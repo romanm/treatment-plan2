@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<sql:query var="uh" dataSource="${owsDbSource}" scope="session" >
+SELECT 
+EXTRACT(year FROM mdate) AS year
+,EXTRACT(month from mdate) AS month
+,owuser, COUNT(*) AS cnt
+FROM history , owuser 
+WHERE idowuser=idauthor
+GROUP BY year,month,owuser
+ORDER BY year DESC,month DESC, cnt DESC
+</sql:query>
+<table>
+	<tr><th>owuser</th><th>#</th></tr>
+	<c:forEach var="uhRow" items="${uh.rows}" varStatus="stat">
+		<c:set var="rmonth" value="${uhRow.month }" />
+		<c:if test="${month!=rmonth }">
+			<c:set var="ryear" value="${uhRow.year }" />
+			<c:set var="month" value="${rmonth }" />
+			<tr>
+				<th>
+					<spring:eval var="d" expression="jxp.getYMDate(ryear,rmonth)"/>
+					<fmt:formatDate value="${d}" pattern="yyyy, MMMM" />
+				</th>
+			</tr>
+		</c:if>
+		<tr>
+			<td>${uhRow.owuser }</td>
+			<td>${uhRow.cnt }</td>
+		</tr>
+	</c:forEach>
+</table>
+</jsp:root>

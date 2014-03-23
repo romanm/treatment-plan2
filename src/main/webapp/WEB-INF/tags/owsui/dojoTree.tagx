@@ -1,0 +1,18 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+<jsp:directive.attribute name="name" />
+<jsp:directive.attribute name="query" />
+<div id="${name}Tree" class="folderTree">
+	<!-- //required for FireFox (version <9) and Opera IE7 -->
+</div>
+<script type="text/javascript">
+	var modelT = createForestStoreModel('${query}');
+	console.log(modelT);
+	createDojoTree('${name}Tree', '${query}', modelT);
+</script>
+<!-- 
+ -->
+
+</jsp:root>

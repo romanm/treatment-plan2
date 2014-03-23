@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+">
+
+	
+	<!-- 
+	<bean name="connectionFactory" class="org.springframework.amqp.rabbit.connection.SingleConnectionFactory">
+		<constructor-arg index="0" value="localhost"/>
+		<property name="username" value="guest" />
+		<property name="password" value="guest" />
+	</bean>
+	
+	<bean id="messageListenerContainer"
+		class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
+		<property name="connectionFactory" ref="connectionFactory" />
+		<property name="queueName" value="mtl.doc.request" />
+		<property name="concurrentConsumers" value="5" />
+		<property name="messageListener" ref="messageListenerAdapter" />
+	</bean>
+	
+	<bean id="messageListenerAdapter"
+		class="org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter">
+		<property name="delegate" ref="serverHandler" />
+		<property name="messageConverter" ref="serializerMessageConverter" />
+	</bean>
+	
+	<bean name="serializerMessageConverter"
+		class="org.springframework.amqp.support.converter.SerializerMessageConverter">
+	</bean>
+
+	<bean name="serverHandler" class="com.qwit.amqp.ServerHandler"/>
+
+	<bean name="cScf" class="org.springframework.amqp.rabbit.connection.SingleConnectionFactory">
+		<constructor-arg index="0" value="localhost"/>
+		<property name="username" value="guest" />
+		<property name="password" value="guest" />
+	</bean>
+
+	<bean id="cMessageListenerContainer"
+		class="org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer">
+		<property name="connectionFactory" ref="cScf" />
+		<property name="queueName" value="hello.world.queue" />
+		<property name="concurrentConsumers" value="5" />
+		<property name="messageListener" ref="cMessageListenerAdapter" />
+	</bean>
+	<bean id="cMessageListenerAdapter"
+		class="org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter">
+		<property name="delegate" ref="clientHandler" />
+		<property name="messageConverter" ref="serializerMessageConverter2" />
+	</bean>
+	
+	<bean name="serializerMessageConverter2"
+		class="org.springframework.amqp.support.converter.SerializerMessageConverter"/>
+	
+	<bean name="serverHandler" class="com.qwit.amqp.ServerHandler"/>
+	<bean name="clientHandler" class="com.qwit.amqp.ClientHandler"/>
+	 -->
+</beans>

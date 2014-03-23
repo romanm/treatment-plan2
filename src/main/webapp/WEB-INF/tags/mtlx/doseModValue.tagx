@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="drugT"	type="com.qwit.domain.Tree"	required="true"/>
+<jsp:directive.attribute name="day"	type="java.lang.Integer"/>
+<jsp:directive.attribute name="ts"		type="com.qwit.domain.Ts"/>
+
+<spring:eval var="pdpT" expression="jxp.patientDoseProcentT(drugT,day)" />
+<c:if test="${not empty pdpT}">
+	<spring:eval var="pdpdT" expression="jxp.child(pdpT,'dose',1)" />
+</c:if>
+<spring:eval var="doseT" expression="jxp.child(drugT,'dose',1)" />
+<!-- 
+<spring:eval var="patientDoseProcentT" expression="jxp.pDoseProcentT(schemaMtl,doseT.parentT,0)" />
+<c:set var="dayT" value="${patientDoseProcentT.parentT.parentT}" />
+<spring:eval var="patientDoseProcentDoseT" expression="jxp.pDoseProcentDoseT(schemaMtl,doseT.parentT)" />
+ -->
+<c:set var="doseText">
+	<c:choose>
+		<c:when test="${not empty pdpdT }">
+		aaa
+		</c:when>
+		<c:when test="${not empty pdpT }">
+			<c:set var="procent" value="${pdpT.mtlO.pvalue}%"/>
+			<span title="${procent}">
+				<fmt:formatNumber pattern="##" value="${schemaMtl.calcDoseR[doseT]*pdpT.mtlO.pvalue/100}" />
+				- <b>${procent}</b>
+			</span>
+		</c:when>
+ <!-- 
+		<c:when test="${'week'==part and ts.cday!=day}">###</c:when>
+		<c:when test="${not empty patientDoseProcentDoseT or not empty patientDoseProcentT}">
+			<mtl:calcDoseValueText doseT="${doseT}"/>
+		</c:when>
+  -->
+		<c:when test="${'plan'==owsSession.schemaPart}">
+			<mtl:calcDoseValueText doseT="${doseT}" ts="${ts}"/>
+		</c:when>
+		<c:when test="${not fn:contains(doseT.mtlO.unit,'/' )}">x</c:when>
+		<c:otherwise>###</c:otherwise>
+	</c:choose>
+</c:set>
+<c:choose>
+	<c:when test="${empty schemaMtl.patientMtl}">
+		<qhtm:a editStep="editStep" idt="${doseT.id}" >${doseText}</qhtm:a>
+	</c:when>
+	<c:when test="${schemaMtl.docT==doseT.parentT.parentT}">
+		<qhtm:a editStep="f2editStep" idt="${doseT.id}" modDay="${day}" action="modDay" ts="${ts}">${doseText}</qhtm:a>
+	</c:when>
+	<c:otherwise>${doseText}</c:otherwise>
+</c:choose>
+
+</jsp:root>

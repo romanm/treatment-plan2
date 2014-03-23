@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<secured attributes="ROLE_USER" />
+	<persistence-context />
+
+	<var name="formUtil"		class="com.qwit.util.FormUtil" />
+	<var name="flowObjCreator"	class="com.qwit.util.FlowObjCreator" />
+	<input name="id"			type="int" />
+	<input name="idc"			type="int" />
+	<!-- 
+	<input name="idf"			type="int" />
+	 -->
+	<input name="folder"		type="string" />
+	<input name="search"		type="string" />
+
+	<on-start>
+		<evaluate expression="formUtil.logline('------explorer flow--------1')" />
+		<!-- 
+		<evaluate	expression="explorerService.makeExplorerMtl(folder, id, search)"	result="flowScope.explorerMtl" />
+		 -->
+		<evaluate	expression="explorerService.makeExplorerMtl(id, search)"	result="flowScope.explorerMtl" />
+		<evaluate expression="formUtil.logline('------explorer flow--------2')" />
+		<set name="flowObjCreator.idf"		value="requestParameters.id" />
+		<evaluate expression="formUtil.logline('flowObjCreator.folder=' +flowObjCreator.folder)" />		
+		<evaluate expression="formUtil.logline('------explorer flow--------3')" />
+		<evaluate expression="formUtil.logline('------explorer flow--------3 '+requestParameters.a)" />
+		<evaluate expression="formUtil.logline('------explorer flow--------3 '+explorerMtl)" />
+		<set name="explorerMtl.action"		value="requestParameters.a" />
+		<set name="explorerMtl.idc"			value="requestParameters.idc" />
+		<evaluate expression="formUtil.logline('------explorer flow--------4')" />
+		<!-- 
+		<evaluate expression="flowObjCreator.newProtocol" />
+		 -->
+		<evaluate expression="documentService.setFlushModeCommit()" />
+	</on-start>
+
+	<!--
+	<action-state id="startState">
+		<transition on="saveNewProtocol" to="saveNewProtocol">
+			<set name="formUtil.mode"		value="'newDoc'"/>
+			<set name="explorerMtl.action"	value="'newDoc'"/>
+		</transition>
+	</action-state>
+	 -->
+
+	<action-state id="handleAction">
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------handleAction-----on-entry---getAction-'+explorerMtl.getAction())" />
+			<evaluate expression="formUtil.logline('--------handleAction-----on-entry---getIdt-'+explorerMtl.getIdt())" />
+		</on-entry>
+		<!-- 
+		<evaluate expression="explorerMtl.getAction()"/>
+		 -->
+		<evaluate expression="handleAction.handleAction(explorerMtl)"/>
+		<transition on="newLabor"		to="saveNewLabor"/>
+		<transition on="newGeneric"		to="saveNewGeneric"/>
+		<transition on="newProtocol"	to="newProtocol"/>
+		<transition on="importProtocol"	to="importProtocol"/>
+		<transition on="importProtocolSynchron"	to="importProtocolSynchron"/>
+		<transition on="newPatient"		to="saveNewPatient"/>
+		<transition on="cut"	to="cancel">
+			<evaluate expression="formUtil.logline('----handleAction----cut--1--------')" />
+			<evaluate expression="explorerService.cut(explorerMtl)" />
+		</transition>
+		<transition on="copy"	to="saveNewDoc">
+			<evaluate expression="formUtil.logline('----handleAction----copy--1--------')" />
+			<evaluate expression="explorerMtl.copy()" />
+			<evaluate expression="formUtil.logline('----handleAction----copy--2--------')" />
+		</transition>
+		
+		<!-- paste the protocols -->
+		<transition on="paste"	to="save">
+			<evaluate expression="explorerService.paste(explorerMtl)" />
+		</transition>
+		
+		<!-- move tree node up -->
+		<transition on="upNode"	to="save" >
+			<evaluate expression="formUtil.logline('----upNode----' + idc)" />
+			<evaluate expression="explorerService.moveTreeNode(explorerMtl, idc, 'up')" />
+			<!-- 
+			<evaluate expression="explorerMtl.moveNode('up')" />
+			 -->
+		</transition>
+
+		<!-- move tree node down -->
+		<transition on="downNode"	to="save" >
+			<evaluate expression="formUtil.logline('----upNode----' + idc)" />
+			<evaluate expression="explorerService.moveTreeNode(explorerMtl, idc, 'down')" />
+			<!-- 
+			<evaluate expression="explorerMtl.moveNode('down')" />
+			 -->
+		</transition>
+
+		<transition on="newTreeNode"	to="newFolder" />
+		<transition on="renameTreeNode"	to="renameFolder" />
+		<transition on="deleteTreeNode"	to="deleteFolder" />
+		<transition on="deleteNode"		to="deleteNode" />
+
+		<transition on="success"	to="saveNewDoc" />
+		<on-exit>
+			<set name="explorerMtl.action"	value="null" />
+			<evaluate expression="formUtil.logline('----handleAction----exit--------')" />
+		</on-exit>
+	</action-state>
+
+	<action-state id="deleteNode">
+		<on-entry>
+			<set name="explorerMtl.idt"	value="requestParameters.idt" />
+			<evaluate expression="formUtil.logline('--------deleteNode----------'+requestParameters.idt)" />
+			<evaluate expression="formUtil.logline('--------deleteNode----------'+explorerMtl.idt)" />
+		</on-entry>
+		<evaluate expression="explorerService.deleteEditNode(explorerMtl)" />
+		<transition on="success"	to="save" >
+		<!--
+			<evaluate expression="documentService.saveSchemaNative(schemaMtl)" />
+		 -->
+		</transition>
+	</action-state>
+
+	<view-state id="newFolder" model="flowObjCreator">
+		<binder>
+			<binding property="idf"/>
+			<binding property="folder" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('----newFolder----' + idc)" />
+			<set name="formUtil.mode"			value="'newFolder'" />
+			<evaluate expression="formUtil.logline('----newFolder---flowObjCreator-' + flowObjCreator)" />
+			<set name="flowObjCreator.idf"		value="idc" />
+			<!-- 
+			<evaluate expression="formUtil.logline('newFolder' + '  idf=' + flowObjCreator.idf 
+			+ ', folder' + flowObjCreator.folder + ', idc: ' + idc )" />
+			 -->
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="formUtil.logline('----newFolder--save--' + idc)" />
+			<evaluate expression="
+			explorerService.newFolder(explorerMtl,flowObjCreator.idf,flowObjCreator.folder)" />
+		</transition>
+	</view-state>
+
+	<view-state id="renameFolder" model="flowObjCreator">
+		<binder>
+			<binding property="idf"/>
+			<binding property="folder" />
+		</binder>
+		<on-entry>
+			<set name="formUtil.mode"		value="'renameFolder'" />
+			<set name="flowObjCreator.idf"	value="idc" />
+			<evaluate expression="formUtil.logline('renameFolder' + '  idf=' + flowObjCreator.idf + ', folder' + flowObjCreator.folder + ', idc: ' + idc )" />
+			<evaluate expression="explorerService.setFolderName(flowObjCreator,idc)" />
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="explorerService.renameFolder(flowObjCreator)" />
+		</transition>
+	</view-state>
+
+	<view-state id="deleteFolder" model="flowObjCreator">
+		<!-- 
+		<binder>
+			<binding property="idf"/>
+		</binder>
+		 -->
+		<on-entry>
+		<!-- 
+			<set name="flowObjCreator.idf"		value="idc" />
+		 -->
+			<evaluate expression="formUtil.logline('deleteFolder' + '  idf=' + flowObjCreator.idf + ', idfp' +flowScope.idfp)" />
+			<evaluate expression="deleteService.deleteFolderEntry(flowObjCreator,idc)" />
+			<evaluate expression="formUtil.logline('deleteFolder 2 ')" />
+		</on-entry>
+		<transition on="cancel" to="cancel"/>
+		<transition on="save" to="save">
+			<set name="flowObjCreator.idf"		value="flowObjCreator.folderO.parentF.id" />
+			<evaluate expression="formUtil.logline('deleteFolder save 1 '+flowObjCreator.idf)" />
+			<evaluate expression="deleteService.deleteFolder(flowObjCreator)"/>
+			<evaluate expression="formUtil.logline('deleteFolder save 2 ')" />
+			<!-- 
+			<evaluate expression="explorerService.deleteFolder(flowObjCreator)" result="flowObjCreator.idf" />
+			 -->
+		</transition>
+	</view-state>
+
+	<view-state id="saveNewLabor"  view="explorer" model="flowObjCreator">
+		<binder>
+			<binding property="laborName" />
+			<binding property="laborUnit" />
+		</binder>
+		<transition on="cancel" to="cancel"/>
+		<transition on="save" to="save">
+			<evaluate expression="documentService.saveNewLabor(flowObjCreator)" />
+		</transition>
+	</view-state>
+
+	<view-state id="saveNewGeneric" model="flowObjCreator">
+		<binder>
+			<binding property="genericName" />
+		</binder>
+		<on-entry>
+			<set name="formUtil.mode"			value="'newGeneric'" />
+		</on-entry>
+		<transition on="cancel" to="cancel"/>
+		<transition on="save" to="save">
+			<evaluate expression="documentService.saveNewGeneric(flowObjCreator)" />
+		</transition>
+	</view-state>
+
+	<view-state id="newProtocol" model="flowObjCreator">
+		<binder>
+			<binding property="newProtocol.protocol" />
+			<binding property="newProtocol.protocolvar" />
+
+			<binding property="newProtocol.intentionAdjuvant" />
+			<binding property="newProtocol.intentionLine" />
+			<binding property="newProtocol.intentionRests" />
+
+			<binding property="newProtocol.schemaName" />
+			<binding property="newProtocol.duration" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--saveNewProtocol---entry---------')" />
+			<!-- 
+			<set name="flowObjCreator.mode"			value="'newProtocol'" />
+			 -->
+			<evaluate expression="documentService.saveNewProtocolEntry(flowObjCreator,explorerMtl)" />
+			<evaluate expression="formUtil.logline('saveNewProtocol' + '  idf=' + flowObjCreator.idf + ', protocol=' + flowObjCreator.newProtocol.protocol)" />
+		</on-entry>
+		<transition on="cancel" to="cancel">
+			<evaluate expression="formUtil.logline('-----cancel---------')" />
+		</transition>
+		<!-- 
+		<transition on="saveSchema" to="saveNewDoc">
+		 -->
+		<transition on="saveSchema" to="saveSchema">
+			<evaluate expression="formUtil.logline('saveNewProtocol-before save' + '  idf=' + flowObjCreator.idf + ', protocol=' + flowObjCreator.newProtocol.protocol)" />
+			<evaluate expression="documentService.saveNewProtocol(flowObjCreator)" />
+			<evaluate expression="formUtil.logline('--------------')" />
+		</transition>
+		<on-exit>
+			<evaluate expression="formUtil.logline('--saveNewProtocol---exit---------')" />
+		</on-exit>
+	</view-state>
+
+	<view-state id="importProtocol" model="flowObjCreator" >
+		<binder>
+			<binding property="idimport"/>
+			<binding property="idf"/>
+			<binding property="folder"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--importProtocol---entry---------')" />
+		</on-entry>
+		<transition on="save" to="saveImportToConfirm" >
+			<!-- OLD & BAD
+		<transition on="save" to="saveNewDoc" >
+		<transition on="save" to="importProtocolSynchron" >
+			 <evaluate expression="documentService.importProtocol(flowObjCreator)" />
+			 -->
+			<!-- NEW & GOOD
+			<evaluate expression="formUtil.logline('USE importService.importProtocolViaNetwork(flowObjCreator)')" />
+			<evaluate expression="importService.importProtocolSynchron(flowObjCreator)" />
+			 -->
+			<evaluate expression="formUtil.logline('...importProtocol...........save........1..')" />
+			<evaluate expression="importService.importProtocolViaNetwork(flowObjCreator)" />
+			<evaluate expression="formUtil.logline('...importProtocol...........save........2..')" />
+		</transition>
+	</view-state>
+
+	<view-state id="importProtocolSynchron" model="flowObjCreator" view="explorer">
+		<on-entry>
+			<evaluate expression="formUtil.logline('--importProtocolSynchron---entry---------')" />
+		</on-entry>
+		<transition on="save" to="saveNewDoc" >
+			<evaluate expression="importService.importProtocolSynchron()" />
+		</transition>
+	</view-state>
+
+	<view-state id="saveNewPatient" model="flowObjCreator">
+		<binder>
+			<binding property="newPatient.patient" />
+			<binding property="newPatient.forename" />
+			<binding property="newPatient.sex" />
+			<binding property="newPatient.insurance" />
+			<binding property="bdate" />
+			<binding property="day" />
+			<binding property="month" />
+			<binding property="year" />
+			<binding property="idf" />
+			<binding property="folder" />
+		</binder>
+		<on-entry>
+			<set name="formUtil.mode"			value="'newPatient'" />
+			<evaluate expression="formUtil.logline('saveNewPatient' + '  idf=' + flowObjCreator.idf + ', protocol=' + flowObjCreator.newPatient.patient)" />
+		</on-entry>
+		<transition on="cancel" to="cancel"/>
+		<transition on="save" to="saveNewDocPatient">
+			<evaluate expression="formUtil.logline('saveNewPatient-before save' + '  idf=' + flowObjCreator.idf + ', protocol=' + flowObjCreator.newProtocol.protocol)" />
+			<evaluate expression="documentService.saveNewPatient(flowObjCreator)" />
+			<evaluate expression="formUtil.logline('--------------')" />
+		</transition>
+	</view-state>
+
+	<end-state id="saveSchema"			commit="true" 
+		view="externalRedirect:/schema=#{flowObjCreator.idf}" />
+	<end-state id="save"			commit="true" 
+		view="externalRedirect:/explorer=#{flowObjCreator.idf}" />
+		
+	<end-state id="saveImportToConfirm"	commit="true" 
+		view="externalRedirect:/explorerflow?id=#{flowObjCreator.idf}&amp;a=importProtocolSynchron" />
+
+	<end-state id="saveNewDoc"	commit="true" 
+		view="externalRedirect:/explorer=#{flowObjCreator.idf}" />
+
+	<end-state id="saveNewDocPatient"	commit="true" 
+		view="externalRedirect:/patient=#{flowObjCreator.newPatient.id}" />
+		<!--
+		view="externalRedirect:/explorer=#{flowObjCreator.idf}&amp;search=" />
+		-->
+	<end-state id="cancel"	view="externalRedirect:/explorer=#{flowObjCreator.idf}" />
+
+	<global-transitions>
+		<transition on-exception="org.springframework.webflow.execution.ActionExecutionException" to="cancel">
+			<evaluate expression="formUtil.logerror(schemaMtl.action+'...actionExecutionException...')" />
+			<set name="flashScope.actionExecutionException" value="'actionExecutionException_'+schemaMtl.action" />
+		</transition>
+	</global-transitions>
+
+</flow>

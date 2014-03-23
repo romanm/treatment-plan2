@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="taskT"	type="com.qwit.domain.Tree" required="true"/>
+
+<c:set var="tsDay1"/>
+<c:set var="duration" value="${schemaMtl.docT.mtlO.duration}" />
+<c:set var="appNr" value="${schemaMtl.appNr}" />
+<c:set var="dddM" value="${schemaMtl.drugDoseDaysM}" />
+
+<mtl:doseModViewAll />
+
+<table id="tableEd" style="text-align: center;">
+	<c:set var="dayNr" value="0"/>
+	<thead>
+		<qhtm:theadPatient colspan="${appNr*schemaMtl.lastWeekDay+4}" />
+		<tr class="dotted small">
+			<td align="right"><fmt:message key="ui_day"/>
+			a1a ${appNr}
+			</td>
+			<c:set var="previousDay" value="-111"/>
+			<c:set var="dayNrLast" value="0" />
+			<!-- 
+			<c:forEach begin="1" end="${appNr}" var="subTaskNr">
+				<c:forEach items="${schemaMtl.weekDayS}" var="d" varStatus="stat" >
+					<c:set var="dayNrLast" value="${duration*(subTaskNr-1)+d}" />
+					<td class="${stat.count==1?'leftdouble':''}" >${duration*(subTaskNr-1)+d}</td>
+					<c:set var="dayNr" value="${dayNr+1}"/>
+				</c:forEach>
+			</c:forEach>
+			 -->
+			<c:forEach items="${schemaMtl.weekDayS}" var="d" varStatus="stat" >
+				<c:set var="dayNrLast" value="${d}" />
+				<td class="${stat.count==1?'leftdouble':''}" >${d}</td>
+				<c:set var="dayNr" value="${dayNr+1}"/>
+			</c:forEach>
+			
+			<c:if test="${dayNr==2 and schemaMtl.hasPeriod}"><td>${dayNrLast}</td></c:if>
+			<th rowspan="2" class="leftdouble" style="width:30px">
+				<fmt:message key="ui_dose"/><br/> [mg/m2]</th>
+			<th rowspan="2" style="width:30px"><fmt:message key="ui_doseCalculated"/> [mg]</th>
+			<th rowspan="2" style="width:30px"><fmt:message key="ui_therapyDays"/></th>
+		</tr>
+		<tr class="dotted">
+			<th class="select" id="th_${schemaMtl.docT.id}"><mtl:planName blockT="${schemaMtl.docT}"/></th>
+			<c:set var="dateLast"/>
+			<!-- 
+			<c:forEach begin="1" end="${appNr}" var="subTaskNr">
+				<c:forEach items="${schemaMtl.weekDayS}" var="d" varStatus="stat">
+					<c:set var="dateLast">
+						<spring:eval var="dd" 
+						expression="schemaMtl.getBeginCalendar().plusDays(duration*(subTaskNr-1)+d-1).toDate()" />
+						<fmt:formatDate value="${dd}" pattern="dd.MM"/>
+					</c:set>
+					<th class="small ${stat.count==1?'leftdouble':''}" >${dateLast}</th>
+				</c:forEach>
+			</c:forEach>
+			 -->
+			<c:forEach items="${schemaMtl.weekDayS}" var="d" varStatus="stat">
+				<c:set var="dateLast">
+					<spring:eval var="dd" 
+					expression="schemaMtl.getBeginCalendar().plusDays(d-1).toDate()" />
+					<fmt:formatDate value="${dd}" pattern="dd.MM"/>
+				</c:set>
+				<th class="small ${stat.count==1?'leftdouble':''}" >${dateLast}</th>
+			</c:forEach>
+			<c:if test="${dayNr==2 and schemaMtl.hasPeriod}"><th class="small">${dateLast}</th></c:if>
+		</tr>
+	</thead>
+	<c:if test="${taskT.id==schemaMtl.docT.id}">
+		<tbody>
+			<c:set var="drugDoseL" value=""/>
+			<c:forEach items="${schemaMtl.plan}" var="ts">
+				<c:set var="taskT" value="${ts.timesT.parentT.parentT.parentT}" />
+				<c:if test="${taskT.id==schemaMtl.taskPremedicationT.id}">
+					<c:set var="drugT" value="${ts.timesT.parentT.parentT}" />
+					<spring:eval var="doseT" expression="jxp.getDose(taskT)"/>
+					<c:set var="drugDose" value="${drugT.idClass}:${doseT.idClass}:${ts.timesT.ref}:${ts.timesT.idClass}" />
+					<c:if test="${not fn:contains(drugDoseL,drugDose)}">
+						<qhtm:trWeekDrug drugT="${drugT}" dddM="${dddM}" drugDose="${drugDose}" dayNr="${dayNr}" ts="${ts}" />
+						<c:set var="drugDoseL" value="${drugDoseL},${drugDose}" />
+					</c:if>
+				</c:if>
+			</c:forEach>
+			<c:set var="drugDoseL" value=""/>
+			<c:forEach items="${schemaMtl.plan}" var="ts">
+				<c:set var="dayT"	value="${ts.timesT.parentT}" />
+				<c:set var="taskT"	value="${dayT.parentT.parentT}" />
+				<c:if test="${taskT.id==schemaMtl.docT.id or taskT.id==schemaMtl.taskSupportT.id}">
+					<c:set var="drugT" value="${ts.timesT.parentT.parentT}" />
+					<spring:eval var="doseT" expression="jxp.getDose(drugT)"/>
+					<c:set var="drugDose" 
+					value="${drugT.idClass}:${doseT.idClass}:${ts.timesT.ref}:${ts.timesT.idClass}" />
+					<c:if test="${not fn:contains(drugDoseL,drugDose)}">
+						<c:set var="dayC" value="${schemaMtl.classM[dayT.idClass]}" />
+						<spring:eval var="isPeriod" expression="jxp.isPeriod(dayC.abs)" />
+						<c:choose>
+							<c:when test="${isPeriod}">
+								<qhtm:trWeekDrugPeriod drugT="${drugT}" ts="${ts}"/>
+							</c:when>
+							<c:otherwise>
+								<qhtm:trWeekDrug drugT="${drugT}" dddM="${dddM}" drugDose="${drugDose}" dayNr="${dayNr}" ts="${ts}"/>
+							</c:otherwise>
+						</c:choose>
+						<c:set var="drugDoseL" value="${drugDoseL},${drugDose}" />
+					</c:if>
+				</c:if>
+			</c:forEach>
+			<c:forEach items="${schemaMtl.docT.childTs}" var="drugT">
+				<c:forEach items="${drugT.childTs}" var="dayT">
+					<c:if test="${empty dayT.idClass and dayT.tabName=='day'}">
+						<qhtm:trWeekDrug drugT="${drugT}" dddM="${dddM}" drugDose="${drugDose}" dayNr="${dayNr}" ts="${ts}" />
+					</c:if>
+				</c:forEach>
+			</c:forEach>
+			<c:forEach var="drugT" items="${schemaMtl.taskSupportT.childTs}">
+				<c:forEach items="${drugT.childTs}" var="dayT">
+					<c:if test="${empty dayT.idClass and dayT.tabName=='day'}">
+						<qhtm:trWeekDrug drugT="${drugT}" dddM="${dddM}" drugDose="${drugDose}" dayNr="${dayNr}" ts="${ts}" />
+					</c:if>
+				</c:forEach>
+			</c:forEach>
+		</tbody>
+	</c:if>
+	<tbody>
+		<tr>
+			<td style="text-align: right; vertical-align: middle">
+				<fmt:message key="tag_task_signum"/>:
+			</td>
+				<c:set var="appTd"/>
+				<c:forEach begin="1" end="${appNr}" var="subTaskNr">
+					<c:forEach items="${schemaMtl.weekDayS}" var="d"  varStatus="stat">
+						<td style="border: 1px solid;${stat.count==1?'border-left: double;':''}"></td>
+					</c:forEach>
+				</c:forEach>
+			<td class="leftdouble" colspan="3" style="text-align: right; vertical-align: middle">
+				<mtl:repetitionDay/>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<br/>
+<br/>
+<div>
+	Unterschrift des Arztes am Tag 1 der Therapie: ......................................................................
+</div>
+</jsp:root>

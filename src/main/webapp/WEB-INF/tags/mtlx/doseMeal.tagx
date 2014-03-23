@@ -1,0 +1,38 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="timesC"		type="com.qwit.domain.Times" required="true"/>
+<jsp:directive.attribute name="cortisolT"	type="java.util.Map" required="true"/>
+
+<c:set var="n" value="1" />
+<c:set var="nn" value="1" />
+<c:set var="doseMeal" />
+
+<c:forEach items="${fn:split(timesC.abs,'=')}" var="m">
+	<c:set var="doseMeal" value="${doseMeal}${n>1?'-':''}" />
+	<c:choose>
+		<c:when test="${m=='1'}">
+			<c:set var="mgProMalT" value="${cortisolT[nn]}"/>
+			<c:choose>
+				<c:when test="${nn==2}"><c:set var="mgProMalT" value="${cortisolT['2']}"/></c:when>
+				<c:when test="${nn==3}"><c:set var="mgProMalT" value="${cortisolT['3']}"/></c:when>
+				<c:when test="${nn==4}"><c:set var="mgProMalT" value="${cortisolT['4']}"/></c:when>
+			</c:choose>
+			<c:set var="mgProMalC"	value="${schemaMtl.classM[mgProMalT.idClass]}"/>
+			<c:set var="doseMeal"	value="${doseMeal}${mgProMalC.pvalue}" />
+			<c:set var="nn" value="${nn+1}" />
+		</c:when>
+		<c:otherwise>
+			<c:set var="doseMeal" value="${doseMeal}0" />
+		</c:otherwise>
+	</c:choose>
+	<c:set var="n" value="${n+1}" />
+</c:forEach>
+${doseMeal}
+</jsp:root>

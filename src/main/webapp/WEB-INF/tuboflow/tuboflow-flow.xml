@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<secured attributes="ROLE_USER" />
+	<persistence-context />
+
+	<var name="formUtil"	class="com.qwit.util.FormUtil" />
+	<input name="id"		type="int" required="true" />
+	<!-- 
+	<input name="idc"		type="int" required="true" />
+	 -->
+
+	<on-start>
+		<evaluate expression="documentService.setFlushModeCommit()" />
+		<evaluate expression="formUtil.logline('-----on-start---'+requestParameters.id)" />
+		<evaluate expression="formUtil.logline('-----on-start---'+requestParameters.idc)" />
+		<!--
+		<evaluate expression="documentService.makeTumorboard(id,requestParameters.idc)" result="flowScope.patientMtl" />
+		-->
+		<evaluate expression="documentService.makeTumorboard(id,requestParameters.idt)" result="flowScope.patientMtl" />
+		<evaluate expression="formUtil.logline('-----on-start--2-')" />
+	</on-start>
+
+	<action-state id="handleAction">
+		<on-entry>
+			<evaluate expression="patientMtl.checkEditNodeId(requestParameters.idt,requestParameters.idc)" />
+			<evaluate expression="formUtil.logline('--handleAction---on-entry--end-')" />
+		</on-entry>
+		<!-- 
+		<evaluate expression="patientMtl.handleAction(requestParameters.a)"/>
+		 -->
+		<evaluate expression="handleAction.handleActionTubo(patientMtl,requestParameters.a)"/>
+		
+		<!-- Noticen -->
+		<transition on="ows_tumorboard_tinyAnamnese"	to="tuboNoticeEdit" >
+			<evaluate expression="tumorboardService.makeCheckItemNotice(patientMtl,'Kurzanamnese')" />
+		</transition>
+		<transition on="ows_tumorboard_diagnose2"	to="tuboNoticeEdit" >
+			<evaluate expression="tumorboardService.makeCheckItemNotice(patientMtl,'Relev. Begleiterkrankungen')" />
+		</transition>
+		<transition on="ows_tumorboard_tumorMarker"	to="tuboNoticeEdit" >
+			<evaluate expression="tumorboardService.makeCheckItemNotice(patientMtl,'TumorMarker')" />
+		</transition>
+		<transition on="ows_tumorboard_findingCT"	to="tuboNoticeEdit" >
+			<evaluate expression="tumorboardService.makeCheckItemNotice(patientMtl,'CT- Befunde')" />
+		</transition>
+		<transition on="newNotice"	to="tuboNoticeEdit" >
+			<evaluate expression="formUtil.logline('--------newNotice------')" />
+			<evaluate expression="tumorboardService.makeCheckItemNotice(patientMtl)" />
+		</transition>
+		<transition on="notice"		to="tuboNoticeEdit" >
+			<evaluate expression="formUtil.logline('----handleAction----notice------')" />
+		</transition>
+		<transition on="save"	to="save" >
+			<evaluate expression="documentService.savePatientNative(patientMtl)" />
+		</transition>
+		<transition on="deleteNode"	to="save" >
+			<evaluate expression="formUtil.logline('--------handleAction------'+patientMtl.getDocT())" />
+			<evaluate expression="documentService.deleteEditNode(patientMtl)" />
+			<evaluate expression="documentService.savePatientNative(patientMtl)" />
+		</transition>
+		<transition on="newDiagnose"	to="tuboDiagnoseEdit" >
+		</transition>
+		
+		<transition on="success"	to="tuboViewAndEdit" />
+		<on-exit>
+			<evaluate expression="formUtil.logline('---handleAction-----on-exit------')" />
+			<set name="patientMtl.action"	value="null" />
+		</on-exit>
+	</action-state>
+
+	<view-state id="tuboViewAndEdit" model="patientMtl">
+		<binder>
+			<binding property="action" />
+			<binding property="idt" />
+			<binding property="idc" />
+			<!-- Notice -->
+			<binding property="editNoticeC.notice" />
+			<binding property="editNoticeC.type" />
+		</binder>
+		<transition on="editStep"	to="handleAction" />
+		<transition on="save"		to="handleAction" >
+			<set name="patientMtl.action"	value="'save'" />
+		</transition>
+		<transition on="cancel"		to="cancel" >
+			<set name="formUtil.mode"	value="''" />
+			<evaluate expression="patientMtl.editStepCancel()" />
+		</transition>
+	</view-state>
+
+	<view-state id="tuboTNMEdit" model="patientMtl">
+	</view-state>
+	<view-state id="tuboDiagnoseEdit" model="patientMtl">
+		<binder>
+			<binding property="action" />
+			<binding property="idt" />
+			<binding property="idc" />
+			<binding property="editDiagnoseO.diagnose" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------tuboNoticeEdit------')" />
+			<evaluate expression="documentService.addNewDiagnose(patientMtl)" />
+		</on-entry>
+		<transition on="editStep"	to="handleAction" >
+			<evaluate expression="formUtil.logline('--------tuboNoticeEdit----editStep--')" />
+			<evaluate expression = "documentService.reviseDiagnose(patientMtl)" />
+		</transition>
+		<transition on="insertDiagnose"	to="tuboViewAndEdit" >
+			<evaluate expression = "documentService.reviseDiagnose(patientMtl,requestParameters.idt)" />
+		</transition>
+		<!-- 
+		<transition on="ok"	to="tuboViewAndEdit" >
+			<evaluate expression="patientMtl.closeEditId()" />
+			<evaluate expression = "documentService.reviseDiagnose(patientMtl)" />
+		</transition>
+		 -->
+		<transition on="cancel"		to="cancel" >
+			<set name="formUtil.mode"	value="''" />
+			<evaluate expression="patientMtl.editStepCancel()" />
+		</transition>
+	</view-state>
+
+	<view-state id="tuboNoticeEdit" model="patientMtl">
+		<binder>
+			<binding property="idt" />
+			<binding property="editNoticeC.notice" />
+			<binding property="editNoticeC.type" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------tuboNoticeEdit------')" />
+			<evaluate expression="patientMtl.openEditNotice()" />
+		</on-entry>
+		<!-- 
+		<transition on="ok"	to="handleAction" >
+			<evaluate expression="patientMtl.closeEditId()" />
+		</transition>
+		 -->
+		<transition on="part"	/>
+		<transition on="editStep"	to="handleAction" >
+			<evaluate expression="patientMtl.checkCloseEditId()" />
+			<evaluate expression="formUtil.logline('--------tuboNoticeEdit----editStep--')" />
+		</transition>
+		<transition on="cancel"		to="cancel" >
+			<set name="formUtil.mode"	value="''" />
+			<evaluate expression="patientMtl.editStepCancel()" />
+		</transition>
+		<on-exit>
+			<evaluate expression = "documentService.reviseNotice(patientMtl)" />
+		</on-exit>
+	</view-state>
+
+	<end-state id="save"	commit="true" view="externalRedirect:/tumorboard?id=#{patientMtl.tuboId}" />
+	<end-state id="cancel"	view="externalRedirect:/tumorboard?id=#{patientMtl.tuboId}" />
+
+</flow>

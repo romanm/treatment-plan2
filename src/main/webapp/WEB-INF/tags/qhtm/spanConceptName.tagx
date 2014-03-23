@@ -1,0 +1,23 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="rowMap" type="java.util.Map" required="false" description="The schema sql row map"/>
+<jsp:directive.attribute name="conceptO" type="com.qwit.domain.Protocol" />
+	<!-- 
+	 -->
+	<c:choose>
+		<c:when test="${not empty conceptO}"><c:set var="conceptE" value="${conceptO}" /></c:when>
+		<c:when test="${not empty rowMap}"><c:set var="conceptE" value="${rowMap}" /></c:when>
+	</c:choose>
+	<span title="variant:${conceptE.protocolvar}">
+		<c:out value="${conceptE.protocol}" />
+	</span>
+	<!-- 
+	<c:out value="${conceptE.protocol} ${conceptE.protocolvar}" />
+	 -->
+	<c:choose>
+		<c:when test="${not empty conceptO}"><qhtm:spanConceptIntention conceptO="${conceptO}" /></c:when>
+		<c:when test="${not empty rowMap}"><qhtm:spanConceptIntention rowMap="${rowMap}" /></c:when>
+	</c:choose>
+</jsp:root>

@@ -1,0 +1,19 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+<jsp:directive.page language="java" contentType="text/json; charset=UTF-8" pageEncoding="UTF-8"/>
+${formUtil.jsonDrugs}
+${formUtil.folderTreeJSON}
+<c:set var="debug">
+<!--
+{'identifier':'id','label':'name','items':
+	[   
+		{'id':'9932', 'name':'protocol' ,  'children':
+			[ 
+				{'id':'4975090989898', 'name':'Test Protocol', 'parentId':'9932', 'parentName':'protocol' }
+			]
+		}
+	]
+}
+-->
+</c:set>
+</jsp:root>

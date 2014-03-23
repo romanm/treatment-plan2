@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+    <secured attributes="ROLE_USER" />
+    <persistence-context />
+
+    <var name="drugC"	class="com.qwit.domain.Drug" />
+    <var name="laborC"	class="com.qwit.domain.Labor" />
+    <var name="list"	class="java.util.ArrayList" />
+    <var name="tree"	class="com.qwit.domain.Tree" />
+    <var name="folderDocRootO"
+             class="com.qwit.domain.Folder" />
+
+    <var name="formUtil"	class="com.qwit.util.FormUtil" />
+    <input name="id"		type="int" required="true" />
+    <input name="idt"		type="int" />
+    <input name="idc"		type="int" />
+    <input name="a"			type="string" />
+
+    <on-start>
+        <evaluate expression="documentService.setFlushModeCommit()" />
+        <evaluate expression="documentService.makeDrugMtl(id)" result="flowScope.drugMtl" />
+        <set name="drugMtl.idt"		value="requestParameters.idt" />
+        <set name="drugMtl.idc"		value="requestParameters.idc" />
+        <set name="drugMtl.action"	value="requestParameters.a" />
+        <set name="formUtil.jsonDrugs"		value="documentService.getJsonDrugs()" />
+        <set name="formUtil.jsonDoseUnit"	value="documentService.getJsonDoseUnit()" />
+        <set name="formUtil.jsonDoseApp"	value="documentService.getDoseApp()" />
+        <set name="formUtil.jsonLabor"		value="documentService.getJsonLabors()" />
+        <set name="formUtil.jsonLaborUnits"	value="documentService.getJsonLaborUnits()" />
+        <set name="formUtil.jsonFinding"	value="documentService.getJsonFindings()" />
+        <set name="formUtil.jsonFindingUnits"	value="documentService.getJsonFindingUnits()" />
+        <set name="formUtil.jsonSymptoms"	value="documentService.getJsonSymptoms()" />
+    </on-start>
+
+    <action-state id="handleAction">
+        <!-- 
+             		<evaluate expression="drugMtl.getAction()"/>
+             		<evaluate expression="drugMtl.isNewEdit()"/>
+      	 -->
+        <evaluate expression="handleAction.handleAction(drugMtl)"/>
+        <transition on="newTablet"		to="drugNewTablet"/>
+        <transition on="newTrade"		to="saveNewTrade"/>
+        <transition on="editDrugName"		to="saveDrugName"/>
+                
+        <transition on="importSchema"	to="importSchema"/>
+        <transition on="taskSupport"	to="createEditObject">
+            <evaluate expression="formUtil.logline('--------taskSupport------------')" />
+            <evaluate expression="documentService.initInsideTask(drugMtl,'support')" />
+            <evaluate expression="formUtil.logline('--------taskSupport------------')" />
+            <evaluate expression="drugMtl.relocateEditNode(drugMtl.getTaskSupportT())" />
+            <evaluate expression="formUtil.logline('--------taskSupport------------')" />
+        </transition>
+        <transition on="taskPremedication" to="createEditObject">
+            <evaluate expression="documentService.initInsideTask(drugMtl,'taskPremedication')" />
+            <evaluate expression="drugMtl.relocateEditNode(drugMtl.getTaskPremedicationT())" />
+        </transition>
+        <transition on="taskHomeTablet" to="createEditObject">
+            <evaluate expression="documentService.initInsideTask(drugMtl,'taskHomeTablet')" />
+            <evaluate expression="drugMtl.relocateEditNode(drugMtl.getTaskHomeTabletT())" />
+        </transition>
+		
+        <transition on="copy"	to="drugxViewAndEdit">
+            <evaluate expression="formUtil.logline('---handleAction-----copy--1--')" />
+            <evaluate expression="copyPasteService.copyFromDoc(drugMtl)" />
+            <!-- 
+        			<evaluate expression="drugMtl.copy()" />
+        			 -->
+            <evaluate expression="formUtil.logline('---handleAction-----copy--2--')" />
+            <!--
+         			<set name="userCareSessionContainer.userCareSession.copyNodeT"	value="schemaMtl.copyNodeT" />
+         			-->
+        </transition>
+        <transition on="paste"	to="save">
+            <!--
+         			<set name="schemaMtl.copyNodeT"	value="userCareSessionContainer.userCareSession.copyNodeT" />
+         			-->
+            <evaluate expression="formUtil.logline('--------paste--1--')" />
+            <evaluate expression="copyPasteService.pasteSourceTarget(drugMtl)" />
+            <!-- 
+        			<evaluate expression="drugMtl.paste()" />
+        			 -->
+            <evaluate expression="formUtil.logline('--------paste--2--')" />
+            <evaluate expression="documentService.saveDrugDoc(drugMtl)" />
+            <evaluate expression="formUtil.logline('--------paste--3--')" />
+        </transition>
+
+        <transition on="newAdditionalDrug" to="createEditObject">
+            <set name="tree"	value="drugDrugCreator.setTreeManager(drugMtl).addChild()" />
+            <!-- 
+        			<evaluate expression="drugMtl.getDdrug(drugMtl.getParentT()).add(tree)" />
+        			 -->
+            <evaluate expression="drugMtl.setIdt(tree.getId())" />
+        </transition>
+        <transition on="newTaskNotice" to="createEditObject">
+            <evaluate expression="drugMtl.setIdt(taskNoticeCreator.setTreeManager(drugMtl).addChild().getId())" />
+        </transition>
+		
+        <transition on="Notice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'')" />
+        </transition>
+        <transition on="noticeNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'notice')" />
+        </transition>
+        <transition on="tubo_adviceNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'tubo_advice')" />
+        </transition>
+        <transition on="summeDoseExpr" to="summeDoseExpr"/>
+        <transition on="totalsdoseNotice" to="summeDoseNotice">
+            <!-- 
+                			<evaluate expression="documentService.addNotice(drugMtl,'totalsdose')" />
+         		 -->
+        </transition>
+        <transition on="portNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'port')" />
+        </transition>
+        <transition on="tdaNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'tda')" />
+        </transition>
+        <transition on="breNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'bre')" />
+        </transition>
+        <transition on="literatureNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'literature')" />
+        </transition>
+        <transition on="paravasatNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'paravasat')" />
+        </transition>
+        <transition on="interactionNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'interaction')" />
+        </transition>
+        <transition on="toxicityNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'toxicity')" />
+        </transition>
+        <transition on="dreductionNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'dreduction')" />
+        </transition>
+        <transition on="dreductionHematoToxNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'dreductionHematoTox')" />
+        </transition>
+        <transition on="scriteriaNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'scriteria')" />
+        </transition>
+        <transition on="laborNotice" to="createEditObject">
+            <evaluate expression="documentService.addNotice(drugMtl,'labor')" />
+        </transition>
+		
+        <transition on="newNotice"		to="createEditObject">
+            <evaluate expression="drugMtl.setIdt(nodeCreator.setTagName('notice').setTreeManager(drugMtl).addChild().getId())" />
+        </transition>
+		
+        <transition on="newMaxDose"		to="createEditObject">
+            <evaluate expression="drugMtl.newMaxDose('maxDose', exprCreator, doseCreator, nodeCreator)" />
+        </transition>
+        <transition on="maxDoseCumulative"
+                            to="createEditObject">
+            <evaluate expression="drugMtl.newMaxDose('maxDoseCumulative', exprCreator, doseCreator, nodeCreator)" />
+        </transition>
+        <transition on="newLiterature"		to="createEditObject">
+            <evaluate expression="formUtil.logline('--------newLiterature--1--')" />
+            <evaluate expression="formUtil.logline('--------newLiterature--2--')" />
+            <evaluate expression="drugMtl.setIdt(nodeCreator.setTagName('literature').setTreeManager(drugMtl).addChild().getId())" />
+            <evaluate expression="formUtil.logline('--------newLiterature--3--')" />
+        </transition>
+        <transition on="newSymptom"		to="createEditObject">
+            <evaluate expression="drugMtl.setIdt(nodeCreator.setTagName('symptom').setTreeManager(drugMtl).addChild().getId())" />
+        </transition>
+        <transition on="newDrug"		to="createEditObject">
+            <!--evaluate expression="drugMtl.setIdt(taskDrugCreator.setTreeManager(drugMtl).addChild().getId())" / -->
+            <evaluate expression="formUtil.logline('--------newDrug--1--')" />
+            <evaluate expression="schemaService.addTaskDrug(drugMtl)" />
+            <evaluate expression="formUtil.logline('--------newDrug--2--')" />
+        </transition>
+        <transition on="newApp" to="createEditObject">
+            <evaluate expression="documentService.addApp(drugMtl)" />
+        </transition>
+        <transition on="newSupportDrug"	to="createEditObject">
+            <evaluate expression="documentService.setBlockSupportDrug(drugMtl, taskDrugCreator)" />
+        </transition>
+        <transition on="newLabor"		to="createEditObject">
+            <evaluate expression="drugMtl.setIdt(taskLaborCreator.setTreeManager(drugMtl).addChild().getId())" />
+        </transition>
+        <transition on="setBlockId"		to="drugxViewAndEdit">
+            <evaluate expression="drugMtl.setBlockId(requestParameters.idt)" />
+        </transition>
+        <transition on="newBlockGcsf"		to="drugxViewAndEdit">
+            <evaluate expression="formUtil.logline('--------newBlockGcsf----')" />
+            <evaluate expression="documentService.initTaskInsideDrug(drugMtl,'drug','gcsf')" />
+            <evaluate expression="formUtil.logline('--------newBlockGcsf----')" />
+        </transition>
+        <transition on="newBlock"		to="drugxViewAndEdit">
+            <evaluate expression="formUtil.logline('--------newBlock----')" />
+            <evaluate expression="documentService.initTaskInsideDrug(drugMtl,'drug','inside')" />
+            <evaluate expression="formUtil.logline('--------newBlock----')" />
+        </transition>
+        <transition on="drugGruppe"		to="drugxViewAndEdit">
+            <set name="formUtil.mode"	value="'drugGruppe'" />
+            <set name="folderDocRootO"	value="documentService.readFolderDoc()" />
+        </transition>
+        <transition on="rewriteOK"		to="drugxViewAndEdit">
+            <set name="formUtil.mode"	value="'rewriteOK'" />
+        </transition>
+        <transition on="deleteNode"		to="deleteNode" />
+        <transition on="save"			to="save">
+            <evaluate expression="documentService.saveDrugDoc(drugMtl)" />
+        </transition>
+        <transition on="yes"			to="createEditObject"/>
+        <transition on="no"				to="drugxViewAndEdit">
+            <evaluate expression="drugMtl.setEditNodeT()" />
+        </transition>
+
+        <transition on="upNode"		to="sort1to2" >
+            <evaluate expression="drugMtl.moveNode('up')" />
+        </transition>
+        <transition on="downNode"	to="sort1to2" >
+            <evaluate expression="drugMtl.moveNode('down')" />
+        </transition>
+
+        <transition on="success"		to="createEditObject" />
+        <on-exit>
+            <set name="drugMtl.action"	value="null" />
+        </on-exit>
+    </action-state>
+
+    <action-state id="sort1to2">
+        <!-- 
+             		<evaluate expression="schemaMtl.action" />
+      	 -->
+        <evaluate expression="drugMtl.action" />
+        <transition on="success"	to="save">
+            <evaluate expression="formUtil.logline('--------sort1to2----------')" />
+            <!-- 
+        			<evaluate expression="documentService.saveSchemaNative(schemaMtl)" />
+        			 -->
+            <evaluate expression="documentService.saveDrugDoc(drugMtl)" />
+            <evaluate expression="formUtil.logline('--------sort1to2----------')" />
+        </transition>
+    </action-state>
+	
+    <view-state id="importSchema" view="drugxViewAndEdit" model="drugMtl">
+        <on-entry>
+            <evaluate expression="importService.schema2import(drugMtl)"	result="flowScope.importDocMtl" />
+        </on-entry>
+        <transition on="save" to="save">
+            <evaluate expression="importService.importSchemaViaNetwork(importDocMtl, drugMtl)" />
+        </transition>
+    </view-state>
+
+    <view-state id="saveNewTrade" model="drugMtl">
+        <binder>
+            <binding property="tradeName" />
+        </binder>
+        <on-entry>
+            <set name="formUtil.mode"			value="'newTrade'" />
+        </on-entry>
+        <transition on="cancel" to="cancel"/>
+        <transition on="save" to="save">
+            <evaluate expression="documentService.saveNewTrade(drugMtl)" />
+        </transition>
+    </view-state>
+        
+    <view-state id="saveDrugName" model="drugMtl">
+        <binder>
+            <binding property="docT.mtlO.drug" />
+        </binder>
+        <on-entry>
+            <set name="formUtil.mode" value="'editDrugName'" />
+        </on-entry>
+        <transition on="cancel" to="cancel"/>
+        <transition on="save" to="save"/>
+    </view-state>
+
+    <!-- open new edit form -->
+    <action-state id="createEditObject">
+        <on-entry>
+            <evaluate expression="formUtil.logline('--------createEditObject-----on-entry----')" />
+            <evaluate expression="drugMtl.setEditNodeT()" />
+            <evaluate expression="formUtil.logline('--------createEditObject-----on-entry----'+drugMtl.editNodeName)" />
+        </on-entry>
+        <evaluate expression="drugMtl.editNodeName" />
+        <transition on="notice"	to="drugxViewAndEdit">
+            <evaluate expression="drugMtl.openEditNotice()" />
+            <set name="list"	value="documentService.addNoticeList(drugMtl)" />
+        </transition>
+        <transition on="literature"	to="drugxViewAndEdit" >
+            <evaluate expression="drugMtl.openEditLiterature()" />
+        </transition>
+        <transition on="symptom"	to="drugxViewAndEdit" >
+            <evaluate expression="drugMtl.openEditSymptom()" />
+        </transition>
+        <transition on="drug"		to="drugxViewAndEdit">
+            <evaluate expression="formUtil.logline('--------createEditObject-----drug----')" />
+            <evaluate expression="drugMtl.openEditDrug()" />
+            <evaluate expression="drugMtl.usedDose.readDrugDose(simpleJdbc, drugMtl)" />
+        </transition>
+        <transition on="dose"		to="drugxViewAndEdit">
+            <evaluate expression="drugMtl.openEditDose()" />
+            <evaluate expression="drugMtl.usedDose.readDrugDose(simpleJdbc, drugMtl)" />
+        </transition>
+        <transition on="app"	to="drugxViewAndEdit">
+            <evaluate expression="drugMtl.openEditApp()" />
+        </transition>
+        <transition on="day"		to="drugxViewAndEdit">
+            <evaluate expression="drugMtl.openEditDay()" />
+        </transition>
+        <transition on="times"		to="drugxViewAndEdit">
+            <evaluate expression="drugMtl.openEditTime()" />
+        </transition>
+        <transition on="labor"	to="drugxViewAndEdit">
+            <evaluate expression="drugMtl.openEditLabor()" />
+        </transition>	
+        <transition on="success"	to="drugxViewAndEdit" />
+    </action-state>
+
+    <view-state id="drugNewTablet" model="drugMtl">
+        <binder>
+            <!-- 
+                			<binding property="editTabletO.value" />
+         		 -->
+            <binding property="editTabletInt" />
+            <binding property="editTabletO.portion" />
+            <binding property="editTabletO.unit" />
+        </binder>
+        <on-entry>
+            <evaluate expression="drugService.newTabletEntry(drugMtl)" />
+        </on-entry>
+        <transition on="cancel" to="cancel"/>
+        <transition on="save" to="save">
+            <evaluate expression="drugService.newTabletSave(drugMtl)" />
+        </transition>
+    </view-state>
+
+    <view-state id="summeDoseExpr" model="drugMtl" view="drugxViewAndEdit">
+        <binder>
+            <binding property="maxDose" />
+            <binding property="maxDoseUnit" />
+            <binding property="maxDoseCumulative" />
+            <binding property="maxDoseCumulativeUnit" />
+        </binder>
+        <on-entry>
+            <evaluate expression="formUtil.logline('--summeDoseExpr-----entry--2--'+drugMtl.maxDose)" />
+            <evaluate expression="drugService.summeDoseEntry(drugMtl)" />
+            <evaluate expression="formUtil.logline('--summeDoseExpr-----entry--2--'+drugMtl.maxDose)" />
+        </on-entry>
+        <transition on="save"		to="save">
+            <evaluate expression="drugService.summeDoseSave(drugMtl)" />
+            <evaluate expression="formUtil.logline('--summeDose-----save--2--'+drugMtl.maxDose)" />
+        </transition>
+        <transition on="cancel"		to="drugxViewAndEdit">
+            <evaluate expression="formUtil.logline('--summeDose-----cancel--1--')" />
+        </transition>
+        <transition on="summeDoseNotice"		to="summeDoseNotice">
+        </transition>
+    </view-state>
+
+    <view-state id="summeDoseNotice" model="drugMtl" view="drugxViewAndEdit">
+        <binder>
+            <binding property="editNoticeC.notice" />
+        </binder>
+        <on-entry>
+            <evaluate expression="drugService.summeDoseEntry(drugMtl)" />
+        </on-entry>
+        <transition on="summeDoseExpr"		to="summeDoseExpr">
+            <evaluate expression="documentService.reviseNotice(drugMtl)" />
+        </transition>
+        <transition on="editStep"		to="save">
+            <evaluate expression="formUtil.logline('--summeDose----editStep--1--')" />
+            <evaluate expression="documentService.reviseNotice(drugMtl)" />
+            <evaluate expression="formUtil.logline('--summeDose-----editStep--3--'+drugMtl.maxDose)" />
+        </transition>
+        <transition on="cancel"		to="drugxViewAndEdit">
+            <evaluate expression="formUtil.logline('--summeDose-----cancel--1--')" />
+        </transition>
+    </view-state>
+
+    <view-state id="drugxViewAndEdit" model="drugMtl">
+        <binder>
+            <binding property="action" />
+            <binding property="idt" />
+            <binding property="idc" />
+            <binding property="editNodeT.ref" />
+            <!-- Notice -->
+            <binding property="editNoticeC.notice" />
+            <binding property="editNoticeC.type" />
+            <binding property="laborChain" />
+            <!-- Drug -->
+            <binding property="editDrugC.drug" />
+            <!-- Dose -->
+            <binding property="editDoseC.app" />
+            <binding property="editDoseC.unit" />
+            <binding property="editDoseC.value" />
+            <binding property="editDoseC.pro" />
+            <!-- Tempo -->
+            <binding property="editAppC.appapp" />
+            <binding property="editAppC.unit" />
+            <!-- Day -->
+            <binding property="editDayC.abs" />
+            <binding property="editDayC.newtype" />
+            <!-- Times -->
+            <binding property="editTimesC.abs" />
+            <binding property="editTimesC.relunit" />
+            <binding property="editTimesC.apporder" />
+            <binding property="editTimesC.relvalue" />
+            <binding property="editTimesC.visual" />
+            <binding property="weekMealViewSplit" />
+            <!-- Labor -->
+            <binding property="editedLaborC.labor" />
+            <binding property="editedLaborC.unit" />
+            <!-- Symptom -->
+            <binding property="editSymptomC.symptom" />
+            <!-- Literature -->
+            <binding property="editLiteratureO.title" />
+            <binding property="editLiteratureO.authors" />
+            <binding property="editLiteratureO.spring" />
+            <binding property="editLiteratureO.springtype" />
+            <binding property="editLiteratureO.page" />
+            <binding property="editLiteratureO.year" />
+            <binding property="editLiteratureO.url" />
+        </binder>
+        <transition on="newIdClass"	to="createEditObject" >
+            <evaluate expression="drugMtl.changeIdClass(requestParameters.newIdClass, documentService.getEntityManager())" />
+        </transition>
+        <transition on="editStep"	to="reviseEditNode" >
+            <evaluate expression="drugMtl.editStep()" />
+        </transition>
+        <transition on="rewriteOK">
+            <set name="formUtil.mode"	value="'rewriteOK'" />
+        </transition>
+        <transition on="rewriteConfirm" to="save">
+            <evaluate expression="documentService.rewrite(drugMtl)" />
+        </transition>
+        <transition on="copy"	to="reviseEditNode">
+            <set name="drugMtl.action"	value="'save'" />
+        </transition>
+        <transition on="cancel">
+            <set name="formUtil.mode"	value="''" />
+            <evaluate expression="drugMtl.editStepCancel()" />
+        </transition>
+        <transition on="paste"		to="reviseEditNode">
+            <set name="drugMtl.action"	value="'paste'" />
+        </transition>
+        <transition on="save"		to="reviseEditNode" >
+            <set name="drugMtl.action"	value="'save'" />
+        </transition>
+    </view-state>
+
+    <action-state id="reviseEditNode">
+        <on-entry>
+            <evaluate expression="formUtil.logline('--------reviseEditNode-----on-entry----')" />
+        </on-entry>
+        <evaluate expression="drugMtl.editNodeName" />
+        <transition on="labor"		to="isNewLabor" >
+        </transition>
+        <transition on="drug"		to="isNewDrug" />
+        <transition on="dose"		to="handleAction">
+            <evaluate expression="documentService.reviseDose(drugMtl)" />
+        </transition>
+        <transition on="app"	to="handleAction" >
+            <evaluate expression="formUtil.logline('--------reviseEditNode-----app----b')" />
+            <evaluate expression="drugMtl.addEditMObject(appCreator.setMtlO(drugMtl.getEditAppC()).build())" />
+            <evaluate expression="formUtil.logline('--------reviseEditNode-----app----e')" />
+        </transition>
+        <transition on="literature"		to="handleAction">
+            <evaluate expression="literatureCreator.revise(drugMtl)"/>
+        </transition>
+        <transition on="day"		to="handleAction">
+            <evaluate expression="drugMtl.addEditMObject(dayCreator.setMtlO(drugMtl.getEditDayC()).build())"/>
+        </transition>
+        <transition on="times"		to="handleAction">
+            <evaluate expression="formUtil.logline('--------reviseEditNode-----times----b')" />
+            <evaluate expression="documentService.reviseTimes(drugMtl)" />
+            <evaluate expression="formUtil.logline('--------reviseEditNode-----times----')" />
+            <evaluate expression="drugMtl.changeWeekSplit(documentService.pvL(drugMtl.getNewPvWeekMealView()))" />
+            <evaluate expression="formUtil.logline('--------reviseEditNode-----times----e')" />
+        </transition>
+        <transition on="notice"		to="handleAction">
+            <evaluate expression="documentService.reviseNotice(drugMtl)" />
+        </transition>
+        <transition on="symptom"	to="handleAction">
+            <evaluate expression="documentService.reviseSymptom(drugMtl)" />
+        </transition>
+        <transition on="task"		to="handleAction"/>
+        <transition on="success"	to="handleAction"/>
+    </action-state>
+
+    <action-state id="deleteNode">
+        <on-entry>
+            <evaluate expression="formUtil.logline('--------deleteNode-----on-entry----')" />
+            <set name="drugMtl.idt"	value="requestParameters.idt" />
+        </on-entry>
+        <!-- 
+     		<evaluate expression="drugMtl.deleteEditNode()" />
+     		 -->
+        <evaluate expression="deleteService.deleteEditNode(drugMtl)" />
+        <transition on="success"	to="save" >
+            <evaluate expression="documentService.saveDrugDoc(drugMtl)" />
+        </transition>
+    </action-state>
+	
+    <!-- DRUG -->
+    <action-state id="isNewDrug" >
+        <on-entry>
+            <set name="drugC" value="documentService.seekDrug(drugMtl.getEditDrugC().getDrug())" />
+        </on-entry>
+        <evaluate expression="drugMtl.seekDrugAction(drugC)" />
+        <transition on="nullSeekDrug"	to="newDrugx">
+            <set name="formUtil.mode"	value="'newDrug'" />
+        </transition>
+        <transition on="nullDrug"		to="handleAction">
+            <evaluate expression="drugMtl.removeTaskDrug()" />
+        </transition>
+        <transition on="findDrug"	to="handleAction">
+            <evaluate expression="drugMtl.addEditMObject(drugC)" />
+            <set name="formUtil.mode"	value="null" />
+        </transition>
+    </action-state>
+
+    <view-state id="newDrugx" model="drugMtl">
+        <binder>
+            <binding property="idt" />
+            <binding property="editDrugC.drug" />
+            <!-- Dose
+         			<binding property="editDoseC.app" />
+         			<binding property="editDoseC.unit" />
+         			<binding property="editDoseC.value" />
+         			<binding property="editDoseC.pro" />
+         			<binding property="procent" />
+         			-->
+            <!-- Day
+         			<binding property="editDayC.abs" />
+         			<binding property="editDayC.newtype" />
+         			<binding property="duration" />
+         			-->
+        </binder>
+        <transition on="editStep"	to="reviseEditNode" />
+        <transition on="generic"	to="confirmDrugx" >
+            <set name="formUtil.mode" value="'confirmDrug'"/>
+            <evaluate expression="drugMtl.reviseNewGeneric(drugMtl.editDrugC)"/>
+        </transition>
+        <transition on="trade"		to="registryDrugx" >
+            <set name="formUtil.jsonGeneric" value="documentService.getJsonGeneric()" />
+            <evaluate expression="drugMtl.newTrade()" />
+            <set name="formUtil.mode" value="'newTrade'" />
+        </transition>
+    </view-state>
+	
+    <view-state id="registryDrugx" model="drugMtl">
+        <binder>
+            <binding property="editDrugC.drug" />
+        </binder>
+        <transition on="editStep"	to="isOldGeneric" >
+            <set name="formUtil.mode" value="'confirmDrug'"/>
+        </transition>
+    </view-state>
+    <decision-state id="isOldGeneric">
+        <on-entry>
+            <set name="drugC" value="documentService.seekDrug(drugMtl.getEditDrugC().getDrug())" />
+        </on-entry>
+        <if test="drugC!=null"	then="confirmDrugx"	else="registryDrugx"/>
+        <on-exit>
+            <evaluate expression="drugMtl.reviseNewDrugC(drugC)" />
+        </on-exit>
+    </decision-state>
+    <view-state id="confirmDrugx" model="drugMtl">
+        <transition	on="save"		to="save" >
+            <evaluate expression="documentService.saveDrugDoc(drugMtl)" />
+        </transition>
+    </view-state>
+
+    <!-- LABOR SECTION -->
+    <decision-state id="isNewLabor" >
+        <on-entry>
+            <set name="laborC" value="documentService.seekLabor(drugMtl.editedLaborC)" />
+        </on-entry>
+        <if test="laborC!=null" then="reviseLaborObject" else="newLaborx"/>
+    </decision-state>
+    <view-state id="newLaborx" model="drugMtl">
+        <binder>
+            <binding property="idt" />
+            <binding property="editedLaborC.unit" />
+        </binder>
+        <on-entry>
+            <set name="formUtil.mode"	value="'newLabor'" />
+        </on-entry>
+        <transition on="editStep"	to="reviseLaborObject" >	
+            <set name="laborC"	value="drugMtl.editedLaborC" />
+        </transition>
+        <on-exit>
+            <set name="formUtil.mode"	value="null" />
+        </on-exit>
+    </view-state>	
+    <action-state id="reviseLaborObject" >
+        <evaluate expression="documentService.reviseMObject(laborC, drugMtl)" />
+        <transition on="success" to="handleAction"/>
+    </action-state>
+    <!-- /LABOR SECTION -->
+
+    <!-- 
+          	<end-state id="save"	commit="true" view="externalRedirect:/drug?id=#{id}&amp;part=#{formUtil.part}" />
+    -->
+    <end-state id="save"	view="externalRedirect:/drug=#{id}" commit="true" />
+    <end-state id="cancel"	view="externalRedirect:/drug=#{id}" />
+</flow>

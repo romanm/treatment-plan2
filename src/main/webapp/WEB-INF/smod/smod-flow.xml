@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<secured attributes="ROLE_USER" />
+	<persistence-context />
+
+	<var name="formUtil"	class="com.qwit.util.FormUtil" />
+	
+	<var name="patientSchema"	class="com.qwit.model.PatientSchema" />
+	<input name="id"			type="int" required="true" />
+
+	<on-start>
+		<evaluate	expression="documentService.setFlushModeCommit()" />
+		<evaluate	expression="documentService.makeSchemaMtl(id)"	result="flowScope.schemaMtl" />
+	</on-start>
+
+	<view-state id="chemoDoseMod2" model="patientSchema" view="schemaxViewAndEdit">
+		<binder>
+			<!-- general -->
+			<binding property="action" />
+			<binding property="tsNr" />
+			<binding property="idt" />
+			<!-- dose specific -->
+			<binding property="notice" />
+			<binding property="doseDef100" />
+			<binding property="doseDef" />
+			<binding property="doseProc" />
+			<binding property="doseCalc" />
+			<binding property="doseCalc100" />
+			<binding property="doseModType" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('---chemoDoseMod2-----on-entry--1-')" />
+			<!-- 
+			<set name="schemaMtl.tsNr"		value="requestParameters.tsNr" />
+			<set name="schemaMtl.idt"		value="requestParameters.idt" />
+			<evaluate expression="patientSchemaService.chemoDoseModEntry(patientSchema,schemaMtl)" />
+			 -->
+			<evaluate expression="formUtil.logline('---chemoDoseMod2-----on-entry-1-1-'+requestParameters.idt)" />
+			<set name="schemaMtl.idt"		value="requestParameters.idt" />
+			<set name="schemaMtl.tsNr"		value="requestParameters.tsNr" />
+			<evaluate expression="formUtil.logline('---chemoDoseMod2-----on-entry--2-')" />
+		</on-entry>
+		<on-render>
+			<evaluate expression="formUtil.logline('---chemoDoseMod2-----on-render--1-')" />
+			<evaluate expression="formUtil.logline('---chemoDoseMod2-----on-render-1-1-'+requestParameters.idt)" />
+			<evaluate expression="patientSchemaService.chemoDoseModEntry(patientSchema,schemaMtl)" />
+			<evaluate expression="formUtil.logline('---chemoDoseMod2-----on-render--2-')" />
+		</on-render>
+		<transition on="editStep" >
+			<evaluate expression="patientSchemaService.chemoDoseModEditStep(patientSchema,schemaMtl)" />
+		</transition>
+		<transition on="otherNotice" to="chemoDoseMod2">
+			<evaluate expression="formUtil.logline('--------otherNotice--1-')" />
+			<set name="schemaMtl.idt"		value="requestParameters.idt" />
+			<set name="schemaMtl.tsNr"		value="requestParameters.tsNr" />
+			<evaluate expression="formUtil.logline('--------otherNotice--2-')" />
+		</transition>
+		<transition on="otherDrug" to="chemoDoseMod2">
+			<evaluate expression="formUtil.logline('--------otherDrug-0-1- patientSchema.idt='+patientSchema.idt)" />
+			<evaluate expression="formUtil.logline('--------otherDrug-0-1- schemaMtl.idt='+schemaMtl.idt)" />
+			<evaluate expression="formUtil.logline('--------otherDrug--1- '+requestParameters.doseModType)" />
+			<set name="patientSchema.doseModType"		value="requestParameters.doseModType" />
+			<evaluate expression="formUtil.logline('--------otherDrug--1- '+patientSchema.doseModType)" />
+			<evaluate expression="patientSchemaService.chemoDoseModSave(patientSchema,schemaMtl)" />
+			<evaluate expression="formUtil.logline('--------otherDrug--1- patientSchema.idt='+patientSchema.idt)" />
+			<set name="schemaMtl.idt"		value="patientSchema.idt" />
+			<evaluate expression="formUtil.logline('--------otherDrug--1- schemaMtl.idt='+schemaMtl.idt)" />
+			<set name="schemaMtl.tsNr"		value="patientSchema.tsNr" />
+		</transition>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.chemoDoseModSave(patientSchema,schemaMtl)" />
+		</transition>
+		<!-- 
+		<on-exit>
+			<evaluate expression="patientSchemaService.chemoDoseModExit(patientSchema,schemaMtl)" />
+		</on-exit>
+		 -->
+	</view-state>
+
+	<end-state id="save"			commit="true" view="externalRedirect:/schema-#{owsSession.schemaPart}-#{id}" />
+	<end-state id="cancel"			view="externalRedirect:/schema-#{owsSession.schemaPart}-#{id}" />
+	<global-transitions>
+		<transition on="cancel"		to="cancel"/>
+	</global-transitions>
+</flow>

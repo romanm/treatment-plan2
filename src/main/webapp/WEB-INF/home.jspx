@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:sql	="http://java.sun.com/jsp/jstl/sql"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:security="http://www.springframework.org/security/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	>
+
+<div id="headline"><fmt:message key="ui_breadcrumbIndex" /></div>
+<div id="content">
+	<owsui:message type="error" springAuth="1" />
+	<!-- 
+	<div>
+		Medizinische Ansprechpartnerin ist Frau Dr. Luisa Mantovani 
+		<a href="mailto:mantovani@sanktgeorg.de">mantovani@sanktgeorg.de</a>,
+		<br/>
+		Technischer Ansprechpartner ist Dr. Roman Mishchenko 
+		<a href="mailto:roman.mishchenko@imise.uni-leipzig.de">roman.mishchenko@imise.uni-leipzig.de</a>
+	</div>
+	 -->
+
+	<table align="center">
+		<tr>
+			<td class="module appModule">
+				<div class="moduleHeader"> <fmt:message key="ui_homebox_appModule"/> </div>
+				<mtl:homeBox title="ui_patients" link="${explorer_url}=9931?modus=patient" id="patients">
+					<ul>
+						<li><a href="${explorer_url}=9931?modus=patient"><fmt:message key="ui_patientList"/></a></li>
+						<!-- 
+						<li><fmt:message key="ui_patientNew"/></li>
+						 -->
+						<li><a href="${explorer_url}=9931?modus=patient"><fmt:message key="ui_patientNew"/></a></li>
+					</ul>
+					<br/>
+					<br/>
+				</mtl:homeBox>
+				<mtl:homeBox title="ui_tumorboard" id="tumorboard">
+					<ul>
+						<li><fmt:message key="ui_tumorboardLogin"/></li>
+						<li><fmt:message key="ui_tumorboardHistory"/></li>
+					</ul>
+					<br/>
+				</mtl:homeBox>
+			</td>
+			<td class="module defModule">
+				<div class="moduleHeader"><fmt:message key="ui_homebox_defModule"/></div>
+				<mtl:homeBox title="ui_conceptsTemplate" link="${explorer_url}=9932?modus=definition" id="conceptsTemplate">
+					<ul>
+						<li><a href="${explorer_url}=9932?modus=definition"><fmt:message key="ui_schemaList"/></a></li>
+						<li><a href="${explorer_url}=9932?modus=definition"><fmt:message key="ui_schemaNew"/></a></li>
+						<!-- 
+						<li><a href="${explorer_url}=1263295?subdir=on&amp;modus=definition"><fmt:message key="met_GIST"/></a></li>
+						 -->
+						<li><fmt:message key="ui_studyProtocols"/></li>
+					</ul>
+					<br/>
+				</mtl:homeBox>
+				<mtl:homeBox title="ui_more" link="${explorer_url}=9938" id="more">
+				<ul>
+					<li><fmt:message key="ui_diagnose"/></li>
+					<li><fmt:message key="ui_drugs"/></li>
+					<li><fmt:message key="ui_more"/></li>
+				</ul>
+				</mtl:homeBox>
+			</td>
+		</tr>
+	</table>
+	
+	<!--
+	<table align="center">
+		<tr>
+			<td>
+				<fieldset id="anwendungsmodul" class="homefieldset" style="clear:both;">
+					<legend><fmt:message>ui_homebox_appModule</fmt:message></legend>
+					<mtl:homeBox title="ui_patients" link="${explorer_url}=9931" >
+						<ul>
+							<li><a href="${explorer_url}=9931"><fmt:message key="ui_patientList"/></a></li>
+							-->
+							<!-- 
+							<li><fmt:message key="ui_patientNew"/></li>
+							 -->
+							 <!-- 
+						</ul>
+						<br/>
+						<br/>
+					</mtl:homeBox>
+					<mtl:homeBox title="ui_tumorboard" >
+						<ul>
+							<li><fmt:message key="ui_tumorboardLogin"/></li>
+							<li><fmt:message key="ui_tumorboardHistory"/></li>
+						</ul>
+						<br/>
+					</mtl:homeBox>
+				</fieldset>
+			</td>
+			<td>
+				<fieldset id="definitionsmodul" class="homefieldset">
+					<legend><fmt:message>ui_homebox_defModule</fmt:message></legend>
+					<mtl:homeBox title="ui_conceptsTemplate" link="${explorer_url}=9932" >
+						<ul>
+							<li>
+								<a href="${explorer_url}=1263295"><fmt:message key="met_GIST"/></a>
+							</li>
+							<li><fmt:message key="ui_studyProtocols"/></li>
+						</ul>
+						<br/>
+					</mtl:homeBox>
+				<mtl:homeBox title="ui_more" link="${explorer_url}=9938" >
+				<ul>
+					<li><fmt:message key="ui_diagnose"/></li>
+					<li><fmt:message key="ui_drugs"/></li>
+					<li><fmt:message key="ui_more"/></li>
+				</ul>
+				</mtl:homeBox>
+				</fieldset>
+			</td>
+		</tr>
+	</table>
+	 -->
+	<table class="small">
+		<tr>
+			<th rowspan="2"><fmt:message key="ui_contactPerson"/></th>
+			<th>Medizinische Fragen</th>
+			<td><b>Dr. Luisa Mantovani-Löffler </b>
+			<a href="mailto:luisa.mantovani@sanktgeorg.de">luisa.mantovani@sanktgeorg.de</a>
+			<c:out value=", " />
+			<b>Dr. Roman Mishchenko </b></td>
+		</tr>
+		<tr>
+			<th>Technische Fragen</th>
+			<td><b>Dr. Roman Mishchenko </b>
+			<a href="mailto:roman.mishchenko@imise.uni-leipzig.de">roman.mishchenko@imise.uni-leipzig.de</a></td>
+		</tr>
+		
+	</table>
+</div>
+<div id="sidebar" >
+	
+	<!-- 
+	<h2><fmt:message key="ui_contactPerson"/></h2>
+	 -->
+	<br />
+	<br />
+	<a href="http://www.oncoworkstation.de">oncoworkstation.de</a>
+	<br />
+	<a href="http://www.oncoworkstation.de/oifa/spring/h/faqinpictures"><fmt:message>ui_FAQ</fmt:message></a>
+	<br />
+	<a href="http://www.oncoworkstation.de/oifa/spring/h/index#"><fmt:message>ui_handbook</fmt:message></a> -
+	<br />
+	<a href="http://www.oncoworkstation.de/oifa/spring/h/index#"><fmt:message>ui_impressum</fmt:message></a> -
+<security:authorize ifAllGranted="ROLE_USER">
+<div>
+	<h2>Video</h2>
+	<h3>SOKRATHES Tutorial</h3>
+	<div>
+	<a href="http://www.oncoworkstation.de/oifa/spring/h/video#schemaECF">Definition ECF Therapieschema.</a>
+	</div>
+	<div>
+	<a href="http://www.oncoworkstation.de/oifa/spring/h/video#newPatient">Patientendaten anlegen.</a>
+	</div>
+	<div>
+	<a href="http://www.oncoworkstation.de/oifa/spring/h/video#schema2patient">Therapieschema für Patient.</a>
+	</div>
+</div>
+</security:authorize>
+	
+	<!-- 
+	<center>
+		<div style="margin-top:10px;">
+			<div style="width:220px; background-color:#f0f0f0;">
+				Medizinische Fragen
+				<hr/>
+	-->
+				<!-- 
+				<center>
+					<spring:url var="imgFolder" value="/resources/images" />
+					<img src="${imgFolder}/mantovani.jpg" width="70px" alt="Dr. Luisa Mantovani" />
+				</center>
+				 -->
+	<!-- 
+				<b>Dr. Luisa Mantovani</b> 
+				<br/>
+				<a href="mailto:mantovani@sanktgeorg.de">mantovani@sanktgeorg.de</a>
+			</div>
+			
+			<br/>
+			<br/>
+			<div style="width:220px; background-color:#f0f0f0;">
+				Technische Fragen
+				<hr/>
+	 -->
+				<!-- 
+				<center>
+					<img src="${imgFolder}/roman.jpg" width="70px" alt="Dr. Roman Mishchenko" />
+				</center>
+				 -->
+	<!-- 
+				<b>Dr. Roman Mishchenko</b>
+				<br/>
+				<a href="mailto:roman.mishchenko@imise.uni-leipzig.de">roman.mishchenko@imise.uni-leipzig.de</a>
+			</div>
+		</div>
+	</center>
+	 -->
+
+</div>
+</jsp:root>

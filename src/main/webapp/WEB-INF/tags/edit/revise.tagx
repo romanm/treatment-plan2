@@ -1,0 +1,46 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<jsp:directive.attribute name="toOnClick"	type="java.lang.String"/>
+<jsp:directive.attribute name="visibility"	type="java.lang.String"/>
+
+	<form:hidden path="action"/>
+	<form:hidden path="idt"/>
+	<form:hidden path="idc"/>
+	<form:hidden path="prefixc"/>
+	<c:choose>
+		<c:when test="${not empty explorerMtl }"/>
+		<c:when test="${not empty conceptMtl }"/>
+		<c:when test="${not empty schemaMtl }">
+			<form:hidden path="tsNr"/>
+		</c:when>
+	</c:choose>
+	<c:set var="toOnClick2">${toOnClick}</c:set>
+	<span style="visibility: ${visibility};">
+		<fmt:message key="apply" var="apply"/>
+		<input type="button" id="reviseNode" 
+			onclick="${toOnClick2};dojo.byId('idt').value=0;dojo.byId('editStep').click()"
+			value="${ui_button_OK}" title="${apply}" class="small"/>
+		<input type="button" id="toOnClickForSave" onclick="${toOnClick}" style="visibility: hidden;"/>
+	</span>
+	<input type="submit" id="editSave"		name="_eventId_save"		value="editSave"	style="visibility: hidden;"/>
+	<input type="submit" id="editStep"		name="_eventId_editStep"	value="editStep"	style="visibility: hidden;"/>
+	
+	<c:if test="${not empty docMtl.editNoticeC and docMtl.idt==docMtl.editNodeT.id}">
+		<form:hidden id="inputNotice" path="editNoticeC.notice"/>
+		<form:hidden path="laborChain"/>
+	</c:if>
+
+	<c:choose>
+		<c:when test="${not empty schemaMtl }">
+			<input name="_eventId_parted"	id="parted"		type="submit" style="visibility: hidden;"/>
+			<input name="_eventId_partplan"	id="partplan"	type="submit" style="visibility: hidden;"/>
+			<input name="_eventId_partweek"	id="partweek"	type="submit" style="visibility: hidden;"/>
+			<input name="_eventId_parthour"	id="parthour"	type="submit" style="visibility: hidden;"/>
+			<input name="_eventId_partinfo"	id="partinfo"	type="submit" style="visibility: hidden;"/>
+		</c:when>
+	</c:choose>
+</jsp:root>

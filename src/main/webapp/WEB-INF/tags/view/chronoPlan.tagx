@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<div style="float: right;" class="small" >
+	<spring:eval var="todayDateTime" expression="new org.joda.time.DateTime()" />
+	<c:set var="today">
+		<spring:eval var="now" expression="todayDateTime.toDate()" />
+		heute:
+		<fmt:formatDate value="${now}" pattern="EEEE dd MMMM yyyy kk:mm ww."/>
+		<c:out value="Woche" />
+	</c:set>
+	${today}
+</div>
+<h3><fmt:message key="ui_menuItemLink_chronoPlan" /></h3>
+<c:if test="${not empty param.liste}">
+	<c:set var="patientListe" value="${param.liste}" scope="session" />
+</c:if>
+<table>
+	<tr>
+		<td class="${(empty patientListe or 'station'==patientListe)?'b':''}">
+			<c:out value="| " />
+			<a href="?id=${docMtl.docT.id}&amp;liste=station">
+				<fmt:message key="ui_param_liste_station"/></a></td>
+		<!-- reserviert
+		<td class="${('mystation'==patientListe)?'b':''}">
+			<c:out value="| " />
+			<a href="?id=${docMtl.docT.id}&amp;liste=mystation">
+				<fmt:message key="ui_param_liste_mystation"/></a></td>
+		 -->
+		<td class="${('my'==patientListe)?'b':''}">
+			<c:out value="| " />
+			<a href="?id=${docMtl.docT.id}&amp;liste=my">
+				<fmt:message key="ui_param_liste_my"/></a></td>
+	</tr>
+</table>
+
+<table>
+	<colgroup>
+		<col />
+		<col />
+		<col class="nowrap" />
+		<col />
+		<col />
+	</colgroup>
+	<tr class="dotted">
+		<th>Patient</th>
+		<th>Schema</th>
+		<th>gestartet</th>
+		<!-- 
+		<th>dauert</th>
+		 -->
+		<th></th>
+		<th>neue Therapiestart</th>
+	</tr>
+<c:forEach var="pTaskMap" items="${instituteMtl.patientSchemaListe}" >
+	<spring:eval var="dateTime" expression="docMtl.getDateTime(pTaskMap.get('nextdate'))" />
+	<spring:eval var="date" expression="dateTime.toDate() " />
+	<spring:eval var="weekOfWeekyear" expression="dateTime.weekOfWeekyear().get() " />
+	<c:set var="wowy" value="${weekOfWeekyear}. Woche" />
+	<c:choose>
+		<c:when test="${empty previousDateTime}">
+			<tr class="careweek" >
+				<th colspan="5">
+					<fmt:formatDate value="${date}" pattern="MMMM yyyy" />
+					<div style="float: right;" class="small" ><c:out value="${wowy}" /></div>
+				</th>
+			</tr>
+		</c:when>
+		<c:otherwise>
+			<spring:eval var="todayWeekOfWeekyear" expression="todayDateTime.weekOfWeekyear().get() " />
+			<spring:eval var="previousWeekOfWeekyear" expression="previousDateTime.weekOfWeekyear().get() " />
+		<c:if test="${previousWeekOfWeekyear!=weekOfWeekyear}">
+		<c:if test="${previousWeekOfWeekyear>=todayWeekOfWeekyear and todayWeekOfWeekyear>=weekOfWeekyear}">
+			<tr class="careweek" ><th colspan="5" align="right">${today}</th></tr>
+		</c:if>
+			<tr class="careweek" >
+				<th colspan="5">
+					<spring:eval var="monthOfYear" expression="dateTime.monthOfYear().get() " />
+					<spring:eval var="previousMonthOfYear" expression="previousDateTime.monthOfYear().get() " />
+					<c:if test="${previousMonthOfYear!=monthOfYear}">
+						<fmt:formatDate value="${date}" pattern="MMMM yyyy" />
+					</c:if>
+					<div style="float: right;" class="small" ><c:out value="${wowy}" /></div>
+				</th>
+			</tr>
+		</c:if>
+		</c:otherwise>
+	</c:choose>
+	<tr>
+		<td><a href="patient=${pTaskMap.idpatient}">${pTaskMap.forename} ${pTaskMap.patient}</a></td>
+		<td>
+			<a href="schema-${owsSession.schemaPart}-${pTaskMap.taskId}">${pTaskMap.task}</a>
+			<c:out value=" " />
+			<mtl:schemaCycleNr cycleNr="${pTaskMap.cycleNr}"/>
+		</td>
+		<td class="nowrap">
+			<fmt:formatDate value="${pTaskMap.mdate}" type="both" dateStyle="short" timeStyle="short" />
+		</td>
+		<td>+${pTaskMap.duration} </td>
+		<td>
+		<!-- 
+		<c:set var="duration" value="${pTaskMap.duration}" />
+		<c:if test="${not empty duration }">
+			<spring:eval var="nextTherapyBegin" expression="docMtl.nextTherapyBegin(
+				pTaskMap.get('mdate'),pTaskMap.get('duration')).toDate()" />
+		</c:if>
+			<a href="schemaflow?id=${pTaskMap.taskId}&amp;idt=${pTaskMap.taskId}&amp;a=newCycle">
+				<fmt:formatDate value="${nextTherapyBegin}" dateStyle="short" />
+			</a>
+		 -->
+			<a href="schemaflow?id=${pTaskMap.taskId}&amp;idt=${pTaskMap.taskId}&amp;a=newCycle">
+				<fmt:formatDate value="${pTaskMap.nextdate}" dateStyle="short" />
+			</a>
+		</td>
+	</tr>
+	<c:set var="previousDateTime" value="${dateTime}" />
+</c:forEach>
+
+</table>
+</jsp:root>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:sql	="http://java.sun.com/jsp/jstl/sql"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:security="http://www.springframework.org/security/tags"
+	xmlns:tiles	="http://tiles.apache.org/tags-tiles"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	>
+
+<jsp:directive.page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" />
+<jsp:output doctype-root-element="html" doctype-public="-//W3C//DTD XHTML 1.1//EN"
+		doctype-system="http://www.w3c.org/TR/xhtml11/DTD/xhtml11.dtd" />
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title><mtl:siteTitle/></title>
+	<spring:url value="/images/favicon.ico" var="favicon" />
+	<link rel="SHORTCUT ICON" href="${favicon}" />
+	<spring:url value="/resources/dijit/themes/tundra/tundra.css" var="tundra_url"/>
+	<link rel="stylesheet" type="text/css" href="${tundra_url}" />
+	
+	<style type="text/css" media="all">
+		@import url("<c:url value="/resources/styles/ows2.print2.css" />");
+	</style>
+	
+	<spring:url value="/resources/dojo/dojo.js" var="dojo_url"/>
+	<script src="${dojo_url}" type="text/javascript" ><!-- //required for FF3 and Opera --></script>
+	<spring:url value="/resources/spring/Spring.js" var="spring_url"/>
+	<script src="${spring_url}" type="text/javascript"><!-- //required for FF3 and Opera --></script>
+	<spring:url value="/resources/spring/Spring-Dojo.js" var="spring_dojo_url"/>
+	<script src="${spring_dojo_url}" type="text/javascript"><!-- //required for FF3 and Opera --></script>
+	<spring:url value="/resources/js/ows.js" var="ui_js_url"/>
+	<script src="${ui_js_url}" type="text/javascript"><!-- //required for FF3 and Opera --></script>
+	
+	<c:set var="urlFlow" value="${fn:substringAfter(flowExecutionUrl,'?')}" scope="request"/>
+	<sql:setDataSource var="owsDbSource" driver="org.postgresql.Driver" dataSource="jdbc/ows"
+															scope="application" />
+	<c:set var="urlFlow" value="${fn:substringAfter(flowExecutionUrl,'?')}"
+															scope="request"/>
+	<c:choose>
+		<c:when test="${not empty patientMtl}">
+			<c:set var="docMtl" value="${patientMtl}"	scope="request" />
+		</c:when>
+		<c:when test="${not empty conceptMtl}">
+			<c:set var="docMtl" value="${conceptMtl}"	scope="request" />
+		</c:when>
+		<c:when test="${not empty schemaMtl}">
+			<c:set var="docMtl" value="${schemaMtl}"	scope="request" />
+		</c:when>
+		<c:when test="${not empty userMtl}">
+			<c:set var="docMtl" value="${userMtl}"		scope="request" />
+		</c:when>
+		<c:when test="${not empty drugMtl}">
+			<c:set var="docMtl" value="${drugMtl}"		scope="request" />
+		</c:when>
+		<c:when test="${not empty explorerMtl}">
+			<c:set var="docMtl" value="${explorerMtl}"	scope="request" />
+		</c:when>
+	</c:choose>
+	<c:set var="care" value="${docMtl.userCare}"		scope="session"/>
+	<c:choose>
+		<c:when test="${not empty formUtil}">
+			<c:set var="part" value="${formUtil.part}"	scope="request" />
+		</c:when>
+		<c:otherwise>
+			<c:set var="part" value="${param.part}"		scope="request" />
+		</c:otherwise>
+	</c:choose>
+	
+	<jsp:useBean id="jxp" class="com.qwit.service.JXPathBean" scope="application"/>
+	<jsp:setProperty name="jxp" property="treeManager" value="${docMtl}" />
+	
+	
+	<script type="text/javascript">
+		var urlFlow="${urlFlow}";
+		var isFlow=false;
+
+		<c:if test="${not empty flowExecutionUrl and (fn:contains(flowExecutionUrl,'showflow') or fn:contains(flowExecutionUrl,'drugflow'))}">
+			isFlow=true;
+			<c:if test="${not empty flowExecutionUrl and fn:contains(flowExecutionUrl,'schema7')}">
+				var drugsListe = ${formUtil.jsonDrugs};
+				var doseUnitsListe = ${formUtil.jsonDoseUnit};
+				var doseAppListe = ${formUtil.jsonDoseApp};
+				var laborListe = ${formUtil.jsonLabor};
+				var findingListe  = ${formUtil.jsonFinding};
+			</c:if>
+			<c:if test="${not empty flowExecutionUrl and (fn:contains(flowExecutionUrl,'schema8') or fn:contains(flowExecutionUrl,'drugflow') ) }">
+				var symptomsListe = ${formUtil.jsonSymptoms};
+			</c:if>
+		</c:if>
+
+		dojo.require("dojo.data.ItemFileReadStore");
+		//dojo.require("dojo.back");
+
+		dojo.addOnLoad(init);
+		dojo.addOnLoad(addCopyPasteFunctionality);
+		dojo.addOnLoad(getCookiePageYOffset);
+
+		dojo.require("dojo.cookie");
+	</script>
+	
+</head>
+
+<body class="tundra" onmouseup="javascript:setCookiePageYOffset(window.pageYOffset);">
+
+	<div id="header">
+		<c:set var="ows1sr" value="${fn:substring(pageContext.request.contextPath,0,fn:length(pageContext.request.contextPath)-1)}" />
+		<c:set var="owsContextPath" value="${pageContext.request.contextPath}" />
+		
+		<div id="mainmenu">
+			<dl class="nav navcolumn1">
+				<dt><a href="#"><fmt:message key="ui_title_mainMenu" /></a></dt>
+				<dd><a href="${owsContextPath}/the/explorer/explorer?folder=patient&id=9931&search="><fmt:message>ui_patients</fmt:message></a></dd>
+				<dd><a href="${owsContextPath}/the/explorer/explorer?folder=protocol&id=9932&search=">
+					<fmt:message key="ui_menuItem_concept" /></a></dd>
+				<dd><a href="${owsContextPath}/the/explorer/explorer?folder=diagnose&id=9938&search="><fmt:message key="ui_more"/></a></dd>
+			</dl>
+			<c:set var="id1" value="${id==null?param.id:id}" />
+			<dl class="nav navcolumn2">
+				<dt><a href="http://www.oncoworkstation.de"><fmt:message key="ui_title_community" /></a></dt>
+				<dd>
+					<c:choose>
+						<c:when test="${not empty param.folder}">
+							<a href="${ows1sr}/edit/tab?dir=${id1}"><fmt:message key="ui_menuItem_oldVersion" /></a>
+						</c:when>
+						<c:when test="${not empty drugMtl}">
+							<a href="${ows1sr}/edit/drug?id=${id1}&amp;part=ed"><fmt:message key="ui_menuItem_oldVersion" /></a>
+						</c:when>
+						<c:when test="${not empty docMtl}">
+							<a href="${ows1sr}/edit/task?id=${id1}&amp;part=ed"><fmt:message key="ui_menuItem_oldVersion" /></a>
+						</c:when>
+						<c:when test="${not empty conceptMtl}">
+							<a href="${ows1sr}/edit/protocol?id=${id1}&amp;part=sd"><fmt:message key="ui_menuItem_oldVersion" /></a>
+						</c:when>
+						<c:when test="${not empty patientMtl}">
+							<a href="${ows1sr}/edit/patient?id=${id1}&amp;part=history"><fmt:message key="ui_menuItem_oldVersion" /></a>
+						</c:when>
+						<c:otherwise>
+						</c:otherwise>
+					</c:choose>
+				</dd>
+				<dd>
+					<c:set var="doc0911">
+						<c:choose>
+							<c:when test="${not empty docMtl}">schemaged?id=${id1}</c:when>
+							<c:when test="${not empty conceptMtl}">concept?id=${id1}</c:when>
+							<c:when test="${not empty patientMtl}">basefep?id=${id1}</c:when>
+						</c:choose>
+					</c:set>
+				</dd>
+				<dd><a href="#"><fmt:message key="ui_menuItem_sitemap"></fmt:message></a></dd>
+			</dl>
+			
+		</div>
+		<div id="sitetitle">
+			<h1><a href="${owsContextPath}/the/home">
+				<fmt:message key="ui_name" /> 
+				<fmt:message key="ui_version" />
+			</a></h1>
+			<p><strong><fmt:message key="ui_description" /></strong> </p>
+		</div>
+	</div>
+	<tiles:insertAttribute name="body" />
+	<hr class="clear" />
+<ul class="metalinks">
+	<li><a href="#top" title="zum Seitenanfang"><span>nach oben</span></a></li>
+</ul>
+<div id="footer">
+	<div class="left">
+		<p>&copy; 2010 <a href="#"><fmt:message key="ui_name" /></a></p>
+	</div>
+</div>
+
+</body>
+
+</html>
+</jsp:root>

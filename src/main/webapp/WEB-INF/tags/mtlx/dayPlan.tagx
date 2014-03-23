@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:expr="urn:jsptagdir:/WEB-INF/tags/expr"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+>
+
+<qhtm:patientHead />
+
+<spring:eval var="applicationDurationT" 
+	expression="schemaMtl.getApplicationDurationT(jxp.jxp(docMtl.getDocT()))" 
+	scope="request"/>
+	<!-- 
+<c:set var="applicationDuration" value="${docMtl.docT.mtlO.duration/applicationDurationT.mtlO.ivalue }"/>
+	 -->
+<c:set var="applicationDuration" value="${applicationDurationT.mtlO.ivalue }"
+	scope="request" />
+<c:if test="${not empty param.applicationNr}">
+	<c:set var="sesApplicationNr" value="${param.applicationNr}"	scope="session" />
+</c:if>
+
+<!-- 
+<qhtm:chemoSmallTable />
+<qhtm:chemoAppSmallTable />
+ -->
+
+<qhtm:chemoAppSmallTable2 />
+
+<div>
+	<edit:schemaChangeHistory patientTaskT="${schemaMtl.pschemaT }"
+		therapyChange="${docMtl.patientMtl.therapyChange}" />
+</div>
+<mtl:doseModViewAll />
+
+<table>
+	<thead>
+		<qhtm:theadPatient colspan="7"/>
+		<tr class="dotted" >
+			<th><fmt:message key="ui_time"/></th>
+			<th class="select" id="th_${schemaMtl.docT.id}">
+				<mtl:planName blockT="${schemaMtl.docT}"/>
+			</th>
+			<th colspan="2"><fmt:message key="ui_dose_app"/></th>
+			<!-- 
+			<th><fmt:message key="uiApp"/>/<fmt:message key="uiInfusionDuration"/></th>
+			 -->
+			<th><spring:message code="uiApp"/> / <spring:message code="uiTempo"/></th>
+			<th><fmt:message key="uiSignature"/></th>
+			<th>#</th>
+		</tr>
+	</thead>
+<c:set var="previousDay" value="-111"/>
+<c:set var="lastSameDay" value="-111" />
+<c:set var="dayInfusion" value="0" scope="request" />
+<c:set var="appBeginDay" value="${applicationDuration*(sesApplicationNr-1)+1}" />
+<c:set var="appEndDay" value="${appBeginDay+applicationDuration-1}" />
+<c:if test="${empty sesApplicationNr or 0==sesApplicationNr}">
+<!-- 
+	<c:set var="appBeginDay" value="1" />
+ -->
+	<c:if test="${not empty schemaMtl.plan}">
+		<spring:eval var="appBeginDay" expression="schemaMtl.plan.first().cday" />
+	</c:if>
+	<c:set var="appEndDay" value="${schemaMtl.docT.mtlO.duration}" />
+</c:if>
+<c:forEach items="${schemaMtl.plan}" var="ts">
+<c:if test="${empty applicationDurationT or (ts.cday >= appBeginDay and appEndDay >= ts.cday)}">
+	<c:set var="currTs" value="${ts}" scope="request" />
+	<c:choose>
+		<c:when test="${not empty ts.begin}" />
+		<c:when test="${owsSession.sameDayTogether and not empty toDay and ts.cday le toDay and ts.cday gt firstSameDay}"/>
+		<c:otherwise>
+	<c:if test="${ts.cday>previousDay}">
+		<c:choose>
+			<c:when test="${'hour'==owsSession.schemaPart and not empty docMtl.hourPlan.intensivDayDrugM[ts.cday]}">
+				<tr> <td> <a href="#hourDay_${ts.cday }">Intensiv day ${ts.cday }</a> </td> </tr>
+			</c:when>
+			<c:otherwise>
+			
+		<c:set var="first" value="true"/>
+		<c:forEach items="${schemaMtl.rqmMS[previousDay]}" var="ts2">
+			<tr>
+				<c:choose>
+					<c:when test="${first}"><th>Bedarf:</th></c:when>
+					<c:otherwise><td></td></c:otherwise>
+				</c:choose>
+				<mtl:dayPlanDayDose ts="${ts2}"/>
+			</tr>
+			<c:set var="drugT" value="${ts2.timesT.parentT.parentT}" />
+			<c:set var="ddne">
+				<mtl:ne forT="${schemaMtl.drugDose[drugT]}" noNr="true"/>
+				<spring:eval var="dayS" expression="jxp.childs(drugT,'day')" />
+				<c:forEach items="${dayS}" var="dayP">
+					<c:set var="dayT" value="${dayP.value}"/>
+					<c:if test="${fn:length(schemaMtl.ddNE[dayT])>0}">
+						<mtl:ne forT="${dayT}" noRqm="true" noNr="true"/>
+					</c:if>
+				</c:forEach>
+			</c:set>
+			<c:if test="${not empty ddne}">
+				<tr><td></td><td colspan="5">${ddne}</td></tr>
+			</c:if>
+			<c:set var="first" value="false"/>
+		</c:forEach>
+		<owsui:dayInfusion />
+		<c:set var="dayInfusion" value="0" scope="request" />
+		<thead>
+			<tr style="border-bottom-style: double;" class="planday">
+			<th colspan="7">
+				<spring:eval var="currWeek" expression="(ts.getCday()-1)/7" />
+				<c:set var="previousWeek" value="${(previousDay-1)/7}" />
+				<c:if test="${currWeek>previousWeek}">
+					<div style="float: right;" class="small" >w${currWeek+1}</div>
+				</c:if>
+				<spring:eval var="dayDelayP" expression="jxp.jxp(schemaMtl.getPschemaT())
+		.var('delayedDay').var('day',ts.getCday()).getPointer(
+			'childTs[mtlO/ivariable=$delayedDay and mtlO/ivalue=$day]/childTs[mtlO/ivalue!=0]')" />
+				<c:if test="${not empty dayDelayP.value}">
+					<c:set var="dayDelayO" value="${dayDelayP.value.mtlO}" scope="request" />
+				</c:if>
+				<mtl:planDate ts="${ts}"/>
+				<c:if test="${empty toDay or ts.cday>toDay }">
+					<c:set var="firstSameDay" value="${ts.cday}" />
+					<c:set var="toDay" value="${schemaMtl.sameDayM[ts.cday]}" />
+				</c:if>
+				<c:if test="${not empty dayDelayP.value}">
+					<sup class="red">+
+						${dayDelayP.value.mtlO.ivalue }
+					</sup>
+				</c:if>
+			</th></tr>
+		</thead>
+			</c:otherwise>
+		</c:choose>
+		<c:set var="previousDay" value="${ts.cday}" />
+	</c:if>
+	<c:choose>
+		<c:when test="${not empty schemaMtl.dayRqm[ts.timesT.parentT]}" />
+		<c:when test="${not empty ts.begin}" />
+		<c:when test="${'hour'==owsSession.schemaPart and not empty docMtl.hourPlan.intensivDayDrugM[ts.cday]}"/>
+		<c:otherwise>
+			<!-- Eingabe beschreibung -->
+			<mtl:dayPlanDay ts="${ts}" />
+			<c:set var="drugT" value="${ts.timesT.parentT.parentT }" />
+			<spring:eval var="dDrugDoseMlIP" expression="jxp.var('ml').jxpip(drugT,
+				'childTs[mtlO/unit=$ml]|childTs/childTs[mtlO/unit=$ml]')" />
+			<c:forEach var="dDrugDoseMlP" items="${dDrugDoseMlIP}">
+				<c:set var="dayInfusion" value="${dayInfusion+dDrugDoseMlP.value.mtlO.value}" scope="request" />
+			</c:forEach>
+		</c:otherwise>
+	</c:choose>
+		</c:otherwise>
+	</c:choose>
+</c:if>
+</c:forEach>
+		<owsui:dayInfusion />
+</table>
+
+<c:if test="${schemaMtl.appNr>1}">
+	<table>
+		<tr><th>Name</th><th>Zyklus</th><th>Tag</th><th>Applikation</th><th>Therapiestart</th><th></th></tr>
+		<c:forEach begin="1" end="${schemaMtl.appNr}" var="subTaskNr">
+			<tr>
+				<td><mtl:planName blockT="${schemaMtl.docT}"/></td>
+				<td></td>
+				<td>${schemaMtl.schemaC.duration*(subTaskNr-1)+1}</td>
+				<td>${subTaskNr}</td>
+				<td></td>
+				<td>______________________</td>
+			</tr>
+		</c:forEach>
+	</table>
+</c:if>
+<mtl:repetitionDay/>
+<qhtm:footnotes />
+
+<!--
+<hr/>
+<c:forEach items="${schemaMtl.plan}" var="ts">
+	${not empty ts.begin}.
+	${not empty ts.beyond}.
+	${ts}
+	<hr/>
+</c:forEach>
+-->
+
+<br/>
+<br/>
+<!-- 
+<table width="100%">
+	<tr>
+		<td>Dr.Mantovani</td>
+		<td>Dr.Schimmelpfennig</td>
+		<td>Dr.Kretzschmar</td>
+		<td>Dr.Blasberg</td>
+	</tr>
+</table>
+ -->
+
+<sql:query var="sigBlock" dataSource="${owsDbSource}" scope="session" >
+select notice from tree, notice where did=?<sql:param value="${owsSession.stationM.idinstitute}"/>
+and idclass=idnotice and type='signatureBlock'
+</sql:query>
+<c:forEach var="r" items="${sigBlock.rows}">${r.notice}</c:forEach>
+
+<c:if test="${not empty schemaMtl and param.part!='all' and owsSession.withInfo}">
+	<mtl:alienNotice />
+</c:if>
+
+</jsp:root>

@@ -1,0 +1,61 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="drugT" type="com.qwit.domain.Tree" required="true" description="The drug tree object"/>
+
+<c:set var="drugC" value="${drugT.mtlO}" />
+<c:if test="${empty drugC}">
+	<c:set var="drugC" value="${patientMtl.classM[drugT.idClass]}" />
+</c:if>
+
+<c:choose>
+	<c:when test="${'finding'==drugT.tabName }">
+		${drugT.mtlO.finding }
+	</c:when>
+	<c:when test="${'expr'==drugT.tabName }">
+		${drugT.mtlO.expr }
+		${drugT.mtlO.value}
+	</c:when>
+	<c:when test="${'labor'==drugT.tabName }">
+		${drugT.mtlO.labor }
+	</c:when>
+	<c:when test="${'drug'==drugT.tabName }">
+		<c:set var="drugName"><mtl:drugGenericName drugO="${drugC}"/></c:set>
+		<!-- 
+		<c:set var="drugName">${drugC.generic.drug}</c:set>
+		<c:if test="${drugC!=drugC.generic}">
+			<c:set var="drugName">${drugName}
+				<span style="color: green;">(${fn:toUpperCase(drugC.drug)})</span>
+			</c:set>
+		</c:if>
+		 -->
+		<c:choose>
+			<c:when test="${drugT.parentT.id==schemaMtl.docT.id}">
+				<span class="b">${drugName}</span>
+			</c:when>
+			<c:otherwise>${drugName}</c:otherwise>
+		</c:choose>
+		<c:set var="tradeC" value="${schemaMtl.trade[drugC.id]}" />
+		<c:if test="${not empty tradeC}">
+			<c:out value=" " />
+			<span style="color: green;">(${fn:toUpperCase(tradeC.drug)})</span>
+			<c:out value=" " />
+		</c:if>
+	</c:when>
+	<c:when test="${'notice'==drugT.tabName }">
+		${fn:substring(drugT.mtlO.notice,0,10) }...
+		[${drugT.id }]
+	</c:when>
+	<c:otherwise>
+	drugT.mtlO.drug!=${drugT.tabName}--${drugT.id}
+	<!-- 
+	${drugT.mtlO.drug}
+	 -->
+	</c:otherwise>
+</c:choose>
+
+
+</jsp:root>

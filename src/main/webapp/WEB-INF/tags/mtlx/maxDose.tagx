@@ -1,0 +1,66 @@
+<jsp:root version="2.0"
+	xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+	<jsp:directive.attribute name="noticeT"	type="com.qwit.domain.Tree"	required="true" />
+
+
+<c:if test="${noticeT.mtlO.type=='totalsdose'}">
+a33
+<c:forEach var="exprT" items="${noticeT.childTs}">
+	<c:if test="${'expr'==exprT.tabName}">
+		<c:set var="mtlO" value="${exprT.mtlO}" />
+		<c:choose>
+			<c:when test="${mtlO.value=='maxDose'}"><c:set var="maxDoseT" value="${exprT}" /></c:when>
+			<c:when test="${mtlO.value=='maxDoseCumulative'}"><c:set var="maxDoseCumulativeT" value="${exprT}" /></c:when>
+		</c:choose>
+		<c:forEach var="doseT" items="${exprT.childTs}">
+			<c:choose>
+				<c:when test="${maxDoseT==doseT.parentT}"><c:set var="maxDoseDoseT" value="${doseT}" /></c:when>
+				<c:when test="${maxDoseCumulativeT==doseT.parentT}"><c:set var="maxDoseCumulativeDoseT" value="${doseT}" /></c:when>
+			</c:choose>
+		</c:forEach>
+	</c:if>
+</c:forEach>
+
+<c:choose>
+	<c:when test="${empty maxDoseT}">
+	<!-- 
+		<qhtm:a idt="${noticeT.id}" action="newMaxDose">
+	 -->
+		<qhtm:a idt="${noticeT.id}" action="summeDoseExpr">
+			<spring:message code="mtl_expr_value_maxDose"/>
+		</qhtm:a>
+	</c:when>
+	<c:otherwise>
+		<spring:message code="mtl_expr_value_maxDose"/>
+		<c:out value=" " />
+		<mtl:maxDoseDose maxDoseExprT="${maxDoseT}" maxDoseDoseT="${maxDoseDoseT}"/>
+		<!-- 
+		<mtl:maxDoseDose maxDoseDoseT="${maxDoseDoseT}"/>
+		 -->
+	</c:otherwise>
+</c:choose>,
+<c:choose>
+	<c:when test="${empty maxDoseCumulativeT}">
+	<!-- 
+		<qhtm:a idt="${noticeT.id}" action="maxDoseCumulative">
+	 -->
+		<qhtm:a idt="${noticeT.id}" action="summeDoseExpr">
+			<spring:message code="mtl_expr_value_maxDoseCumulative"/>
+		</qhtm:a>
+	</c:when>
+	<c:otherwise>
+		<spring:message code="mtl_expr_value_maxDoseCumulative"/>
+		<mtl:maxDoseDose maxDoseExprT="${maxDoseCumulativeT}" maxDoseDoseT="${maxDoseCumulativeDoseT}"/>
+	</c:otherwise>
+</c:choose>
+
+</c:if>
+
+</jsp:root>

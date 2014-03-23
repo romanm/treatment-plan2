@@ -1,0 +1,79 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+
+Notice type:
+<c:if test="${not empty param.userNoticeType}">
+	<c:set var="userNoticeType" value="${param.userNoticeType}" scope="session"/>
+</c:if>
+
+<c:set var="userId" value="${userMtl.docT.id }" />
+
+<c:set var="prefix" value="mtl_notice_type_"/>
+
+<select name="noticeType" onchange="self.location.href='${user_url}?id=${userId}&amp;part=massMaintenance_notice&amp;userNoticeType='+this.options[this.selectedIndex].value">
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="labor"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="scriteria"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="bre"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="tda"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="tubo_advice"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="radiotherapy"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="port"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="dreductionHematoTox"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="dreduction"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="toxicity"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="totalsdose"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="interaction"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="paravasat"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="literature"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="rqm"/>
+	<qhtm:option prefix="${prefix}" myValue="${userNoticeType}" value="sup"/>
+</select>
+
+${not empty userNoticeType}
+aa
+${userNoticeType}
+dd
+${currentState.id }
+dd
+${flowScope.lastViewStateId}
+<c:if test="${not empty userNoticeType}">
+	<!-- 
+	SELECT * FROM notice, (SELECT idclass, count(*) as cnt FROM tree group by idclass) cnt
+	where type=?<sql:param value="${userNoticeType}"/>
+	and cnt.idclass=idnotice
+	order by cnt.cnt desc
+	 -->
+	<sql:query var="schemaUseR" dataSource="${owsDbSource}" scope="request" >
+		SELECT * FROM notice
+ , (SELECT idclass, count(*) as cnt FROM tree group by idclass) cnt
+ , (SELECT t2.idclass, count(*) as doccnt FROM tree t1,tree t2 WHERE t1.id=t2.iddoc and t1.id=t1.idclass group by t2.idclass) doc
+	where type=?<sql:param value="${userNoticeType}"/>
+	and cnt.idclass=idnotice
+	and doc.idclass=idnotice
+	order by cnt.cnt desc
+	</sql:query>
+	<table>
+		<c:set var="rowCnt" />
+		<c:forEach var="row" items="${schemaUseR.rows}">
+			<c:if test="${rowCnt!=row.cnt-1}">
+				<c:set var="rowCnt"  value="${row.cnt-1}"/>
+				<tr><th colspan="2">
+				<c:choose>
+					<c:when test="${0==rowCnt}">Null Verwendung. <a href="#">Löschen?</a></c:when>
+					<c:otherwise> Verwendet ${rowCnt} mal.</c:otherwise>
+				</c:choose>
+				</th></tr>
+			</c:if>
+			<tr><td class="select" id="n_${row.idnotice}">
+				<mtl:notice noticeM="${row }"/>
+			</td><td>${row.cnt-1}/${row.doccnt}</td></tr>
+		</c:forEach>
+	</table>
+</c:if>
+</jsp:root>

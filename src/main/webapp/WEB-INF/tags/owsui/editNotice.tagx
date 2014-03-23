@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="noticeT" type="com.qwit.domain.Tree" required="true" description="The notice tree object"/>
+<jsp:directive.attribute name="editWithType" type="java.lang.Boolean" description="editWithType"/>
+
+<c:choose>
+	<c:when test="${empty noticeT}"/>
+	<c:when test="${not empty docMtl.editNoticeC and docMtl.idt==noticeT.id and 'totalsdose'==docMtl.editNoticeC.type}">
+		in edit...
+	</c:when>
+	<c:when test="${not empty docMtl.editNoticeC and docMtl.idt==noticeT.id}">
+		<c:if test="${editWithType and 'task'!=noticeT.parentT.tabName }">
+			<owsui:editNoticeType noticeT="${noticeT}"/>
+		</c:if>
+		<c:if test="${'labor'==docMtl.editNoticeC.type }">
+			<div id="labChainView">
+				<c:forEach var="l" items="${fn:split(docMtl.laborChain,',')}">
+					<c:if test="${fn:length(fn:trim(l))>0}">
+						<spring:message code="mtl_notice_type_labor_${fn:trim(l)}"/>,
+					</c:if>
+				</c:forEach>
+			</div>
+		</c:if>
+		<owsui:htmlEditor notice="${docMtl.editNoticeC.notice}"/>
+		<c:choose>
+			<c:when test="${not empty instituteMtl }">
+				<form:errors path="*" cssClass="note"/>
+				<input type="submit" name="_eventId_save"	value="${ui_button_save}" id="bdSave"/>
+				<input type="button" onclick="cancelReload();" value="${ui_button_cancel}" />
+			</c:when>
+			<c:otherwise>
+				<owsui:okButton toOnClick="setNotice()" id="reviseNode2" />
+				<owsui:cancelButton />
+				<br/>
+			</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:when test="${fn:contains(noticeT.mtlO.notice, 'a href')}">
+		
+		<qhtm:a idt="${noticeT.id}" noEditNoView="${true}">
+			<fmt:message var="ui_edit" key="ui_edit" />
+			<spring:url var="imgNoteUrl" value="/images/note.gif"/>
+			<img src="${imgNoteUrl}" alt="${ui_edit }..." />
+		</qhtm:a>
+		${noticeT.mtlO.notice}
+	</c:when>
+	<c:otherwise>
+		<qhtm:a idt="${noticeT.id}" >
+			<mtl:notice noticeT="${noticeT}" />
+			<c:if test="${not empty patientMtl and empty noticeT.mtlO.notice}">?___________</c:if>
+		</qhtm:a>
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

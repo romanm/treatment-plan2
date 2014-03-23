@@ -1,0 +1,18 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+<jsp:directive.attribute name="doseT"		type="com.qwit.domain.Tree"/>
+<jsp:directive.attribute name="doseModT"	type="com.qwit.domain.Tree"/>
+
+<c:choose>
+	<c:when test="${'dose'==doseModT.tabName and 'pc'==doseModT.mtlO.type}">
+		≈<fmt:formatNumber pattern="##" value="${doseModT.mtlO.value/schemaMtl.calcDose[doseT]*100}" />%
+	</c:when>
+	<c:when test="${'dose'==doseModT.tabName and 'p'==doseModT.mtlO.type}">
+		≈<fmt:formatNumber pattern="##" value="${doseModT.mtlO.value/doseT.mtlO.value*100}" />%
+	</c:when>
+	<c:when test="${'ivariable'==doseModT.tabName}">${doseModT.mtlO.ivalue}%</c:when>
+	<c:otherwise>100%</c:otherwise>
+</c:choose>
+</jsp:root>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0"
+	xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+>
+<jsp:directive.attribute name="doseT" type="com.qwit.domain.Tree" required="true" description="The dose tree object"/>
+<jsp:directive.attribute name="ts" type="com.qwit.domain.Ts"/>
+
+<c:choose>
+	<c:when test="${empty schemaMtl.calcDose[doseT] and not fn:contains(doseT.mtlO.unit,'/')}">
+		<fmt:formatNumber pattern="#.###">${doseT.mtlO.value}</fmt:formatNumber>
+	</c:when>
+	<c:when test="${not empty schemaMtl.calcDose[doseT]}">
+		<c:set var="procent">
+			<fmt:formatNumber pattern="#.###">${schemaMtl.calcDoseR[doseT] *100 / schemaMtl.calcDose[doseT] -100}</fmt:formatNumber>
+		</c:set>
+		
+		<c:set var="title">
+			<fmt:formatNumber pattern="##.###">${schemaMtl.calcDose[doseT]}</fmt:formatNumber> (${procent}%)
+		</c:set>
+		
+		<!-- 
+		<spring:eval var="patientDoseProcentT" expression="jxp.pDoseProcentT(schemaMtl,doseT.parentT,0)"/>
+		<spring:eval var="patientDoseProcentDoseT" expression="jxp.pDoseProcentT(schemaMtl,doseT.parentT,0)"/>
+		 -->	
+<!-- 
+		<c:choose>
+			<c:when test="${not empty patientDoseProcentDoseT}">
+				<c:set var="patientDoseProcentDoseC" value="${schemaMtl.patientMtl.classM[patientDoseProcentDoseT.idClass]}" />
+				<c:choose>
+					<c:when test="${patientDoseProcentDoseC.type=='pc'}">
+						<c:set var="procent">
+							<fmt:formatNumber pattern="##.###">${patientDoseProcentDoseC.value/schemaMtl.calcDoseR[doseT]*100}</fmt:formatNumber>
+						</c:set>
+						<c:set var="title"> ${procent}% (100%=<fmt:formatNumber
+							pattern="##.###">${schemaMtl.calcDose[doseT]}</fmt:formatNumber>)</c:set>
+						<c:set var="malCalcDose" value="${patientDoseProcentDoseC.value}" />
+					</c:when>
+					<c:when test="${patientDoseProcentDoseC.type=='p'}">
+						<c:set var="procent">
+							<fmt:formatNumber pattern="##.###">${patientDoseProcentDoseC.value/schemaMtl.classM[doseT.idClass].value*100}</fmt:formatNumber>
+						</c:set>
+						<c:set var="title">(${procent}%)</c:set>
+						<c:set var="malCalcDose">${schemaMtl.calcDoseR[patientDoseProcentDoseT]}</c:set>
+					</c:when>
+				</c:choose>
+			</c:when>
+			<c:when test="${not empty patientDoseProcentT}">
+				<spring:eval var="procent2dose" expression="schemaMtl.calcDoseR[doseT]*jxp.procent(schemaMtl,doseT)/100"/>
+				<c:set var="procent">
+					<fmt:formatNumber pattern="##.###">${procent2dose/schemaMtl.calcDose[doseT]*100}</fmt:formatNumber>
+				</c:set>
+				<c:set var="title"> ${procent}% (100%=<fmt:formatNumber pattern="##.###">${schemaMtl.calcDose[doseT]}</fmt:formatNumber>)</c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="malCalcDose" value="${schemaMtl.calcDoseR[doseT]}" />
+			</c:otherwise>
+		</c:choose>
+ -->
+		<c:set var="malCalcDose" value="${schemaMtl.calcDoseR[doseT]}" />
+		<c:if test="${not empty ts and 'day'==doseT.mtlO.pro}">
+			<c:set var="title">${title}. ${malCalcDose}/d</c:set>
+			<spring:eval var="malInDay" expression="schemaMtl.malInDay(ts)" />
+			<c:set var="malCalcDose" value="${malCalcDose/malInDay}" />
+		</c:if>
+		<span title="${title}">
+		<fmt:formatNumber pattern="#.###">${malCalcDose}</fmt:formatNumber></span>
+	</c:when>
+	<c:otherwise>?____</c:otherwise>
+</c:choose>
+</jsp:root>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="exprT" type="com.qwit.domain.Tree" required="true" description="The expr tree object"/>
+
+<c:choose>
+<c:when test="${'functionCall'==exprT.mtlO.expr}">
+	<c:choose>
+		<c:when test="${'maxDose'==exprT.mtlO.value}">
+			<fmt:message key="maxDose"/>
+			<c:forEach var="doseT" items="${exprT.childTs}">
+				<c:out value=" " />
+				<mtl:doseValue	doseT="${doseT}"/>
+				<mtl:doseUnit	doseT="${doseT}"/>
+			</c:forEach>
+		</c:when>
+		<c:when test="${'roundMultiple'==exprT.mtlO.value}">
+			<fmt:message key="uiRoundMultiple"/>
+			<c:forEach var="pv" items="${exprT.childTs}">
+				<c:set var="pvC" value="${schemaMtl.classM[pv.idClass]}"/>
+				${pvC.pvalue}
+				<mtl:doseUnit doseT="${exprT.parentT}" calculated="true"/>
+			</c:forEach>
+		</c:when>
+		<c:when test="${'SteroidDayDose'==exprT.mtlO.value}">
+		<a href="../tablete/showflow?id=${schemaMtl.docT.id}&amp;idt=${exprT.id}">
+			<fmt:message key="uiTabletDose"/>
+			<c:forEach items="${exprT.parentT.childTs}" var="tabletT">
+				<c:if test="${tabletT.tabName=='tablet'}">
+					<c:set var="tabletC" value="${schemaMtl.classM[tabletT.idClass]}"/>
+					<fmt:formatNumber pattern="##.###">${tabletC.value}</fmt:formatNumber>
+					${tabletC.unit}
+					<c:choose>
+						<c:when test="${tabletC.portion==2}">(<fmt:message key="uiTablete1to2"/>)</c:when>
+						<c:when test="${tabletC.portion==4}">(<fmt:message key="uiTablete1to4"/>)</c:when>
+					</c:choose>
+				</c:if>
+			</c:forEach>
+		</a>
+		</c:when>
+		<c:otherwise>
+			<fmt:message key="mtl_expr_value_${exprT.mtlO.value}"/>
+		</c:otherwise>
+	</c:choose>
+</c:when>
+</c:choose>
+
+</jsp:root>

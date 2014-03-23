@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+>
+	<jsp:directive.attribute name="tree" type="com.qwit.domain.Tree" required="true" description="The tree object"/>
+	<jsp:directive.attribute name="name" type="java.lang.String" required="true" description="The html tag name"/>
+	<jsp:directive.attribute name="prefix" type="java.lang.String" required="true" description="Prefix to tag id "/>
+	
+	<jsp:directive.attribute name="ts" type="com.qwit.domain.Ts" required="false" description="The mtl ts object"/>
+	<jsp:directive.attribute name="cssClass" type="java.lang.String" required="false" description="Tag class attribute add"/>
+	<jsp:directive.attribute name="style" type="java.lang.String" required="false" description="Tag style attribute"/>
+	<jsp:directive.attribute name="title" type="java.lang.String" required="false" description="Tag title attribute"/>
+	<jsp:directive.attribute name="colspan" type="java.lang.String" required="false" description="Tag title attribute"/>
+	<c:set var="tagId" >${prefix}${tree.id}</c:set>
+	<c:if test="${empty tree}">
+		<c:set var="tagId" >${prefix}${tree.id}</c:set>
+	</c:if>
+	<c:set var="cssClass" >select ${tree.tabName} ${cssClass}</c:set>
+	<c:choose>
+		<c:when test="${tree.id==docMtl.editNodeT.id or tree.id==docMtl.idt}">
+			<c:set var="cssClass">${tagClass} select edited</c:set>
+		</c:when>
+		<c:when test="${tree.id==docMtl.editNodeT.parentT.id and docMtl.editNodeT.id==ts.timesT.parentT.id}">
+			<c:set var="cssClass">${tagClass} parentOfedited</c:set>
+		</c:when>
+	</c:choose>
+	<c:choose>
+		<c:when test="${not empty style and not empty title}">
+<jsp:element name="${name}">
+	<jsp:attribute name="id">${tagId}</jsp:attribute>
+	<jsp:attribute name="class">${cssClass}</jsp:attribute>
+	<jsp:attribute name="style">${style}</jsp:attribute>
+	<jsp:attribute name="title">${title}</jsp:attribute>
+	<jsp:doBody />
+</jsp:element>
+		</c:when>
+		<c:when test="${not empty style}">
+<jsp:element name="${name}">
+	<jsp:attribute name="id">${tagId}</jsp:attribute>
+	<jsp:attribute name="class">${cssClass}</jsp:attribute>
+	<jsp:attribute name="style">${style}</jsp:attribute>
+	<jsp:doBody />
+</jsp:element>
+		</c:when>
+		<c:when test="${not empty title}">
+<jsp:element name="${name}">
+	<jsp:attribute name="id">${tagId}</jsp:attribute>
+	<jsp:attribute name="class">${cssClass}</jsp:attribute>
+	<jsp:attribute name="title">${title}</jsp:attribute>
+	<jsp:doBody />
+</jsp:element>
+		</c:when>
+		<c:otherwise>
+<jsp:element name="${name}">
+	<jsp:attribute name="id">${tagId}</jsp:attribute>
+	<jsp:attribute name="class">${cssClass}</jsp:attribute>
+	<jsp:doBody />
+</jsp:element>
+		</c:otherwise>
+	</c:choose>
+</jsp:root>

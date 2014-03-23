@@ -1,0 +1,48 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="tree" type="com.qwit.domain.Tree" required="true"
+	description="The if tree object"/>
+<c:set var="t2T" value="${tree}" />
+<c:if test="${tree==docMtl.editNodeT.parentT}">
+	<c:set var="t2T" value="${docMtl.editNodeT}" />
+</c:if>
+<qhtm:tag name="span" prefix="ex_" tree="${t2T}">
+	<c:out value=" "/>
+	<qhtm:a idt="${tree.id}" noEdit="${tree.docT!=docMtl.docT }">
+		<b><fmt:message key="mtl_expr_expr_${tree.mtlO.expr}" /></b>
+	</qhtm:a>
+	<c:out value=" "/>
+</qhtm:tag>
+<c:if test="${empty tree.childTs }">
+	<mtl:provideEditSelect editT="${thenNodeT}" idSuffix="selectThenExpr"/>
+</c:if>
+<c:forEach var="thenNodeT" items="${tree.childTs }" varStatus="stat">
+	<c:choose>
+		<c:when test="${docMtl.idt==thenNodeT.id}">
+			<mtl:provideEditSelect editT="${thenNodeT}" idSuffix="selectThenExpr"/>
+		</c:when>
+		<c:when test="${'expr'==thenNodeT.tabName}">
+			<span id="e_${thenNodeT.id}" class="select">
+				<owsui:editExpr exprT="${thenNodeT}"/>
+			</span>
+		</c:when>
+		<c:otherwise>
+		<qhtm:tag name="span" prefix="ex_" tree="${thenNodeT}">
+			<c:out value="${stat.count>1?', ':' ' }"/>
+			<qhtm:a idt="${thenNodeT.id}" noEdit="${thenNodeT.docT!=docMtl.docT }">
+				<mtl:ifElement exprT="${thenNodeT}" />
+			</qhtm:a>
+			<c:out value=" "/>
+		</qhtm:tag>
+		</c:otherwise>
+	</c:choose>
+</c:forEach>
+
+</jsp:root>

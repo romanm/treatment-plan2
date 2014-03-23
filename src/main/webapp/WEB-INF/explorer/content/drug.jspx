@@ -1,0 +1,31 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+	<thead>
+		<tr>
+			<th><fmt:message key="ui_drug_genericName" />
+				&#160;(${fn:length(explorerMtl.drugs)})
+			</th>
+			<th><fmt:message key="ui_drug_tradeName" />
+				&#160;(${explorerMtl.drugsSize})
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:forEach var="drug" items="${explorerMtl.drugs}">
+			<tr>
+				<td id="dr_${drug.id}" class="select"><a href="drug=${drug.id}">${drug.drug}</a></td>
+				<td>
+					<c:forEach var="trade" items="${drug.trades}" varStatus="stat">
+						<span id="trade_${trade.id }" class="select">
+							<c:out value="${trade.drug}" />
+						</span>
+						<c:out value="${fn:length(drug.trades)>stat.count?', ':' '}" />
+					</c:forEach>
+				</td>
+			</tr>
+		</c:forEach>
+	</tbody>
+</jsp:root>

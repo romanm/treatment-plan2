@@ -1,0 +1,138 @@
+#header, #headline, #sidebar, #top, .noprint
+	{display:none;}
+.metalinks
+	{display:none;}
+body
+	{font:80%/1.4em Verdana,Arial,Tahoma,"Trebuchet MS",sans-serif;}
+#content h2
+	{border-bottom: 2px solid #CCCCCC;line-height:1.1em;}
+		/*
+		{border-bottom:2px solid #CCCCCC;font-size:1.7em;font-weight:700;letter-spacing:-1px;}
+		*/
+table
+	{text-align:left;}
+div.floatRight {float: right;}
+.nowrap
+	{white-space: nowrap;}
+.rightNormal 
+	{float: right;font-weight: normal;}
+/*
+table.header1 thead tr th
+*/
+table thead tr th {background-color:#EEEEEE;border-spacing:0;}
+tr.planday th, tr.planday td {border-top: 3px double;}
+tr.boboDo th,tr.boboDo td {border-bottom: 3px double;}
+
+tr.careweek th {border-bottom: 2px solid #CCCCCC;}
+/*
+intensiv
+*/
+div.pageBreakBeforeAlways	{page-break-before: always;}
+table.hour					{border-spacing: 0;width: 100%; text-align: center;}
+col.odd						{background-color: #CCCCCC;}
+table.hour tr th			{border-top: 0.1em solid black; border-right: 0.1em solid black}
+table.hour tr.blinie th,
+table.hour tr.blinie td,
+table.hour tr th.blinie		{border-bottom: 0.2em solid black}
+table.hour tr.group td		{border-top: thin solid black}
+table.hour tr td.alignleft	{text-align: left;}
+table.hourNote				{width: 100%;}
+table.hourNote tr td		{border:1px solid black;vertical-align: top;}
+
+table.tumorboard td.tubo_recomm
+	{border-color: black;border-style: solid;border-width: 1px 10pt;font-size: 16pt;
+	border-left: 10pt solid black;border-right: 10pt solid black;
+	padding-left: 10pt;padding-right: 10pt;
+	}
+a
+	{font-weight:400;text-decoration:none;}
+
+ul.noticeInfo li.b a
+	{font-size:1.1em;font-weight:bold;}
+th a
+	{font-weight:bold;}
+
+.taLeft
+	{text-align:left;}
+.small
+	{font-size:0.8em;}
+/*
+.b		{font-weight:bold;}
+*/
+.b, tr.b span,tr.b a
+	{font-weight:bold;}
+.red
+	{background-color:#E8A1A1;}
+.yellow
+	{background-color: yellow;}
+.green
+	{background-color: green;}
+.blue
+{background-color: blue
+}
+.schemaContentH2,
+	{background-color: rgb(240,240,220)}
+.conceptContentH2
+	{background-color: rgb(220,220,240)}
+	
+
+/********************************************************************
+*
+*       EXPLORER TABLE SECTION
+*
+********************************************************************/
+table.explorer
+{border-collapse: collapse; width: 100%;
+}
+table.explorer tbody tr
+{border-spacing: 11; border-top: 1px dashed #dddddd;
+}
+.table-caption
+{border-bottom: 1px solid #bbbbbb; background-color: rgb(220, 240, 220); font-weight: bold; padding: 4px;
+}
+.table-headline
+{
+}
+.table-header
+{border-bottom: 1px solid #dddddd; background-color: rgb(220, 240, 220); padding: 4px;
+}
+.explorer-table-th
+{padding: 4px; border-top: 2px solid #dddddd;
+}
+/*
+table.explorer tr:nth-child(2n+1)
+{
+    background-color:#f9f9f9;
+}
+
+table.explorer tr th 
+{
+    background-color:#f0f0f0;
+}
+*/
+table.explorer span.explorer,
+table.explorer tr td
+{width: 200px; padding: 5px;
+}
+/*formular tables*/
+table.formular tr td,
+table.formular tr th
+{padding: 0; padding-bottom: 15px;
+}
+.gender
+{width: 150px
+}
+/* Homepage Boxes*/
+.boxHeadeer
+{width: 270px; color: #777; font-size: 1.2em; font-weight: bold; /*: ; border: 1px solid #ccc; background-color: #f0f0f0; text-align: left; padding-left: 5px; padding-top: 0px; */
+}
+.boxBody
+{/* : ; width: 250px; background-color: #f6f6f6; text-align: left; margin: 5px 0 15px 0; border: 0px; font-size: 0.9em; */ color: #777;
+}
+
+#returnToTop
+{
+	display:none;	
+}
+.folderPadding {display: inline; padding-left: 1.5em;}
+	

@@ -1,0 +1,16 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+<jsp:directive.attribute name="drugO" type="com.qwit.domain.Drug" 
+required="true" description="The drug object"/>
+
+${drugO.generic.drug}
+<!-- 
+<c:if test="${drugO!=drugO.generic}">
+	${drugName}<span style="color: green;">(${fn:toUpperCase(drugO.drug)})</span>
+</c:if>
+ -->
+
+</jsp:root>

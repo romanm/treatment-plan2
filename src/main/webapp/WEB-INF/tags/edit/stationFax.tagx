@@ -1,0 +1,30 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+
+<mtl:patientName />
+
+<form:form id="pdf" modelAttribute="instituteO">
+	<table>
+		<tr><th><fmt:message key="ui_editStationName" /></th><td>
+			<form:input path="institute" cssStyle="width:320px" />
+		</td></tr>
+		<tr><th>Phone:</th><td>
+			<form:input path="phone" cssStyle="width:120px" />
+		</td></tr>
+		<tr><th>Fax:</th><td>
+			<form:input path="fax" cssStyle="width:120px" />
+		</td></tr>
+	</table>
+	<form:errors path="*" cssClass="note"/>
+	<br/>
+	<input type="submit" name="_eventId_save"	value="${ui_button_save}" id="bdSave"/>
+	<input type="button" onclick="cancelReload();" value="${ui_button_cancel}" />
+</form:form>
+
+</jsp:root>

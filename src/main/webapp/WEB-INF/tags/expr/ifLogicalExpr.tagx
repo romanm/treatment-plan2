@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:expr="urn:jsptagdir:/WEB-INF/tags/expr"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="ifT" type="com.qwit.domain.Tree" required="true" 
+description="The if tree object"/>
+
+<qhtm:tag name="span" prefix="ex_" tree="${ifT}">
+	${ifHtml}
+</qhtm:tag>
+
+<c:set var="logicT" value="${ifT.childTs[0]}" />
+<c:choose>
+	<c:when test="${'equality'==logicT.mtlO.expr}">
+		<expr:equalityExpr equalityT="${logicT}" />
+	</c:when>
+	<c:when test="${'andOrExpr'==logicT.mtlO.expr}">
+		<c:forEach var="equalityT" items="${logicT.childTs}" varStatus="stat">
+			<c:choose>
+				<c:when test="${stat.count==1}"/>
+				<c:when test="${stat.count==2}">
+					<expr:andOrExpr logicT="${logicT}" />
+				</c:when>
+				<c:otherwise>${logicT.mtlO.value}</c:otherwise>
+			</c:choose>
+			<expr:equalityExpr equalityT="${equalityT}" />
+		</c:forEach>
+	</c:when>
+</c:choose>
+</jsp:root>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="schemaT" type="com.qwit.domain.Tree" required="true" description=""/>
+<jsp:directive.attribute name="conceptMtl" type="com.qwit.model.ConceptMtl" required="true" description=""/>
+
+<div class="task select" id="cs_${schemaT.id}" >
+	<img src="images/syringe.gif"/>
+	<c:set var="schemaC" value="${conceptMtl.classM[schemaT.idClass]}" />
+	<c:choose>
+		<c:when test="${not empty conceptMtl.patientMtl}">
+		
+		<spring:eval var="cycleNr" expression="conceptMtl.patientMtl.cycleNr(schemaT)" />
+		<c:choose>
+			<c:when test="${not empty conceptMtl.patientMtl.pschemaRefM[schemaT.id]}">
+				<c:set var="pSchemaT" value="${conceptMtl.patientMtl.pschemaRefM[schemaT.id]}" />
+				<a href="schema-${owsSession.schemaPart}-${schemaT.id}">${schemaT.mtlO.task }</a>
+				<c:out value=" " />
+				<fmt:formatDate value="${pSchemaT.history.mdate}" pattern="dd-MM-yyyy" />
+				<c:out value=" " />
+				<!-- 
+				<mtl:schemaCycleNr cycleNr="${cycleNr}" />
+				 -->
+		<sub><fmt:message key="mtl_expr_value_cycleNr" />${cycleNr}</sub>
+			</c:when>
+			<c:otherwise>
+		${schemaT.mtlO.task } start 
+		<!-- 
+		<spring:eval var="psSchemaT" expression="docMtl.previousSibling(schemaT)" />
+		<c:set var="psPSchemaT" value="${conceptMtl.patientMtl.pschemaRefM[psSchemaT.id]}" />
+		 -->
+		<spring:eval var="psPSchemaT" expression="docMtl.previousPatientSchema(schemaT)" />
+		<c:set var="psSchemaT" value="${conceptMtl.tree[psPSchemaT.ref]}" />
+				<c:choose>
+				<!-- 
+					<c:when test="${not empty psSchemaT and not empty psPSchemaT}">
+				 -->
+					<c:when test="${psSchemaT.idClass==schemaT.idClass }">
+						<a href="schemaflow?a=newCycle&amp;id=${psSchemaT.id}&amp;idt=${schemaT.id}&amp;cycleNr=${cycleNr}">
+		<sub><fmt:message key="mtl_expr_value_cycleNr" />${cycleNr}</sub>
+						</a>
+					</c:when>
+					<c:otherwise>
+		<sub><fmt:message key="mtl_expr_value_cycleNr" />${cycleNr}</sub>
+					</c:otherwise>
+				</c:choose>
+			</c:otherwise>
+			
+		</c:choose>
+
+		</c:when>
+		<c:otherwise>
+			<a href="${schema_url}-${owsSession.schemaPart}-${schemaT.idClass}">
+			<!-- 
+			${schemaT.id}/${schemaT.idClass}/${docMtl.classM[schemaT.idClass]}
+			<qhtm:spanSchemaName taskO="${schemaT.mtlO}"/>
+			 -->
+				<qhtm:spanSchemaName taskO="${docMtl.classM[schemaT.idClass]}"/>
+				<spring:eval var="cycleNr" expression="conceptMtl.cycleNr(schemaT)+1" />
+				<c:out value=" " />
+				<!-- 
+				<c:out value="[${cycleNr}]" />
+				 -->
+				<sub><fmt:message key="mtl_expr_value_cycleNr" />${cycleNr}</sub>
+			</a>
+		</c:otherwise>
+	</c:choose>
+
+</div>
+
+</jsp:root>

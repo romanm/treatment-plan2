@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<mtl:breadcrumb />
+
+<div id="content" class="conceptContent">
+	<h2><a href="concept=${conceptMtl.docT.id}">
+		<qhtm:spanConceptName conceptO="${conceptMtl.docT.mtlO}" />
+	</a></h2>
+	<hr/>
+	<form:form id="f1" modelAttribute="conceptMtl">
+	<c:if test="${empty conceptMtl.patientMtl }">
+		Therapie Schema Definition:
+		<c:forEach var="schemaT" items="${docMtl.originalSchemaL}" varStatus="stat">
+			<qhtm:tag name="div" prefix="dt_" tree="${schemaT}">
+				<a href="${schema_url}=${schemaT.idClass}">
+					<qhtm:spanSchemaName taskO="${schemaT.mtlO}" taskT="${schemaT}"/>
+				</a>
+				<c:out value="${stat.last?'.':','} "/>
+			</qhtm:tag>
+			<c:if test="${not empty docMtl.variantSchemaML[schemaT.id]}">
+				<ul>
+				<c:forEach var="schemaVariantT" items="${docMtl.variantSchemaML[schemaT.id]}" varStatus="stat">
+					<qhtm:tag name="li" prefix="dt_" tree="${schemaVariantT}">
+						<a href="${schema_url}=${schemaVariantT.idClass}">
+							<qhtm:spanSchemaName taskO="${schemaVariantT.mtlO}" taskT="${schemaVariantT}"/>
+						</a>
+					</qhtm:tag>
+				</c:forEach>
+				</ul>
+			</c:if>
+		</c:forEach>
+		<!-- 
+		<hr/>
+		<c:forEach var="schemaT" items="${docMtl.definitionSchemaL}" varStatus="stat">
+			<qhtm:tag name="div" prefix="dt_" tree="${schemaT}">
+				<a href="${schema_url}=${schemaT.idClass}">
+					<qhtm:spanSchemaName taskO="${schemaT.mtlO}"/>
+				</a>
+				<c:out value="${stat.last?'.':','} "/>
+			</qhtm:tag>
+		</c:forEach>
+		 -->
+	</c:if>
+
+	<c:if test="${not empty docMtl.notFlowNotVariant}">
+		<div>
+			<fmt:message key="ui_concept_notdefinition" />
+			<c:forEach items="${conceptMtl.notFlowNotVariant}" var="nfnv" varStatus="stat">
+				${docMtl.tree[nfnv].mtlO.task}
+				<c:out value="${stat.last?'.':','} "/>
+			</c:forEach>
+		</div>
+	</c:if>
+	<h3 class="protocol select" id="c_${docMtl.docT.id}">Konzept Workflow</h3>
+	<c:choose>
+		<c:when test="${part=='c2'}"><mtl:ulConcept conceptET="${conceptMtl.docT}" /></c:when>
+		<c:when test="${part=='use'}"><mtl:useProtocol /></c:when>
+		<c:otherwise>
+			<mtl:conceptBlock blockT="${conceptMtl.docT}" />
+		</c:otherwise>
+	</c:choose>
+	<hr/>
+	<c:choose>
+		<c:when test="${param.part=='use' or formUtil.part=='use'}" />
+		<c:when test="${empty docMtl.patientMtl}" >
+			<spring:eval var="definitionT" expression="jxp.getChild(docMtl.docT,'definition')"/>
+			<spring:eval var="defChecklist" expression="jxp.var('checklist').jxpip(definitionT, 'childTs[tabName=$checklist]')" />
+			<c:forEach items="${defChecklist}" var="dcP">
+				<c:set var="dEl" value="${dcP.value }" />
+				<owsui:titlePane id="cl_${dEl.idClass}" title="${dEl.mtlO.checklist}">
+					<ol>
+						<c:forEach items="${dEl.childTs}" var="ciT">
+							<c:choose>
+								<c:when test="${'notice'==ciT.tabName }">
+									<li>
+										<owsui:editNotice noticeT="${ciT}"/>
+									</li>
+								</c:when>
+								<c:when test="${'checklist'==ciT.tabName }">
+							<li>${ciT.mtlO.checklist}</li>
+								</c:when>
+								<c:when test="${'checkitem'==ciT.tabName }">
+							<li>${ciT.mtlO.checkitem}</li>
+								</c:when>
+								<c:otherwise>
+							<li>${ciT.mtlO}</li>
+								</c:otherwise>
+							</c:choose>
+						</c:forEach>
+					</ol>
+				</owsui:titlePane>
+			</c:forEach>
+		</c:when>
+		<c:otherwise>
+		</c:otherwise>
+	</c:choose>
+	<mtl:form1hidden />
+	</form:form>
+</div>
+ 
+<div id="sidebar">
+	<owsui:docToolbar />
+	<edit:panel />
+	<!-- 
+	<mtl:nextSave />
+	<c:choose>
+		<c:when test="${formUtil.mode=='newSchema'}"><dialog:newConceptSchema /></c:when>
+		<c:when test="${docMtl.idt==docMtl.docT.id}"> <dialog:dialogEditConceptName /> </c:when>
+		<c:otherwise><fmt:message key="infoDialog" /></c:otherwise> 
+	</c:choose>
+	 -->
+	<h2><fmt:message key="ui_title_views" /></h2>
+	<ul>
+		<li><qhtm:aView part="c1">Sicht 1</qhtm:aView></li>
+		<li><qhtm:aView part="c2">Sicht 2</qhtm:aView></li>
+		<c:if test="${empty schemaMtl.patientMtl}">
+			<li><qhtm:aView part="use"	level="${concept_url}"><mtl:schemaViewName part="use"/></qhtm:aView></li>
+		</c:if>
+		<c:if test="${docMtl.docT.idClass!=docMtl.docT.id}">
+			<br/><br/>
+			<a href="concept=${docMtl.docT.idClass }" target="_blank" >
+				<c:url var="linkExternal" value="/resources/images/link-external.gif" />
+				<img alt="link-external" src="${linkExternal}"/>
+				<c:out value=" " />
+				<fmt:message key="ui_muster" />
+			</a>
+		</c:if>
+		<li>
+			<a href="pdf-concept-c1-${docMtl.docT.id }">
+				<img alt="pdf" src="resources/images/pdf.gif"/>
+			pdf
+			</a>
+		</li>
+	</ul>
+</div>
+
+</jsp:root>

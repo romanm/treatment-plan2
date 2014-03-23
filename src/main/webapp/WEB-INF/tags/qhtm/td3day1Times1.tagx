@@ -1,0 +1,31 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="parentT" type="com.qwit.domain.Tree" required="true" description="The tree object"/>
+<spring:eval var="dayT" expression="jxp.child(parentT,'day',1)" />
+<c:choose>
+	<c:when test="${empty dayT or 'usageBlock_title'==parentT.mtlO.type}">
+		<td colspan="3"></td>
+	</c:when>
+	<c:otherwise>
+	<!-- 
+		qhtm:tag name="td" prefix="td_" tree="${dayT}" style="white-space: nowrap">
+	 -->
+		<qhtm:tag name="td" prefix="td_" tree="${dayT}" >
+			<owsui:editDay dayT="${dayT}"/>
+			<qhtm:subNEnr parentT="${dayT}" />
+		</qhtm:tag>
+		<!-- Times -->
+		<spring:eval var="timesT" expression="jxp.child(dayT,'times',1)" />
+		<qhtm:tag name="td" prefix="td_" tree="${timesT}" style="white-space: nowrap">
+			<owsui:editTime timeT="${timesT}"/>
+		</qhtm:tag>
+		<c:set var="timesNr" value="${docMtl.timesNr[timesT]}" />
+		<td><a name="timesNr_${timesNr}">${timesNr}</a></td>
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

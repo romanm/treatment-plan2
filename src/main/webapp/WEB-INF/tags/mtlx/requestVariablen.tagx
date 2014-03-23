@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+
+		<c:set var="currentSWFState" value="${flowRequestContext.currentState.id}"
+															scope="request"/>
+		<c:choose>
+			<c:when test="${not empty schemaMtl}">
+				<c:set var="docMtl" value="${schemaMtl}"	scope="request" />
+				<c:set var="flow" value="schemaflow"		scope="request" />
+				<c:set var="url1" value="${schema_url}"		scope="request" />
+				<c:set var="patientMtl" value="${schemaMtl.patientMtl}"
+															scope="request" />
+				<!-- 
+				<c:if test="${not empty part}">
+					<c:set var="schemaPart" value="${part}"	scope="session" />
+				</c:if>
+				<c:if test="${not empty part}">
+					<spring:eval expression="owsSession.setSchemaPart(part)" />
+				</c:if>
+				 -->
+			</c:when>
+			<c:when test="${not empty patientMtl}">
+				<c:set var="flow" value="patientflow"		scope="request" />
+				<c:set var="url1" value="${patient_url}"		scope="request" />
+				<c:if test="${not empty patientMtl.tuboId}">
+					<c:set var="flow" value="tuboflow"		scope="request" />
+					<c:set var="url1" value="${tumorboard_url}"
+															scope="request" />
+					<c:if test="${not empty part}">
+						<c:set var="tuboPart" value="${part}"	scope="session" />
+					</c:if>
+				</c:if>
+				<c:set var="docMtl" value="${patientMtl}"	scope="request" /></c:when>
+			<c:when test="${not empty conceptMtl}">
+				<c:set var="flow" value="conceptflow"		scope="request" />
+				<c:set var="url1" value="${concept_url}"	scope="request" />
+				<c:set var="docMtl" value="${conceptMtl}"	scope="request" /></c:when>
+			<c:when test="${not empty userMtl}">
+				<c:if test="${not empty part}">
+					<c:set var="userPart" value="${part}"	scope="session" />
+					<spring:eval expression="owsSession.setUserPart(part)" />
+				</c:if>
+				<c:set var="flow" value="userflow"			scope="request" />
+				<c:set var="url1" value="${user_url}"		scope="request" />
+				<c:set var="docMtl" value="${userMtl}"		scope="request" /></c:when>
+			<c:when test="${not empty drugMtl}">
+				<c:set var="flow" value="drugflow"	scope="request" />
+				<c:set var="url1" value="${drug_url}"		scope="request" />
+				<c:if test="${not empty part}">
+					<c:set var="drugPart" value="${part}"	scope="session" />
+					<spring:eval expression="owsSession.setDrugPart(part)" />
+				</c:if>
+				<c:set var="docMtl" value="${drugMtl}"		scope="request" /></c:when>
+			<c:when test="${not empty explorerMtl}">
+				<c:set var="url1" value="${explorer_url}"	scope="request" />
+				<c:set var="flow" value="explorerflow"		scope="request" />
+				<c:set var="docMtl" value="${explorerMtl}"	scope="request" /></c:when>
+			<c:when test="${not empty instituteMtl}">
+				<c:set var="url1" value="institute"		scope="request" />
+				<c:set var="stationId" value="${instituteMtl.docT.id}"	scope="session" />
+				<c:if test="${not empty part}">
+					<c:set var="stationPart" value="${part}"	scope="session" />
+					<spring:eval expression="owsSession.setStationPart(part)" />
+				</c:if>
+				<c:set var="flow" value="instituteflow"	scope="request" />
+				<c:set var="docMtl" value="${instituteMtl}"	scope="request" />
+			</c:when>
+		</c:choose>
+		
+</jsp:root>

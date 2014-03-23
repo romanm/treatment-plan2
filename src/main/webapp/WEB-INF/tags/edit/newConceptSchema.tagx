@@ -1,0 +1,15 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+>
+
+	<fieldset><legend class="b" ><fmt:message key="uiTherapySchema" /></legend>
+		<form:input path="editSchemaO.task" cssStyle="width:160px"/>
+		<div class="b">
+			<fmt:message key="ui_cycleDauer" />
+		</div>
+		<form:input path="editSchemaO.duration" cssStyle="width:60px"/>
+	</fieldset>
+	<input type="submit" name="_eventId_save"	value="${ui_button_save}" />
+	<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}" />
+</jsp:root>

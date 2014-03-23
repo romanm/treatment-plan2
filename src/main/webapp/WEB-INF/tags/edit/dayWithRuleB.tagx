@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<!-- 
+<c:if test="${docMtl.editNodeT.parentT.tabName=='drug'}">
+	<edit:linkBoard />
+</c:if> 
+ -->
+
+<c:set var="dayT1" value="${docMtl.editDayC}" />
+<c:set var="duration" value="1" />
+<c:choose>
+	<c:when test="${not empty drugMtl}"><c:set var="duration" value="${drugMtl.duration}" /></c:when>
+	<c:when test="${not empty schemaMtl}"><c:set var="duration" value="${schemaMtl.schemaC.duration}" /></c:when>
+</c:choose>
+	<script	type="text/javascript">var duration=${duration};</script>
+	<div style="float: right;">
+		<fmt:message key="ui_day"/>:
+		<fmt:message key="ui_ok" var="ui_ok"/>
+		<c:choose>
+			<c:when test="${not empty drugMtl and formUtil.mode=='duration' and docMtl.schemaC.id==docMtl.docT.id}">
+				<form:input path="duration" cssStyle="width:60px" />
+				<input type="submit" name="_eventId_editDuration" value="${ui_ok}" class="small"/>
+			</c:when>
+			<c:when test="${not empty schemaMtl and formUtil.mode=='duration' and docMtl.schemaC.id==docMtl.docT.id}">
+				<form:input path="schemaC.duration" cssStyle="width:60px" />
+				<input type="submit" name="_eventId_editDuration" value="${ui_ok}" class="small"/>
+			</c:when>
+			<c:otherwise>
+				<a href="?${fn:substringAfter(flowExecutionUrl,'?')}&amp;_eventId=duration">${duration}</a>
+			</c:otherwise>
+		</c:choose>
+	</div> 
+
+	<h3>Absolut</h3>
+	<table id="days" class="nowrap">
+		<thead>
+			<tr class="dotted">
+				<th class="small">W</th>
+				<th colspan="4" align="center">Tage</th>
+				<td><label for="setday_-3">-3</label>
+					<input type="checkbox" onclick="dayAbs();" id="setday_-3" value="-3"/>
+				</td>
+				<td><label for="setday_-2">-2</label>
+					<input type="checkbox" onclick="dayAbs();" id="setday_-2" value="-2"/>
+				</td>
+				<td><label for="setday_-1">-1</label>
+					<input type="checkbox" onclick="dayAbs();" id="setday_-1" value="-1"/>
+				</td>
+			</tr>
+		</thead>
+		<tbody>
+			<c:set var="w" value="1"/>
+			<c:forEach begin="1" end="${duration}" var="weekNr" step="7">
+			<tr class="dotted">
+				<th>${w}</th>
+				<c:forEach begin="${weekNr}" end="${weekNr + 6}" var="dayNr">
+				<td>
+					<label for="setday_${dayNr}">${10>dayNr?'0':''}<c:out value="${dayNr}"/></label>
+					<c:set var="checked" value="" />
+					<c:if test="${dayT1.newtype == 'a'}">
+						<c:forEach items="${fn:split(dayT1.abs, ', ')}" var ="abs">
+		<!-- 
+							<c:if test="${abs == dayNr and dayT1.newtype == 'a'}">
+		 -->
+							<c:if test="${abs == dayNr}">
+								<c:set var="checked" value="checked" />
+							</c:if>
+						</c:forEach>
+					</c:if>
+					<c:choose>
+						<c:when test="${'checked'==checked}">
+							<input type="checkbox" value="${dayNr}" id="setday_${dayNr}" onclick="dayAbs();"
+								checked="checked"/>
+						</c:when>
+						<c:otherwise>
+							<input type="checkbox" value="${dayNr}" id="setday_${dayNr}" onclick="dayAbs();" />
+						</c:otherwise>
+					</c:choose>
+				</td>
+				</c:forEach>
+				<c:set var="w" value="${w + 1}"/>
+			</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+
+
+	<h3>Periodisch</h3>
+	<fmt:message key="uiFromDay"/>
+	<c:set var="fromDay" value="${fn:substringBefore(dayT1.abs,'-')}" />
+	<c:set var="toDay" value="${fn:substringAfter(dayT1.abs,'-')}" />
+	<c:set var="typePeriod" value="${dayT1.newtype=='p'}" />
+	<select id="since" onchange="dayPeriod(this);">
+		<c:set var="w" value="1"/>
+		<c:forEach begin="1" end="${duration}" var="weekNr" step="7">
+			<optgroup label="W${w}">
+				<c:forEach begin="${weekNr}" end="${weekNr + 6}" var="dayNr">
+					<c:choose>
+						<c:when test="${fromDay == dayNr and typePeriod}">
+							<option selected="selected">${dayNr}</option>
+						</c:when>
+						<c:otherwise><option>${dayNr}</option></c:otherwise>
+					</c:choose>
+				</c:forEach>
+				<c:set var="w" value="${w + 1}"/>
+			</optgroup>
+		</c:forEach>
+	</select>
+	<fmt:message key="uiToDay"/>
+	<select id="till" onchange="dayPeriod(this);">
+		<c:set var="w" value="1"/>
+		<c:forEach begin="1" end="${duration}" var="weekNr" step="7">
+		<optgroup label="W${w}">
+			<c:forEach begin="${weekNr}" end="${weekNr + 6}" var="dayNr">
+				<c:choose>
+					<c:when test="${toDay == dayNr and typePeriod}">
+						<option selected="selected">${dayNr}</option>
+					</c:when>
+					<c:otherwise><option>${dayNr}</option></c:otherwise>
+				</c:choose>
+			</c:forEach>
+			<c:set var="w" value="${w + 1}"/>
+		</optgroup>
+		</c:forEach>
+	</select>
+<br />
+
+<h3>Wochentage</h3>
+	<table id="weekday">
+	<thead>
+		<tr class="dotted">
+			<th title="Sonntag">So</th>
+			<th title="Montag">Mo</th>
+			<th title="Dienstag">Di</th>
+			<th title="Mittwoch">Mi</th>
+			<th title="Donnerstag">Do</th>
+			<th title="Freitag">Fr</th>
+			<th title="Samstag">Sa</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr class="dotted">
+			<c:forEach items="So, Mo, Di, Mi, Do, Fr, Sa" var="weekday" varStatus="stat">
+				<td>
+					<c:set var="checked" value="" />
+					<c:if test="${dayT1.newtype == 'w'}">
+					<c:forEach items="${fn:split(dayT1.abs, ', ')}" var ="abs">
+						<spring:eval var="isAbs_int"  expression="abs.matches('[1234567]')"/>
+						<c:if test="${fn:contains(weekday, abs) or (isAbs_int and stat.index==(abs-1))}">
+							<c:set var="checked" value="checked" />
+						</c:if>
+					</c:forEach>
+					</c:if>
+					<c:choose>
+					<c:when test="${'checked'==checked}">
+						<input id="weekday_${stat.index}" type="checkbox" value="${stat.index}" onclick="dayWeek();" checked="checked"/>
+					</c:when>
+					<c:otherwise>
+						<input id="weekday_${stat.index}" type="checkbox" value="${stat.index}" onclick="dayWeek();" />
+					</c:otherwise>
+				</c:choose>
+				</td>
+			</c:forEach>
+		</tr>
+	</tbody>
+	</table>
+
+<!--  -->
+<h3>Sonderregeln A</h3>
+<div>
+		<c:choose>
+			<c:when test="${'timesRelativ'==docMtl.editNodeT.mtlO.newtype}">
+		<input type="checkbox" checked="" id="timesRelativ" onchange="timesRelativF();"/>
+			</c:when>
+			<c:otherwise>
+		<input type="checkbox" id="timesRelativ" onchange="timesRelativF();"/>
+			</c:otherwise>
+		</c:choose>
+		<label for="timesRelativ">
+		<!-- 
+	Übernehmen von Zeitlich verbundene Medikament.
+		Tage von zeitlich verknüpftem Medikament übernehmen
+		 -->
+		Zeitlich verknüpfen mit Zielmedikament
+		</label>
+</div>
+
+<!-- 
+	<ul class="numol">
+		<li id="a_timesRelativ">
+		<spring:eval var="timesT" expression="jxp.child(docMtl.editNodeT,'times',1)" />
+		<c:set var="refTimesT" value="${docMtl.tree[timesT.ref]}" />
+			<c:choose>
+				<c:when test="${1==docMtl.editNodeT.mtlO.abs }">
+		<input type="radio" name="deep" id="deep1" value="1" onchange="timesRelativDeep(this);"/>
+				</c:when>
+				<c:otherwise>
+		<input type="radio" checked="" name="deep" id="deep1" value="1" onchange="timesRelativDeep(this);"/>
+				</c:otherwise>
+			</c:choose>
+		<label for="deep1">#${docMtl.timesNr[refTimesT]}</label>
+		<c:if test="${not empty refTimesT.ref}">
+			und/oder
+			<c:set var="refTimesT" value="${docMtl.tree[refTimesT.ref]}" />
+			<c:choose>
+				<c:when test="${2==docMtl.editNodeT.mtlO.abs }">
+			<input type="radio" checked="" name="deep" id="deep2" value="2" onchange="timesRelativDeep(this);"/>
+				</c:when>
+				<c:otherwise>
+			<input type="radio" name="deep" id="deep2" value="2" onchange="timesRelativDeep(this);"/>
+				</c:otherwise>
+			</c:choose>
+			<label for="deep2">#${docMtl.timesNr[refTimesT]}</label>
+		</c:if>
+		</li>
+		<li id="a_forRule">
+ -->
+
+<h3>Sonderregeln B</h3>
+<c:set var="forRuleT" value="${fn:split(docMtl.editNodeT.mtlO.newtype,'_') }" />
+<c:set var="forRuleN" value="${fn:split(docMtl.editNodeT.mtlO.abs,',') }" />
+		Startgabe am Tag
+	<select id="startDaySelect" onchange="forRule();">
+		<c:forEach begin="1" end="9" var="n" >
+			<option>${n}</option>
+		</c:forEach>
+	</select>
+	<select id="giveCycleSelect" onchange="forRule();" size="2">
+		<c:set var="t" value="als erste Gabe" />
+		<c:choose>
+			<c:when test="${forRuleT[1]=='g'}">
+				<option value="g" selected="">${t}</option>
+			</c:when>
+			<c:otherwise>
+				<option value="g">${t}</option>
+			</c:otherwise>
+		</c:choose>
+		<c:set var="t" value="in diesem Zyklus" />
+		<c:choose>
+			<c:when test="${forRuleT[1]=='c'}">
+				<option value="c" selected="">${t}</option>
+			</c:when>
+			<c:otherwise>
+				<option value="c">${t}</option>
+			</c:otherwise>
+		</c:choose>
+	</select>
+	dann periodisch jede
+
+				<!-- 
+	<spring:eval var="isForRuleN_int"  expression="forRuleN.size()"/>
+	${isForRuleN_int }
+	<spring:eval var="isForRuleN_int"  expression="forRuleN[1].matches('[1234567]')"/>
+	${isForRuleN_int }
+				 -->
+					+${docMtl.editNodeT.mtlO.newtype}
+	<select id="repetitionSelect" onchange="forRule();">
+		<option> </option>
+		<c:forEach begin="1" end="9" var="n" >
+			<c:choose>
+				<c:when test="${dayT1.newtype == 'w'}">
+					<option>${n}</option>
+				</c:when>
+				<c:when test="${isForRuleN_int and forRuleN[1]==n }">
+					<option selected="">${n}</option>
+				</c:when>
+				<c:otherwise>
+					<option>${n}
+					+${docMtl.editNodeT.mtlO.abs}
+					</option>
+				</c:otherwise>
+			</c:choose>
+		</c:forEach>
+	</select>
+	
+			
+	<select id="dayWeekSelect" onchange="forRule();" size="2">
+		<c:set var="t" value="Tage" />
+		<c:choose>
+			<c:when test="${forRuleT[2]=='d'}">
+				<option value="d" selected="">${t}</option>
+			</c:when>
+			<c:otherwise><option value="d">${t}</option></c:otherwise>
+		</c:choose>
+		<c:set var="t" value="Wochen" />
+		<c:choose>
+			<c:when test="${forRuleT[2]=='w'}">
+				<option value="w" selected="">${t}</option>
+			</c:when>
+			<c:otherwise><option value="w">${t}</option></c:otherwise>
+		</c:choose>
+	</select>
+	<!-- 
+		</li>
+	</ul>
+	 -->
+		
+<h3 class="invisibleWhite">.</h3>
+<!-- 
+Hinzufüge neuer
+ -->	
+zusätzlichen 
+<a href="javascript:void(0);" onclick="dojo.byId('idt').value=${docMtl.editNodeT.id};dojo.byId('action').value='newDay';dojo.byId('editStep').click();">
+	<fmt:message key="ui_day"/>
+</a>
+hinzufügen
+<br />
+<!-- 
+Hinzufüge neue 
+ -->
+<a href="javascript:void(0);" onclick="dojo.byId('idt').value=${docMtl.editNodeT.id};dojo.byId('action').value='newNotice';dojo.byId('editStep').click();">
+	<fmt:message key="uiDayNotice"/>
+</a>
+hinzufügen
+	
+</jsp:root>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+>
+			<b>
+	<fmt:message key="ui_BSA" />:
+	<fmt:formatNumber pattern="##.##">${patientMtl.bsa}</fmt:formatNumber> m²,
+			</b>
+	<c:if test="${not empty patientMtl.bsaType 
+	and not empty patientMtl.height 
+	and not empty patientMtl.weight}">
+		<span class="small">
+			<c:out value="(" />
+			<c:choose>
+				<c:when test="${'aibw'==patientMtl.bsaType}">
+			<fmt:message key="ui_bsaType_${patientMtl.bsaType}" >
+				<fmt:param value="${patientMtl.aibw}" />
+				<fmt:param value="${patientMtl.bsaReal}" />
+			</fmt:message> 
+				</c:when>
+				<c:when test="${'2m2'==patientMtl.bsaType}">
+			<fmt:message key="ui_bsaType_${patientMtl.bsaType}" >
+				<fmt:param value="${patientMtl.bsaReal}" />
+			</fmt:message> 
+				</c:when>
+				<c:otherwise>
+			<fmt:message key="ui_bsaType_${patientMtl.bsaType}" />
+				</c:otherwise>
+			</c:choose>
+			<c:out value=")" />
+		</span>
+	</c:if>
+
+</jsp:root>

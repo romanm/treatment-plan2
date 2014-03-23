@@ -1,0 +1,27 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+>
+
+
+<c:choose>
+	<c:when test="${docMtl.rightWriteYes>docMtl.accessRight}">
+		<fmt:message key="ui_noRightToWrite"/>
+		<input type="button" onclick="cancelReload();" value="${ui_button_cancel}" />
+	</c:when>
+	<c:otherwise>
+		<form:form id="f2" modelAttribute="flowObjCreator">
+			<form:errors path="*"/>
+			<form:hidden id="idf" path="idf" />
+			<fieldset>
+				<legend><fmt:message key="ui_newFolderName" />:</legend>
+				<form:input id="newFolderName" path="folder" cssStyle="width:200px"/>
+			</fieldset>
+			<input type="submit" name="_eventId_save"		value="${ui_button_save}"/>
+			<input type="button" onclick="cancelReload();" value="${ui_button_cancel}" />
+		</form:form>
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

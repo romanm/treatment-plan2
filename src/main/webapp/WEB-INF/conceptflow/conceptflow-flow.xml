@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<secured attributes="ROLE_USER" />
+	<persistence-context />
+	
+	<var name="formUtil"	class="com.qwit.util.FormUtil" />
+	<input name="id"		type="int" required="true" />
+	
+	<on-start>
+		<evaluate expression="documentService.setFlushModeCommit()" />
+		<evaluate expression="documentService.makeConceptMtl(id)" result="flowScope.conceptMtl" />
+		<set name="conceptMtl.idt"		value="requestParameters.idt" />
+		<set name="conceptMtl.idc"		value="requestParameters.idc" />
+		<set name="conceptMtl.action"	value="requestParameters.a" />
+	</on-start>
+	
+	<action-state id="handleAction" >
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------handleAction----------')" />
+		</on-entry>
+		<!--
+		<evaluate expression="conceptMtl.getAction()" />
+		-->
+		<evaluate expression="handleAction.handleAction(conceptMtl)" />
+		<transition on="armName"	to="armName" >
+			<evaluate expression="formUtil.logline('----handleAction----armName--1--------')" />
+		</transition>
+		<transition on="copy"	to="conceptxViewAndEdit">
+			<evaluate expression="formUtil.logline('----handleAction----copy--1--------')" />
+			<evaluate expression="documentService.copy(conceptMtl)" />
+			<evaluate expression="formUtil.logline('----handleAction----copy--2--------')" />
+		</transition>
+		<transition on="paste"	to="save">
+			<evaluate expression="documentService.paste(conceptMtl)" />
+		</transition>
+		<!-- 
+		<transition on="newChoose" to="conceptxViewAndEdit" >
+		 -->
+		<transition on="newChoose" to="save" >
+			<set name="formUtil.mode" value="'newChoose'" />
+			<evaluate expression="documentService.addChoose(conceptMtl)" />
+		</transition>
+		<transition on="defineSchemaVariant" to="defineSchemaVariant" >
+		</transition>
+		<transition on="newSchema" to="newConceptSchemax" >
+			<evaluate expression="formUtil.logline('--------handleAction------newSchema----')" />
+			<set name="formUtil.mode" value="'newSchema'" />
+			<evaluate expression="conceptMtl.openEditSchema()" />
+		</transition>
+		<transition on="editConceptNameAndO" to="createEditObject">
+			<evaluate expression="conceptMtl.setIdt(conceptMtl.getDocT().getId())" />
+		</transition>
+		<transition on="deleteNode"	to="deleteNode" />
+		<transition on="save"		to="save">
+			<evaluate expression="documentService.saveConceptSchema(conceptMtl)" />
+		</transition>
+		<transition on="upNode"		to="save" >
+			<evaluate expression="conceptMtl.moveNode('up')" />
+		</transition>
+		<transition on="downNode"	to="save" >
+			<evaluate expression="conceptMtl.moveNode('down')" />
+		</transition>
+	</action-state>
+
+<!--
+	<action-state id="createEditObject">
+		<on-entry>
+			<evaluate expression="formUtil.logline('- -createEditObject- -')" />
+			<evaluate expression="conceptMtl.setEditNodeT()" />
+		</on-entry>
+		<evaluate expression="conceptMtl.editNodeName" />
+		<transition on="protocol"	to="conceptxViewAndEdit">
+			<evaluate expression="conceptMtl.openEditConcept()" />
+		</transition>
+	</action-state>
+-->
+
+	<view-state id="createEditObject" model="conceptMtl" view="conceptxViewAndEdit">
+		<binder>
+			<binding property="newProtocol.protocol" />
+			<binding property="newProtocol.protocolvar" />
+			<binding property="newProtocol.intentionAdjuvant" />
+			<binding property="newProtocol.intentionLine" />
+			<binding property="newProtocol.intentionRests" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------createEditObject----------')" />
+			<evaluate expression="conceptMtl.setEditNodeT()" />
+			<evaluate expression="conceptMtl.openEditConcept()" />
+		</on-entry>
+		<transition on="saveSchema" to="save">
+			<evaluate expression="conceptMtl.reviseIntention()" />
+			<evaluate expression="formUtil.logline('--------createEditObject--before--save------'+conceptMtl.newProtocol)" />
+		</transition>
+	</view-state>
+	
+	<view-state id="conceptxViewAndEdit" model="conceptMtl">
+		<binder>
+			<binding property="conceptC.protocol" />
+			<!-- 
+			<binding property="conceptC.intention" />
+			 -->
+			<binding property="conceptC.intentionAdjuvant" />
+			<binding property="conceptC.intentionLine" />
+			<binding property="conceptC.intentionRests" />
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------conceptxViewAndEdit------1--')" />
+		</on-entry>
+		<transition on="editDuration"	to="conceptxViewAndEdit" >
+			<evaluate expression="conceptMtl.nextCurrentId()" />
+			<evaluate expression="formUtil.logline('--------reviseEditNode-----editDuration--1--')" />
+			<evaluate expression="conceptMtl.reviseIntention()" />
+			<evaluate expression="formUtil.logline('--------reviseEditNode-----editDuration--2--')" />
+			<set name="formUtil.mode"	value="''" />
+			<set name="conceptMtl.idt"	value="null" />
+		</transition>
+		<!-- 
+		<transition on="cancel"		to="cancel" />
+		 -->
+		<transition on="editStep"	to="reviseEditNode" />
+		<transition on="save"		to="reviseEditNode" >
+			<set name="conceptMtl.action"	value="'save'" />
+		</transition>
+		<transition on="newChoose"		to="reviseEditNode">
+			<evaluate expression="formUtil.logline('--------conceptxViewAndEdit-----newChoose--1--')" />
+			<set name="conceptMtl.action"	value="'newChoose'" />
+		</transition>
+		<transition on="copy"		to="reviseEditNode">
+			<evaluate expression="formUtil.logline('--------conceptxViewAndEdit-----copy--1--')" />
+			<set name="conceptMtl.action"	value="'copy'" />
+		</transition>
+		<transition on="paste"		to="reviseEditNode">
+			<evaluate expression="formUtil.logline('--------conceptxViewAndEdit-----paste--1--'+requestParameters.idc)" />
+			<evaluate expression="formUtil.logline('--------conceptxViewAndEdit-----paste--1--'+conceptMtl.idc)" />
+			<set name="conceptMtl.idc"		value="requestParameters.idc" />
+			<set name="conceptMtl.action"	value="'paste'" />
+		</transition>
+	</view-state>
+	
+	<action-state id="reviseEditNode">
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------reviseEditNode-----on-entry----')" />
+		</on-entry>
+		<evaluate expression="conceptMtl.editNodeName" />
+		<transition on="protocol"	to="handleAction" >
+			<evaluate expression="formUtil.logline('--------reviseEditNode-----protocol----')" />
+			<evaluate expression="conceptMtl.reviseIntention()" />
+		</transition>
+		<transition on="success"	to="handleAction"/>
+	</action-state>
+	
+	<view-state id="armName" model="conceptMtl">
+		<binder>
+			<binding property="editArmO.arm"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------newStudyarm----------')" />
+			<evaluate expression="conceptMtl.openEditArm()" />
+			<set name="formUtil.mode" value="'armName'" />
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="formUtil.logline('--------newStudyarm----------1')" />
+			<evaluate expression="documentService.saveArmName(conceptMtl)" />
+			<evaluate expression="formUtil.logline('--------newConceptSchema----------2')" />
+		</transition>
+		<!-- 
+		<transition on="cancel" to="cancel"/>
+		 -->
+	</view-state>
+
+	<view-state id="defineSchemaVariant" model="conceptMtl">
+		<binder>
+			<binding property="idt"/>
+			<binding property="ids"/>
+		</binder>
+		<transition on="save" to="save">
+			<evaluate expression="formUtil.logline('--------defineSchemaVariant----------1')" />
+			<evaluate expression="documentService.saveTaskVariant(conceptMtl)" />
+			<evaluate expression="formUtil.logline('--------defineSchemaVariant----------2')" />
+		</transition>
+	</view-state>
+
+	<view-state id="newConceptSchemax" model="conceptMtl">
+		<binder>
+			<binding property="editSchemaO.task"/>
+			<binding property="editSchemaO.duration"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------newConceptSchemax----------')" />
+		</on-entry>
+		<transition on="save" to="saveSchema">
+			<evaluate expression="formUtil.logline('--------newConceptSchema----------1')" />
+			<evaluate expression="documentService.saveConceptSchema(conceptMtl)" />
+			<evaluate expression="formUtil.logline('--------newConceptSchema----------2')" />
+		</transition>
+		<!-- 
+		<transition on="cancel" to="cancel"/>
+		 -->
+	</view-state>
+	<action-state id="deleteNode">
+	<!-- 
+		<on-entry>
+			<set name="conceptMtl.idt"	value="requestParameters.idt" />
+			<set name="conceptMtl.idc"	value="requestParameters.idc" />
+		</on-entry>
+		<evaluate expression="documentService.deleteEditNode(conceptMtl)" />
+	 -->
+		<evaluate expression="deleteService.deleteConceptEditNode(conceptMtl)" />
+		<transition on="success"	to="save" >
+			<evaluate expression="documentService.saveConceptSchema(conceptMtl)" />
+		</transition>
+	</action-state>
+	
+	<end-state id="saveSchema"	view="externalRedirect:/schema=#{conceptMtl.idt}"	commit="true" />
+	<end-state id="save"	view="externalRedirect:/concept=#{id}"	commit="true" />
+	<end-state id="cancel"	view="externalRedirect:/concept=#{id}" />
+	<global-transitions>
+		<transition on="cancel" to="cancel">
+			<set name="conceptMtl.idt"	value="null" />
+			<set name="conceptMtl.idc"	value="null" />
+		</transition>
+	</global-transitions>
+</flow>

@@ -1,0 +1,41 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="doseT"	type="com.qwit.domain.Tree" required="true"/>
+<jsp:directive.attribute name="timesT"	type="com.qwit.domain.Tree" required="true"/>
+
+<c:set var="cortisolT"	value="${schemaMtl.cortisol[doseT]}"/>
+<c:set var="timesC"		value="${timesT.mtlO}"/>
+<c:set var="cd" value="${schemaMtl.calcDoseR[doseT]}" />
+<c:if test="${empty schemaMtl.patientMtl}">
+	<c:set var="cd" value="${doseT.mtlO.value}" />
+</c:if>
+${cd }
+<c:choose>
+	<c:when test="${not empty cortisolT}">
+		<mtl:doseMeal timesC="${timesC}" cortisolT="${cortisolT}" />
+	</c:when>
+	<c:otherwise>
+		<c:set var="malN" value="1" />
+		<c:if test="${'day'==doseT.mtlO.pro }">
+			<c:set var="malN" value="${fn:length(fn:replace(fn:replace(timesC.abs,'=',''),'0',''))}" />
+		</c:if>
+		<fmt:formatNumber var="cd" pattern="##" value="${cd / malN}" />
+		${fn:replace(fn:replace(timesC.abs,"=","-"),"1",cd)}
+	<!-- 
+		<c:set var="cd"><fmt:formatNumber pattern="##" value="${doseT.mtlO.value / malN}" /></c:set>
+		<c:if test="${empty docMtl.patientMtl }">
+			<c:set var="cd" value="${doseT.mtlO.value}" />
+			<spring:eval var="cd" expression="docMtl.float2string(cd)"/>
+		</c:if>
+		${fn:replace(fn:replace(timesC.abs,"=","-"),"1",cd)}
+	 -->
+	</c:otherwise>
+</c:choose>
+</jsp:root>

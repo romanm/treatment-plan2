@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags" 
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<table class="oddEven">
+<thead class="group3">
+	<tr><th><fmt:message key="uiHistory" />
+	</th><th><fmt:message key="uiValue" /></th><th><fmt:message key="uiDatum" /></th></tr>
+</thead>
+
+<tbody>
+	<c:set var="previousDate" />
+	<c:forEach var="phe" items="${patientMtl.docT.childTs}">
+	<c:choose>
+		<c:when test="${phe.tabName=='task'}"><c:set var="class1" value="coloroldhistory1" /></c:when>
+		<c:when test="${phe.tabName=='protocol'}"><c:set var="class1" value="coloroldhistory2" /></c:when>
+	</c:choose>
+	<c:forEach items="${phe.childTs}" var="pv">
+		<c:if test="${pv.tabName=='pvariable' and pv.mtlO.pvariable=='ofDate'}">
+			<c:set var="ofDateT" value="${pv}" />
+			<fmt:formatDate var="kk" value="${ofDateT.history.mdate}" pattern="kk"/>
+			<fmt:formatDate var="kkmm" value="${ofDateT.history.mdate}" pattern="kk:mm"/>
+			<c:set var="kkmm" value="${fn:replace(kkmm,'24','. .') } " />
+		</c:if>
+	</c:forEach>
+	<!-- 
+		pd - previous date
+		cd - current date
+	 -->
+	<fmt:formatDate var="cd" value="${ofDateT.history.mdate}" pattern="D" />
+	<c:if test="${not empty previousDate}">
+		<fmt:formatDate var="pd" value="${previousDate.history.mdate}" pattern="D" />
+	</c:if>
+	<c:if test="${pd!=cd}">
+		<tr class="planday">
+			<th colspan="3">
+				<div class="floatRight">
+					<fmt:formatDate value="${ofDateT.history.mdate}" pattern=" EEEE"/>
+				</div>
+				<!-- 
+				<fmt:formatDate value="${ofDateT.history.mdate}" dateStyle="short"/>
+				<fmt:formatDate value="${ofDateT.history.mdate}" dateStyle="default"/>
+				 -->
+				<fmt:formatDate value="${ofDateT.history.mdate}" dateStyle="long"/>
+			</th>
+		</tr>
+	</c:if>
+	<!-- 
+	<tr class="${class1}">
+	 -->
+	<tr class="${class1} select" id="h_${phe.id}">
+			<c:choose>
+				<c:when test="${phe.tabName=='notice'}">
+		<td><mtl:noticeDoseMod noticeT="${phe}" /></td>
+		<td>
+			<c:set var="noticeC" value="${patientMtl.classM[phe.idClass]}" />
+			<owsui:editNotice noticeT="${phe}"/>
+		</td>
+				</c:when>
+				<c:when test="${phe.tabName=='protocol'}">
+					<c:set var="protocolC" value="${patientMtl.classM[phe.idClass]}" />
+					<!-- 
+			<qhtm:td prefix="pr_" id="${phe.id}">
+			</qhtm:td>
+					 -->
+			<td>
+				<c:choose>
+					<c:when test="${protocolC.protocoltype=='study'}">Studien Protokol</c:when>
+					<c:otherwise><fmt:message key="ui_therapieProtocol" /></c:otherwise>
+				</c:choose>
+			</td>
+			<qhtm:tag name="td" prefix="ta_" tree="${phe}" cssClass="conceptContentH2">
+				<a href="concept=${phe.id}">${protocolC.protocol}</a>
+			</qhtm:tag>
+				</c:when>
+				<c:when test="${phe.tabName=='labor'}">
+					<c:set var="laborC" value="${phe.mtlO}" />
+		<td><mtl:message prefix="mtl_labor_" key="${laborC.labor}" /></td>
+		<td><mtl:pvalue varT="${phe}" unit="${laborC.unit}" />
+		</td>
+				</c:when>
+				<c:when test="${phe.tabName=='finding' and 'bsaType'==phe.mtlO.finding}">
+		<td colspan="2">
+				<mtl:bsa />
+		</td>
+				</c:when>
+				<c:when test="${phe.tabName=='finding'}">
+		<td><mtl:message prefix="mtl_finding_" key="${phe.mtlO.finding}" />
+		<c:choose>
+			<c:when test="${'weight'==phe.mtlO.finding}"><c:set var="weightT" value="${phe }" /></c:when>
+			<c:when test="${'height'==phe.mtlO.finding}"><c:set var="heightT" value="${phe }" /></c:when>
+		</c:choose>
+		</td>
+		<td>
+		<!-- 
+			<mtl:pvalue varT="${phe}" unit="${findingC.unit}" />
+		 -->
+				<mtl:value varT="${phe}" />
+		</td>
+				</c:when>
+				<c:when test="${phe.tabName=='diagnose'}">
+				<c:set var="diagnoseT" value="${phe}" />
+		<td><fmt:message key="ui_diagnose" /></td>
+		<td><mtl:patientDiagnose diagnoseT="${phe}" /></td>
+				</c:when>
+				<c:when test="${'task'==phe.tabName and 'tubo'==phe.mtlO.type}">
+			<qhtm:tag name="td" prefix="ta_" tree="${phe}">
+				<a href="tumorboard?id=${phe.ref}">${phe.mtlO.task}</a>
+			</qhtm:tag>
+			<td>
+				<spring:eval var="tuboRecommP" expression="jxp.var('notice').var('tubo_recomm')
+				.jxp(phe).getPointer('childTs[mtlO/type=$tubo_recomm]/childTs[tabName=$notice]')" />
+				${not empty tuboRecommP.value.mtlO.notice?':':'' }
+				${tuboRecommP.value.mtlO.notice }
+			</td>
+			<!-- 
+			<td><mtl:ofDate historyT="${phe}" patientMtl="${patientMtl}" /></td>
+			 -->
+				</c:when>
+				<c:when test="${'task'==phe.tabName}">
+				<c:set var="schemaT" value="${phe}" />
+			<qhtm:tag name="td" prefix="tn_" tree="${phe}">
+				<fmt:message key="uiTherapySchema" />
+			</qhtm:tag>
+			<qhtm:tag name="td" prefix="ta_" tree="${phe}" cssClass="schemaContentH2">
+				<a href="schema-${owsSession.schemaPart}-${phe.ref}">${phe.mtlO.task}</a>
+				<c:out value=" " />
+				<mtl:schemaCycleNr pschemaT="${phe}" />
+			</qhtm:tag>
+			<!-- 
+			<td><mtl:ofDate historyT="${phe}" patientMtl="${patientMtl}" /></td>
+			 -->
+				</c:when>
+				<c:when test="${'folder'==phe.tabName}">
+					<td colspan="2">
+						<fmt:message key="ui_patient_transferred">
+							<fmt:param value="${phe.mtlO.folder }" />
+							<fmt:param value="${patientMtl.docT.parentT.mtlO.folder }" />
+						</fmt:message>
+					</td>
+				</c:when>
+				<c:when test="${'url'==phe.tabName}"/>
+				<c:otherwise>
+		<td>${phe.id }.${phe.tabName}</td>
+				</c:otherwise>
+			</c:choose>
+			<c:if test="${'url'!=phe.tabName}">
+				<c:set var="userMap" value="${patientMtl.userM[phe.history.idauthor]}" />
+				<fmt:formatDate var="rd" value="${phe.history.mdate }" type="both"
+					dateStyle="short" timeStyle="short" />
+				<c:set var="rtitle" value="${userMap.forename } ${userMap.contactperson } ${rd}" />
+				<qhtm:tag name="td" prefix="ti_" tree="${phe}" title="${rtitle }">${kkmm}</qhtm:tag>
+				<!-- 
+				<td title="${rtitle}">${userMap.owuser }</td>
+				 -->
+				<td>${docMtl.chronologNr[phe.id]}</td>
+			</c:if>
+	</tr>
+	<c:set var="previousDate" value="${ofDateT}" />
+	<c:choose>
+		<c:when test="${'task'==phe.tabName}">
+		<tr><td colspan="2">
+			<edit:schemaChangeHistory patientTaskT="${phe}"
+				therapyChange="${docMtl.therapyChange}" />
+		</td></tr>
+		</c:when>
+	</c:choose>
+	</c:forEach>
+	<c:if test="${empty weightT or empty heightT }">
+		<tr ><td colspan="2" class="red">
+			<a href="patientflow?id=${docMtl.docT.id}&amp;a=bsaDialog">
+				KOF: ?____________________
+			</a>
+		</td></tr>
+	</c:if>
+	<c:if test="${empty schemaT }">
+		<tr><td colspan="2" class="red">
+			<a href="explorer=9932">
+			<!-- 
+				Konzept / Therapie / Studienprotok wählen
+				Therapie- / Studienprotokoll auswählen
+			 -->
+				Therapie- / Studienprotokoll zuordnen
+			</a>
+		</td></tr>
+	</c:if>
+</tbody>
+
+</table>
+
+</jsp:root>

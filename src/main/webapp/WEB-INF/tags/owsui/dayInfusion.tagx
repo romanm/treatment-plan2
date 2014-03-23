@@ -1,0 +1,38 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+
+<c:if test="${dayInfusion gt 0 }">
+			<c:if test="${not empty dayInfusionEndTs}" >
+	<tr>
+		<td colspan="2" style="text-align: right;">
+			<fmt:message key="ui_dayInfusion" />
+			<c:out value=" = "/>
+		</td>
+		<td colspan="2" >
+			<b>
+			<fmt:formatNumber pattern="###" value="${dayInfusion }"/>
+			<c:out value=" ml"/>
+			</b>
+		</td>
+		<td>
+				<spring:eval var="minInf" expression="(dayInfusionEndTs.getTsBeyondEnd().getTime()-dayInfusionBeginTs.getTime())/1000/60" />
+				<spring:eval var="hInf" expression="minInf/60" />
+				<spring:eval var="minInf" expression="minInf-hInf*60" />
+				<c:if test="${hInf>0 }">${hInf }h</c:if>
+				<c:if test="${minInf>0 }">${minInf }min</c:if>
+		</td>
+		<td colspan="2" class="small" style="text-align: right;">
+			Σ#${dayInfusionBeginTs.nr }-${dayInfusionEndTs.nr }
+		</td>
+	</tr>
+			</c:if>
+</c:if>
+
+</jsp:root>

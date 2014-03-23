@@ -1,0 +1,38 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<form:form id="f2" modelAttribute="flowObjCreator">
+	<form:errors	path="genericName" cssClass="note" />
+	<c:if test="${not empty flowObjCreator.drugO }">
+		<a href="#" onclick="window.open('drug?id=${flowObjCreator.drugO.generic.id}'
+		, 'Zweitfenster', 'width=900,height=300,scrollbars=yes')">
+			<mtl:drugGenericName drugO="${flowObjCreator.drugO}"/>
+		</a>
+	</c:if>
+	<table>
+		<tr><th><fmt:message key="ui_newLaborName" />:</th></tr>
+		<tr>
+			<td>
+				<form:input		path="laborName" cssStyle="width:130px"/>
+			</td>
+		</tr>
+		<tr><th><fmt:message key="ui_newLaborName" />:</th></tr>
+		<tr>
+			<td>
+				<form:input		path="laborUnit" cssStyle="width:130px"/>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<form:hidden id="idf" path="idf" />
+				<form:hidden id="folder" path="folder" />
+				<input type="submit" name="_eventId_save"	value="${ui_button_save}"/>
+				<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}"/>
+			</td>
+		</tr>
+	</table>
+</form:form>
+</jsp:root>

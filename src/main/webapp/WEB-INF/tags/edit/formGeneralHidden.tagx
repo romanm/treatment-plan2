@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<form:hidden path="action" />
+<form:hidden path="idt" />
+<!-- 
+<edit:revise/>
+ -->
+<form:hidden path="tsNr" />
+<input type="submit" id="editStep"		name="_eventId_editStep"	value="editStep"	style="visibility: hidden;"/>
+
+</jsp:root>

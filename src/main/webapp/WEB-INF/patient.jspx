@@ -1,0 +1,48 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0" 
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<mtl:breadcrumb />
+<div id="content">
+	<h2><a href="patient=${patientMtl.docT.id}">
+		Patient: <mtl:patientName bsa="no"/>
+	</a></h2>
+	---------------------------------
+	<qhtm:patientHead />
+	<p/>
+	owsSession.patientPart=
+	${owsSession.patientPart }
+	<form:form id="f1" modelAttribute="patientMtl">
+		<c:choose>
+			<c:when test="${not empty patientMtl.tuboId}">
+				<mtl:tumorboard />
+			</c:when>
+			<c:when test="${'year'==owsSession.patientPart}"> <mtl:historyYear /> </c:when>
+			<c:otherwise><mtl:historyTimes /></c:otherwise>
+		</c:choose>
+		<mtl:form1hidden />
+	</form:form>
+</div>
+
+<div id="sidebar">
+	<owsui:docToolbar />
+	<edit:panel />
+	<ul class="sidemenu">
+		<li>
+	<!--
+		<mtl:editPatient idt="${patientMtl.docT.id}" action="newProtocol">
+		protocol
+		</mtl:editPatient>
+	 -->
+		</li>
+	</ul>
+</div>
+
+</jsp:root>
+

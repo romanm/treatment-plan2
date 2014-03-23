@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+	xmlns:sql	="http://java.sun.com/jsp/jstl/sql"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:security="http://www.springframework.org/security/tags"
+	xmlns:tiles	="http://tiles.apache.org/tags-tiles"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.page import="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter"/>
+<jsp:directive.page import="org.springframework.security.core.AuthenticationException"/>
+<div id="headline">
+	<p> <fmt:message key="ui_breadcrumbIndex" />	
+	<strong style="color: black;">..</strong>	<fmt:message>ui_login</fmt:message>
+</p>
+</div>
+<div id="content">
+
+	<c:choose>
+		<c:when test="${not empty param.a and param.a =='invalidConfirmKey'}"> Ihr bestätigungscode ist abgelaufen</c:when>
+		<c:when test="${not empty param.a and param.a =='saveResetPassword'}"> Sie haben Ihr Passwort erfolgreich gewechselt! Bitte loggen Sie sich ein</c:when>
+		<c:when test="${not empty param.a and param.a =='accountConfirmed'}"> accountConfirmed!</c:when>
+		<c:when test="${not empty param.a and param.a =='accountConfirmationDenied'}"> accountConfirmation denied!</c:when>
+		<c:when test="${not empty param.a and param.a =='sendPasswordReminder'}"> a password reminder sent to your email adress</c:when>
+		
+		<c:when test="${not empty param.a and param.a =='successfulRegistry'}"> 
+			<owsui:message type="note" key="registry_successful" />
+		</c:when>
+		<c:otherwise>
+			<owsui:message type="note" key="login_invitation" />
+		</c:otherwise>
+	</c:choose>
+	<div class="span-10 append-2 last">
+		<c:if test="${not empty param.login_error}">
+			<div class="error">
+				Your login attempt was not successful, try again.<br /><br />
+				Reason: 
+				${SPRING_SECURITY_LAST_EXCEPTION.message}
+				<!-- 
+				<jsp:expression>
+				((AuthenticationException) session.getAttribute(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_LAST_EXCEPTION_KEY)).getMessage()
+				</jsp:expression>>
+				 -->
+			</div>
+		</c:if>
+		<!-- 
+		<form name="f" action="<c:url value="/the/loginProcess" />" method="post">
+		 -->
+		 <c:url var="lp" value="/loginProcess" />
+		<form name="f" action="${lp}" method="post">
+		<br />
+			<center>
+				<table class="login">
+					<tr class="first">
+						<td><label for="j_username"><fmt:message>ui_login_user</fmt:message></label></td>
+						<td>
+							<c:set var="value">
+								<c:if test="${not empty param.login_error}">
+									${SPRING_SECURITY_LAST_USERNAME}
+									<!--
+							 ${sessionScope}
+									<jsp:expression>
+										session.getAttribute(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_LAST_USERNAME_KEY)
+									</jsp:expression>>
+									-->
+								</c:if>
+							</c:set>
+							<input type="text" name="j_username" id="j_username" value="${value}"/>
+						</td>
+					</tr>
+					<tr>
+						<td><label for="j_password"><fmt:message>ui_login_password</fmt:message></label></td>
+						<td><input type="password" name="j_password" id="j_password" />
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+							<input type="checkbox" name="_spring_security_remember_me" id="remember_me" />
+							<label for="remember_me"><fmt:message>ui_login_remember</fmt:message></label>
+							<script type="text/javascript">
+								Spring.addDecoration(new Spring.ElementDecoration({
+									elementId : "remember_me",
+									widgetType : "dijit.form.CheckBox"}));
+							</script>
+						</td>
+						
+					</tr>
+					<tr class="last">
+						<td></td>
+						<td>
+							<button id="submit" type="submit">Login</button>
+							<script type="text/javascript">
+								Spring.addDecoration(new Spring.ValidateAllDecoration({event : 'onclick', elementId : 'submit'}));
+							</script>
+						</td>
+					</tr>
+					<tr><td></td><td>
+						<br/>
+							<spring:url value="/registerflow?a=remindPassword" var="remind_password_url"/>
+							<a href="${remind_password_url}">
+								<fmt:message>ui_remind_password</fmt:message>
+							</a>
+						</td>
+					</tr>
+				</table>
+			</center>
+		</form>
+	</div>
+</div>
+
+<div id="sidebar" >
+	
+	<h2><fmt:message>ui_title_dialog</fmt:message></h2>
+	
+	<br/>
+	<p>Raum fr Dialog, zustzliche Navigation oder Extras - links	</p>
+	
+</div>
+</jsp:root>

@@ -1,0 +1,28 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="literatureO"	type="com.qwit.domain.Literature"	required="true"/>
+<b>
+${literatureO.title}
+</b>
+<c:if test="${not empty literatureO.authors}"><c:out value=", ${literatureO.authors}"/></c:if>
+<!-- 
+${literatureO.springtype}
+ -->
+${literatureO.spring}
+<c:if test="${literatureO.year>0}"><c:out value=" "/><fmt:message key="tag_literature_year"/> ${literatureO.year}</c:if>
+<c:if test="${not empty literatureO.volume}"><c:out value=" "/><fmt:message key="tag_literature_volume"/> ${literatureO.volume}</c:if>
+<c:if test="${not empty literatureO.page}"><c:out value=" "/><fmt:message key="tag_literature_page"/> ${literatureO.page}</c:if>
+
+<!-- 
+${literatureO.year};
+${literatureO.volume};
+${literatureO.page}
+${literatureO.url}
+ -->
+
+
+</jsp:root>

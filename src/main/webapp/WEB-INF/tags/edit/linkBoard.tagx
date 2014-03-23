@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+
+<c:set var="editNodeName" value="${docMtl.editNodeT.tabName}"/>
+<c:choose>
+	<c:when test="${editNodeName=='drug'}"><c:set var="drugT" value="${docMtl.editNodeT}"/></c:when>
+	<c:when test="${editNodeName=='day'}"><c:set var="drugT" value="${docMtl.editNodeT.parentT}"/></c:when>
+	<c:when test="${editNodeName=='dose'}"><c:set var="drugT" value="${docMtl.editNodeT.parentT}"/></c:when>
+	<c:when test="${editNodeName=='times'}"><c:set var="drugT" value="${docMtl.editNodeT.parentT.parentT}"/></c:when>
+</c:choose>
+<spring:eval var="doseT" expression="jxp.getDose(drugT)"/>
+<table>
+	<tr>
+		<th align="right">
+			<spring:message code="ui_drug" />
+			<c:out value=": " />
+		</th>
+		<td>
+			<c:choose>
+				<c:when test="${not empty drugT.mtlO and 'drug'==drug.tabName}">
+					<c:set var="drugName" value="${drugT.mtlO.drug}" />
+				</c:when>
+				<c:otherwise>
+					<c:set var="drugName"><span class="red"><fmt:message key="ui_newDrug" /></span></c:set>
+				</c:otherwise>
+			</c:choose>
+			<c:choose>
+				<c:when test="${editNodeName=='drug'}"><span class="b">${drugName}</span></c:when>
+				<c:otherwise>
+				<!-- 
+					<a style="font-size: 2em;" onclick="dojo.byId('idt').value=${drugT.id};dojo.byId('editStep').click();" href="javascript:void(0);">
+				 -->
+					<a onclick="dojo.byId('idt').value=${drugT.id};dojo.byId('editStep').click();" href="javascript:void(0);">
+						${drugName}
+					</a>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<tr>
+		<th align="right">
+			<spring:message code="ui_dose" />
+			<c:out value=": " />
+		</th>
+		<td>
+			<c:set var="doseHtml">
+				<c:choose>
+					<c:when test="${empty doseT.mtlO.value and empty doseT.mtlO.unit and empty doseT.mtlO.app }">
+						<span class="red"><c:out value="###" /></span>
+					</c:when>
+					<c:otherwise>
+						<mtl:doseValue doseT="${doseT}"/>
+						<mtl:doseUnit doseT="${doseT}"/>
+						<c:out value=" " />
+						<mtl:doseApp doseT="${doseT}"/>
+					</c:otherwise>
+				</c:choose>
+			</c:set>
+			<c:choose>
+				<c:when test="${editNodeName=='dose'}"><span class="edited"> ${doseHtml}</span></c:when>
+				<c:otherwise>
+				<!-- 
+					<div style="float: right;">
+					</div>
+				 -->
+					<a onclick="dojo.byId('idt').value=${doseT.id};dojo.byId('editStep').click();" href="javascript:void(0);">
+						${doseHtml}
+					</a>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</tr>
+	<spring:eval var="dayS" expression="jxp.childs(drugT,'day')" />
+	<c:forEach items="${dayS}" var="dayP" varStatus="stat">
+		<c:set var="dayT" value="${dayP.value}"/>
+		<tr>
+			<th align="right">
+				<spring:message code="ui_day" />
+				<c:out value=": " />
+			</th>
+			<td>
+		<c:choose>
+			<c:when test="${empty dayT.mtlO.abs}">
+				<c:set var="day"><span class="red"><c:out value="###"/></span></c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="day" value="${dayT.mtlO.abs}"/>
+			</c:otherwise>
+		</c:choose>
+		<c:choose>
+			<c:when test="${dayT.id==docMtl.editNodeT.id}">
+			<!-- 
+				<owsui:editDayHidden prefix="${stat.first?'Tag':''}" dayT="${docMtl.editNodeT}"/>
+			 -->
+				<span id="inputDay" style="color: green" class="select edited"><mtl:day dayT="${dayT}" /></span>
+			</c:when>
+			<c:otherwise>
+		<a onclick="dojo.byId('idt').value=${dayT.id};dojo.byId('editStep').click();" href="javascript:void(0);"
+		>${day}</a>
+			</c:otherwise>
+		</c:choose>
+			</td>
+		</tr>
+		<spring:message var="ui_times" code="ui_times" />
+		<spring:eval var="timesS" expression="jxp.childs(dayP.value,'times')" />
+		<c:forEach items="${timesS}" var="timesP">
+			<c:set var="timesT" value="${timesP.value}"/>
+			<c:set var="times" value="${not empty timesT.mtlO.abs?timesT.mtlO.abs:(not empty timesT.ref?'relativ':'__:__')}"/>
+			<tr>
+				<th align="right"><c:out value="${ui_times }: " /></th>
+				<td>
+					<c:set var="classRed" value="${empty timesT.mtlO.abs?'red':'' }" />
+					<c:choose>
+						<c:when test="${timesT.id==docMtl.editNodeT.id}"><span class="edited">${times}</span></c:when>
+						<c:when test="${timesT.parentT.id==docMtl.editNodeT.id}">
+					<a class="childOfedited ${classRed}" onclick="dojo.byId('idt').value=${timesT.id};dojo.byId('editStep').click();" href="javascript:void(0);"
+					>${times}</a>
+						</c:when>
+						<c:otherwise>
+					<a class="${classRed}" onclick="dojo.byId('idt').value=${timesT.id};dojo.byId('editStep').click();" href="javascript:void(0);"
+					>${times}</a>
+						</c:otherwise>
+					</c:choose>
+				</td>
+			</tr>
+		</c:forEach>
+	</c:forEach>
+</table>
+
+<!-- 
+<c:set var="days" value="" />
+<spring:eval var="dayS" expression="jxp.childs(drugT,'day')" />
+<c:forEach items="${dayS}" var="dayP" varStatus="stat">
+	<c:set var="dayT" value="${dayP.value}"/>
+	<c:set var="day" value="${stat.first?'Tag':','} ${dayT.mtlO.abs}"/>
+	<c:set var="day1">
+		<c:choose>
+			<c:when test="${dayT.id==docMtl.editNodeT.id}">
+				<owsui:editDayHidden prefix="${stat.first?'Tag':''}" dayT="${docMtl.editNodeT}"/>
+				<!-
+				<span class="edited">${day}</span>
+				->
+			</c:when>
+			<c:when test="${dayT.id==docMtl.editNodeT.parentT.id}">
+				<a class="parentOfedited" onclick="dojo.byId('idt').value=${dayT.id};dojo.byId('editStep').click();" href="javascript:void(0);"
+				>${day}</a>
+			</c:when>
+			<c:otherwise>
+		<a onclick="dojo.byId('idt').value=${dayT.id};dojo.byId('editStep').click();" href="javascript:void(0);"
+		>${day}</a>
+			</c:otherwise>
+		</c:choose>
+	</c:set>
+	<c:set var="days" value="${fn:trim(days)}${fn:trim(day1)}${fn:trim(dayEdit)}" />
+</c:forEach>
+${days}
+ -->
+
+<!-- 
+<c:set var="first" value="true" />
+<spring:eval var="dayS" expression="jxp.childs(drugT,'day')" />
+<c:forEach items="${dayS}" var="dayP">
+	<spring:eval var="timesS" expression="jxp.childs(dayP.value,'times')" />
+	<c:forEach items="${timesS}" var="timesP">
+		<c:set var="timesT" value="${timesP.value}"/>
+		<c:set var="times" value="${first?'Uhrzeit':'u'}"/>
+		<c:choose>
+			<c:when test="${timesT.id==docMtl.editNodeT.id}"><span class="edited">${times}</span></c:when>
+			<c:when test="${timesT.parentT.id==docMtl.editNodeT.id}">
+		<a class="childOfedited" onclick="dojo.byId('idt').value=${timesT.id};dojo.byId('editStep').click();" href="javascript:void(0);"
+		>${times}</a>
+			</c:when>
+			<c:otherwise>
+		<a onclick="dojo.byId('idt').value=${timesT.id};dojo.byId('editStep').click();" href="javascript:void(0);"
+		>${times}</a>
+			</c:otherwise>
+		</c:choose>
+		<c:set var="first" value="false" />
+	</c:forEach>
+</c:forEach>
+<br/>
+ -->
+
+</jsp:root>

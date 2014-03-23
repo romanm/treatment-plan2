@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<div id="headline">
+	<spring:message code="ui_breadcrumbIndex" />
+	
+	<c:if test="${not empty explorerMtl }">
+		${rsaquo}<spring:message code="${explorerMtl.folderType}" />
+	</c:if>
+	<c:set var="folderT" value="${docMtl.docT.parentT}" />
+	<c:set var="folderName" value="${docMtl.docT.tabName}" />
+	<c:if test="${'folder'!=folderT.tabName}">
+		<c:set var="folderName" value="${folderT.docT.tabName}" />
+		<c:set var="folderT" value="${folderT.docT.parentT}" />
+		<c:if test="${'folder'!=folderT.tabName}">
+			<c:set var="folderT" value="${folderT.parentT}" />
+		</c:if>
+	</c:if>
+	<mtl:folder4doc folderT="${folderT}" />
+
+	<c:if test="${not empty schemaMtl.patientMtl.patientC}">
+		${rsaquo}<a href="patient=${docMtl.patientMtl.docT.id}" class="b patientContentH2"><mtl:patientName/></a>
+	</c:if>
+	<c:set var="parentT" value="${docMtl.docT.docT}"/>
+	<c:if test="${docMtl.docT.id!=parentT.id}">
+		${rsaquo}
+		<c:choose>
+			<c:when test="${parentT.tabName=='patient'}">
+				<a href="patient=${parentT.id}" class="b patientContentH2"><mtl:patientName /></a>
+			</c:when>
+			<c:when test="${parentT.tabName=='protocol'}">
+				<a href="${concept_url}=${parentT.id}" class="conceptContentH2"><mtl:conceptName /></a>
+			</c:when>
+			<c:when test="${docMtl.docT.tabName=='protocol'}">
+				<a href="${concept_url}=${docMtl.docT.id}" class="conceptContentH2"><mtl:conceptName /></a>
+			</c:when>
+			<c:otherwise>
+				<a href="${concept_url}=${parentT.id}">${parentT.tabName}</a>
+			</c:otherwise>
+		</c:choose>
+	</c:if>
+
+	<c:choose>
+		<c:when test="${not empty schemaMtl}">
+			${rsaquo}
+			<span class="schemaContentH2"> ${schemaMtl.schemaC.task} </span>
+		</c:when>
+		<c:when test="${not empty conceptMtl}">
+			${rsaquo}
+			<span class="conceptContentH2"> <mtl:conceptName /> </span>
+		</c:when>
+	</c:choose>
+	<c:choose>
+		<c:when test="${not empty flowExecutionUrl}">
+		<span class="small">
+			<c:choose>
+				<c:when test="${formUtil.mode=='patientData' or formUtil.mode=='beginDate'}">
+					<jsp:element name="span">
+						<jsp:attribute name="class">
+							<c:if test="${formUtil.mode=='patientData'}">b</c:if>
+						</jsp:attribute>
+						<spring:message code="ui_patientSearchOrNew" />
+					</jsp:element>
+					${rsaquo}
+					<jsp:element name="span">
+						<jsp:attribute name="class">
+							<c:if test="${formUtil.mode=='beginDate'}">b</c:if>
+						</jsp:attribute>
+						<spring:message code="ui_beginDateNew" />
+					</jsp:element>
+				</c:when>
+			</c:choose>
+		</span>
+		</c:when>
+	</c:choose>
+</div>
+</jsp:root>

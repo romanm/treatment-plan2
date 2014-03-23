@@ -1,0 +1,10 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+>
+	Arm Name
+	<form:input path="editArmO.arm" cssStyle="width:160px"/>
+	<br/>
+	<input type="submit" name="_eventId_save"	value="${ui_button_save}" />
+	<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}" />
+</jsp:root>

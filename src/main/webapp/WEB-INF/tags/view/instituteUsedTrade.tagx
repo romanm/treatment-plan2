@@ -1,0 +1,49 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<h2><fmt:message key="ui_instituteUsedTrade" /></h2>
+
+<h3 class="select" id="idClassC_3" >Neuer Handelsname</h3>
+
+<hr/>
+<table>
+<tr>
+	<th>Generik</th>
+	<th>Handelsname</th>
+</tr>
+<!-- 
+<c:forEach var="tradeO" items="${instituteMtl.tradeList }">
+		<tr>
+			<td>
+		${tradeO.generic.drug }
+			</td>
+			<td>
+		${tradeO.drug }
+			</td>
+		</tr>
+</c:forEach>
+ -->
+<c:forEach var="tradeT" items="${instituteMtl.docT.childTs }">
+	<c:if test="${'drug'==tradeT.tabName }">
+		<tr>
+			<td id="i_${tradeT.id}" class="select">
+		${tradeT.mtlO.generic.drug }
+			</td>
+			<td>
+		${tradeT.mtlO.drug }
+			</td>
+		</tr>
+	</c:if>
+</c:forEach>
+</table>
+
+</jsp:root>

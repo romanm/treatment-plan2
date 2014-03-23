@@ -1,0 +1,68 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+<jsp:directive.attribute name="timesT"		type="com.qwit.domain.Tree" required="true" description="The day tree object"/>
+<jsp:directive.attribute name="ts"			type="com.qwit.domain.Ts" />
+<jsp:directive.attribute name="weekDrug"	type="com.qwit.model.WeekDrug"/>
+<jsp:directive.attribute name="noHhmm"		type="java.lang.Boolean"/>
+
+
+<c:choose>
+	<c:when test="${timesT.mtlO.relunit=='M' and timesT.mtlO.relvalue>=60}">
+		<c:set var="restMin" value="${timesT.mtlO.relvalue%60}" />
+		<c:set var="distance">
+			<fmt:formatNumber pattern="##">${(timesT.mtlO.relvalue-restMin)/60}</fmt:formatNumber
+			>h<fmt:formatNumber pattern="##">${restMin}</fmt:formatNumber><fmt:message key="ui_times_M"/>
+		</c:set>
+	</c:when>
+	<c:when test="${timesT.mtlO.relunit=='H' or timesT.mtlO.relunit=='M'}">
+		<c:set var="distance"
+			>${timesT.mtlO.relvalue}<fmt:message key="ui_times_${timesT.mtlO.relunit}"/></c:set>
+	</c:when>
+</c:choose>
+
+<c:set var="hhmmP" value="__:__" />
+<c:if test="${noHhmm}"><c:set var="hhmmP" value=""/></c:if>
+
+<c:choose>
+	<c:when test="${empty timesT.mtlO.abs and empty timesT.ref and not empty timesT.mtlO}">Error</c:when>
+	<c:when test="${fn:indexOf(timesT.mtlO.abs,'=')>0}">${fn:replace(timesT.mtlO.abs,'=','-')}</c:when>
+	<c:when test="${isPlan}">
+		<c:choose>
+			<c:when test="${empty ts.timesT.ref and not empty ts.timesT.mtlO.abs}">
+				<fmt:formatDate value="${ts}" pattern="kk:mm"/>
+			</c:when>
+			<c:otherwise>${hhmmP}+${ts.hhmm}
+			</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:when test="${not empty timesT.ref}">
+		<c:set var="hhmm" value="${docMtl.tree[timesT.ref].tabName=='task'?'Beginn':''}" />
+		<c:set var="refTimesT" value="${docMtl.tree[timesT.ref]}"/>
+		<c:set var="rn" value="${docMtl.timesNr[refTimesT]}" />
+		<c:set var="n" value="${docMtl.timesNr[timesT]}" />
+		<c:set var="hhmm"
+		>${hhmm}<c:choose
+			><c:when test="${timesT.mtlO.apporder=='0'}">.${rn}></c:when
+			><c:when test="${timesT.mtlO.apporder=='2'}">${rn}>.</c:when
+			><c:when test="${timesT.mtlO.apporder=='3'}">.${n}></c:when
+			><c:when test="${timesT.mtlO.apporder=='1'}">&lt;${rn}.</c:when
+		></c:choose></c:set>
+		<c:set var="hhmm">${hhmm}${(not empty distance)?'|':''}${distance}|${timesT.mtlO.apporder=='3'?rn:n}</c:set>
+		<span id="rel_${timesT.id}" class="small">${hhmmP}(${hhmm})</span>
+	</c:when>
+</c:choose>
+
+<c:set var="hhmm" value="__:__" />
+<c:if test="${noHhmm}"><c:set var="hhmm" value=""/></c:if>
+
+<c:choose>
+	<c:when test="${isPlan}"/>
+	<c:when test="${fn:indexOf(timesT.mtlO.abs,'=')>0}"/>
+	<c:when test="${empty timesT.idClass}">${hhmm}</c:when>
+	<c:otherwise>${fn:replace(timesT.mtlO.abs,'00,','00, ')}</c:otherwise>
+</c:choose>
+
+</jsp:root>

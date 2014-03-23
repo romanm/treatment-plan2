@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="ts"		type="com.qwit.domain.Ts" required="true"/>
+
+<!-- 
+<c:set var="timesText">
+	<c:choose>
+		<c:when test="${fn:contains(ts.timesT.mtlO,'=')}">
+			${fn:replace(ts.timesT.mtlO.abs,'=','-')}
+		</c:when>
+		<c:when test="${empty ts.timesT.ref and not empty ts.timesT.mtlO.abs}">
+			<fmt:formatDate value="${ts}" pattern="kk:mm"/>
+		</c:when>
+		<c:when test="${part=='plan'}">___:___+${ts.hhmm}</c:when>
+		<c:otherwise>+${ts.hhmm}</c:otherwise>
+	</c:choose>
+</c:set>
+
+<span class="${schemaMtl.idt==ts.timesT.id?'edited':'' }">
+	<qhtm:a idt="${ts.timesT.id}" >${timesText}</qhtm:a>
+</span>
+ -->
+	<owsui:editTime timeT="${ts.timesT}" ts="${ts}"/>
+</jsp:root>

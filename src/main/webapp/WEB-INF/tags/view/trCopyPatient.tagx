@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+
+<jsp:directive.attribute name="patientM" type="java.util.Map" required="true" description="Patient as DB row to copy"/>
+
+	<tr>
+		<td>
+		<c:out value="${patientM.forename } ${patientM.patient}" />
+		<c:out value=" " />
+		</td>
+		<td>
+		<c:out value="${patientM.sex} " />
+		</td>
+		<td>${patientM.birthdate}</td>
+		<td>
+		<c:choose>
+			<c:when test="${not empty patientM.idt }">
+				in History ${patientCopyMap.cntSourcePatientHistoryMap[patientM.ids] }
+				<c:set var="copiedPatientHistoryMapList" value="${patientCopyMap.copiedPatientHistoryMapList[patientM.idt] }" />
+				<c:if test="${not empty copiedPatientHistoryMapList}">
+					copied
+					<spring:eval expression="copiedPatientHistoryMapList.size()" />
+				</c:if>
+				<a href="?${urlFlow}&amp;_eventId=update1patient&amp;ids=${patientM.ids}">
+					update1patient
+				</a>
+				<a href="../luisa/patient=${patientM.ids}" target="_blank" >
+					source patient
+				</a>
+				- >
+				<a href="patient=${patientM.idt}" target="_blank" >
+					target patient
+				</a>
+			</c:when>
+			<c:otherwise>
+				<a href="?${urlFlow}&amp;_eventId=copy1patient&amp;ids=${patientM.ids}">
+					copy1patient
+				</a>
+			</c:otherwise>
+		</c:choose>
+		</td>
+	</tr>
+</jsp:root>

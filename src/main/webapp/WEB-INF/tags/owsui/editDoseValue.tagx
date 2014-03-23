@@ -1,0 +1,44 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="doseT" type="com.qwit.domain.Tree" required="true" description="The dose tree object"/>
+
+<c:choose>
+	<c:when test="${not empty docMtl.editDoseC and docMtl.idt==doseT.id}">
+	<!-- 
+		<form:input id="doseValue" path="editDoseC.value" cssStyle="width:80px" />
+		<fmt:message key="uiDoseInvalid" var="uiDoseInvalid" scope="application"/>
+		<script	type="text/javascript"><![CDATA[
+		Spring.addDecoration(new Spring.ElementDecoration({
+			elementId : "doseValue", widgetType : "dijit.form.ValidationTextBox",
+			widgetAttrs : { required : true
+				, regExp : "\\d{1,5}"
+			, invalidMessage : "${uiDoseInvalid}"}
+		}));
+		dojo.addOnLoad(function(){
+			dijitFocus("doseValue");
+		});
+		]]></script>
+	 -->
+		<mtl:doseValue doseT="${doseT}"/>
+	</c:when>
+	<c:otherwise>
+		<c:choose>
+			<c:when test="${not empty patientMtl and doseT.parentT.parentT.id==docMtl.docT.id}">
+				<owsui:ajs editT="${doseT}"  action="chemoDoseMod">
+					<mtl:doseValue doseT="${doseT}"/>
+				</owsui:ajs>
+			</c:when>
+			<c:otherwise>
+				<qhtm:a idt="${doseT.id}"><mtl:doseValue doseT="${doseT}"/></qhtm:a>
+			</c:otherwise>
+		</c:choose>
+	</c:otherwise>
+</c:choose>
+</jsp:root>

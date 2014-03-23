@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- Scans for application @Components to deploy 
+	<context:component-scan base-package="org.springframework.webflow.samples.booking" />
+	-->
+	<context:component-scan base-package="com.qwit.service" />
+	<context:component-scan base-package="com.qwit.controller" />
+	<context:component-scan base-package="com.qwit.validation" />
+	<context:component-scan base-package="com.qwit.crypt" />
+
+	<!-- RabbitMQ Server only configuration block 
+	<context:component-scan base-package="com.qwit.config.server"/>
+	-->
+	<!-- RabbitMQ Client only configuration block - obsolete 
+	<context:component-scan base-package="com.qwit.config.client"/>
+	-->
+
+	<!-- Imports the configurations of the different infrastructure systems of the application -->
+	<import resource="proxy-config.xml" />
+	<import resource="rabbitmq-config.xml" />
+	<import resource="ows-exception-config.xml" />
+	<import resource="webmvc-config.xml" />
+	<import resource="webflow-config.xml" />
+	<import resource="data-access-config.xml" />
+	<import resource="security-config.xml" />
+	<import resource="ows-config.xml" />
+	<import resource="ows-dbUpdate.xml" />
+	<import resource="ows-dbUpdateStructure.xml" />
+
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="classpath:messages"/>
+		<property name="defaultEncoding"	value="UTF-8" />
+		<property name="fileEncodings"		value="UTF-8" />
+	</bean>
+
+</beans>

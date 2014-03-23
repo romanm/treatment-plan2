@@ -1,0 +1,24 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="drugT" type="com.qwit.domain.Tree" required="true"/>
+
+<spring:eval var="neIP" expression="jxp.var('notice').var('expr').var('drug').jxpip(drugT
+,'childTs[tabName=$notice or tabName=$expr]
+|childTs[not(tabName=$drug or tabName=$expr)]/childTs[tabName=$notice or tabName=$expr]')" />
+<spring:eval var="hasNext" expression="neIP.hasNext()" />
+<c:if test="${hasNext and not empty docMtl.footnotesM}">
+	<sup>
+		<c:forEach var="neP" items="${neIP }" varStatus="stat" >
+			<c:out value="${stat.count>1?',':''}" />
+			<a href="#neNr_${docMtl.footnotesM[neP.value]}">
+				<c:out value="${docMtl.footnotesM[neP.value]}" />
+			</a>
+		</c:forEach>
+	</sup>
+</c:if>
+
+</jsp:root>

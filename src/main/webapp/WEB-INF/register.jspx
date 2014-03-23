@@ -1,0 +1,38 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+
+<div id="headline">&#160;</div>
+
+<!--
+	<mtl:breadcrumb />
+ -->
+
+<div id="content">	
+	<c:choose>
+		<c:when test="${'register'==currentSWFState}"><mtl:userRegister/></c:when>
+		<c:when test="${'remindPassword'==currentSWFState}">
+			<form:form id="f1" modelAttribute="registerUserForm">
+				<mtl:userRemindPassword/>
+			</form:form>
+		</c:when>
+		<c:when test="${'successfullRegistry'==currentSWFState}"> success!</c:when>
+		<c:when test="${'resetPassword'==currentSWFState}">
+			<form:form id="f1" modelAttribute="registerUserForm">
+				<mtl:userResetPassword/>
+			</form:form>
+		</c:when>
+	</c:choose>
+</div>
+
+<div id="sidebar" >
+</div>
+
+</jsp:root>

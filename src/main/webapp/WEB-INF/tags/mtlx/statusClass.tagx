@@ -1,0 +1,28 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+>
+
+<jsp:directive.attribute name="docStatus" required="true" />
+	<!-- 
+	<c:choose>
+		<c:when test="${'work'==docStatus}">red</c:when>
+		<c:when test="${'submitted1'==docStatus}">red</c:when>
+		<c:when test="${'submitted'==docStatus}">yellow</c:when>
+		<c:when test="${'ok'==docStatus}">green</c:when>
+	</c:choose>
+	<c:choose>
+		<c:when test="${'work'==docStatus}">red</c:when>
+		<c:when test="${'submitted1'==docStatus}">yellow</c:when>
+		<c:when test="${'submitted'==docStatus}">green</c:when>
+		<c:when test="${'ok'==docStatus}">blue</c:when>
+	</c:choose>
+	 -->
+
+	<c:choose>
+		<c:when test="${'work'==docStatus}">red</c:when>
+		<c:when test="${'submitted1'==docStatus}">yellow</c:when>
+		<c:when test="${'submitted'==docStatus}">yellow</c:when>
+		<c:when test="${'ok'==docStatus}">green</c:when>
+	</c:choose>
+
+</jsp:root>

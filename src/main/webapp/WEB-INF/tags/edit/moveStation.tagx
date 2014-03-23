@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<form:form id="f2" modelAttribute="patientMtl">
+	<c:choose>
+		<c:when test="${'moveStation'==currentSWFState}">
+		
+		<b>Meine Einrichtung:</b>
+		${empty owsSession.stationO.institute?'?':owsSession.stationO.institute}
+		<!-- 
+	${patientMtl.docT.parentT.mtlO.folder }
+	${patientMtl.docT.parentT.mtlO.id }
+		 -->
+		<c:set var="folder" value="${patientMtl.docT.parentT.mtlO.folder }" />
+<div>
+a11
+	<spring:eval var="sz" expression="owsSession.getUserStationList().size()" />
+	${sz}
+	a22
+	<form:select path="idMovestation" size="${sz}">
+		<c:forEach var="stationO" items="${owsSession.userStationList }">
+			<c:set var="disabled" value="${stationO.id==owsSession.stationO.id}" />
+			<form:option value="${stationO.id}" title="${stationO.institute }" disabled="${disabled }">
+				${stationO.institute }
+			</form:option>
+		</c:forEach>
+	</form:select>
+</div>
+<input type="submit" name="_eventId_ok" value="${ui_button_OK}"/>
+<input type="button" onclick="cancelReload();" value="${ui_button_cancel}" />
+		</c:when>
+		<c:otherwise>
+			<div>
+				Bestätigen Sie die Verlegung 
+				<br/>
+				Patient
+				<b><mtl:patientName bsa="no"/></b>
+			</div>
+			<div>von Abteilung:</div>
+			<b>${owsSession.patientStationO.institute }</b>
+			<div>in Abteilung:</div>
+			${patientMtl.idMovestation }
+			<!-- 
+			<spring:eval var="stationO" expression="owsSession.getUserStation(patientMtl.idMovestation)" />
+			<b>${stationO.institute }</b>
+			 -->
+			 <spring:eval var="sz" expression="owsSession.getUserStationList().size()" />
+			<form:select path="idMovestation" size="${sz}">
+				<c:forEach var="stationM" items="${owsSession.userStationList }">
+					<c:set var="disabled" value="${stationM.idinstitute==owsSession.stationM.idinstitute}" />
+					<form:option value="${stationM.idinstitute}" title="${stationM.institute }" disabled="${disabled }">
+						${stationM.institute }
+					</form:option>
+				</c:forEach>
+			</form:select>
+			<div>
+	<button type="submit" name="_eventId_save" ><img src="${Save16gif}" alt="Save"/> ${ui_button_save}</button>
+	<input type="button" onclick="cancelReload();" value="${ui_button_cancel}" />
+			</div>
+		</c:otherwise>
+	</c:choose>
+</form:form>
+
+</jsp:root>

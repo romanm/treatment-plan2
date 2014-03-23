@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<div class="note">Es wäre richtig vor dem Arbeit mit Massenpflege die Datenbank Kopie zu machen.</div>
+<span class="${'idClassOnly'==userMtl.seekLogic?'note':''}">
+	<fmt:message key="ui_seekLogic_idClassOnly"/>
+</span>
+<c:out value=" | "/>
+<span class="${'drugSimpleNotice'==userMtl.seekLogic?'note':''}">
+	<fmt:message key="ui_seekLogic_drugSimpleNotice"/>
+</span>
+<c:out value=" | "/>
+<span class="${'drugRqmSupNotice'==userMtl.seekLogic?'note':''}">
+	<fmt:message key="ui_seekLogic_drugRqmSupNotice"/>
+</span>
+<c:out value=" | "/>
+
+<table>
+	<c:set var="targetT" value="${owsSession.targetT}" />
+	<c:set var="targetTabName" value="${targetT.tabName}" />
+	<c:set var="sourcetTabName" value="${owsSession.sourceT.tabName}" />
+	<tr><td>
+		<b><fmt:message key="ui_massMaintenance_rewrite" />:</b>
+		<c:out value=" " />
+		<span class="select" id="idClass_1" title="${targetTabName }">
+			<mtl:mtlObject tree="${owsSession.targetT}" withType="${true}" />
+		</span>
+	</td>
+	<td>
+		<b><fmt:message key="ui_massMaintenance_by" />:</b>
+		<c:out value=" " />
+		<span class="select" id="idClassSource1_2" title="${sourcetTabName }">
+		<!-- 
+		owsSession.sourceT
+		 -->
+			<mtl:mtlObject tree="${owsSession.sourceT}" withType="${true}" />
+		</span>
+	</td></tr>
+	<c:if test="${not empty owsSession.targetT }">
+		<c:set var="folderName"/>
+		<c:forEach var="row" items="${userMtl.replaceSchemaL}" varStatus="stat">
+			<c:if test="${row.folder!=folderName }">
+				<c:set var="folderName" value="${row.folder }"/>
+				<tr><th colspan="2">${row.folder }</th></tr>
+			</c:if>
+			<c:if test="${row.idtask!=prevIdtask }">
+			<tr><td>
+			<c:out value="${stat.count} " />
+		<a href="${schema_url}=${row.idtask}">${row.task }</a>
+			</td><td>
+			<c:choose>
+				<c:when test="${not empty owsSession.sourceT}">
+				a1
+				${row.idfolder }
+				${docMtl.userFolderRightM[row.idfolder]}
+				a2
+					<qhtm:a idt="${row.idt}" action="rewrite" withRightLevel="0">
+						<fmt:message key="ui_massMaintenance_rewrite" />
+					</qhtm:a>
+					<!-- 
+					<a href="?${urlFlow}&amp;_eventId=rewrite&amp;idt=${row.idt}">
+						<fmt:message key="ui_massMaintenance_rewrite" />
+					</a>
+					 -->
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="ui_massMaintenance_rewrite" />
+				</c:otherwise>
+			</c:choose>
+			<!--
+				<fmt:message key="ui_massMaintenance_rewrite" />
+			-->
+			</td></tr>
+			</c:if>
+			<c:set var="prevIdtask" value="${row.idtask }" />
+		</c:forEach>
+	</c:if>
+</table>
+
+</jsp:root>

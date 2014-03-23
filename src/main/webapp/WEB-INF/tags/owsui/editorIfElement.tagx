@@ -1,0 +1,85 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="exprT" type="com.qwit.domain.Tree" required="true" description="The expr tree object"/>
+<c:set var="exprC" value="${schemaMtl.classM[exprT.idClass]}" />
+
+<c:choose>
+	<c:when test="${exprT.tabName=='dose'}">
+		<mtl:doseValue	doseT="${exprT}" />
+		<mtl:doseUnit	doseT="${exprT}" />
+		<mtl:doseApp	doseT="${exprT}" notInputSimbol="true"/>
+	</c:when>
+	<c:when test="${not empty exprT.ref}">
+		<owsui:editorIfElement exprT="${schemaMtl.tree[exprT.ref]}" />
+	</c:when>
+	
+	<c:when test="${exprT.tabName=='pvariable'}">
+		${exprC.pvalue}
+		<span id="unit">
+			<c:choose>
+				<c:when test="${exprC.unit=='yes_no'}"></c:when>
+				<c:otherwise>${exprC.unit}</c:otherwise>
+			</c:choose>
+		</span>
+	</c:when>
+	<c:when test="${exprT.tabName=='pvariable'}">
+		<div id="falls2">
+			<input id="fallsField" value="${exprC.pvalue}" size="6" />
+			<span id="unit">
+				<c:choose>
+					<c:when test="${exprC.unit=='yes_no'}"></c:when>
+					<c:otherwise>${exprC.unit}</c:otherwise>
+				</c:choose>
+			</span>
+		</div>
+	</c:when>
+	<c:when test="${exprT.tabName=='expr'}"><owsui:editExpr exprT="${exprT}" /></c:when>
+	<c:when test="${exprT.tabName=='drug'}">${exprC.drug}</c:when>
+	<c:when test="${exprT.tabName=='finding'}">
+		<form:select id="falls1" path="" onchange="check(this.options[this.selectedIndex])">
+			<fmt:message key="ExprOptgroup1" var="ExprOptgroup1"/>
+			<optgroup label="${ExprOptgroup1 }">
+				<option value="optgrpoup1" unit="mg/m"><fmt:message key="ExprKreatinin"/></option>
+				<option value="more"><fmt:message key="ExprMore"/></option>
+			</optgroup>
+			<fmt:message key="ExprOptgroup2" var="ExprOptgroup2"/>
+			<optgroup label="${ExprOptgroup2 }">
+				<option value="optgrpoup2" unit="kg" 
+					selected="${exprC.finding == 'Gewichtskontrolle'?'selected':''}"
+				><fmt:message key="ExprFindingWeight"/></option>
+				<option value="optgrpoup2" unit="mg"><fmt:message key="ExprFindingLeucocyte"/></option>
+				<option value="optgrpoup2" unit="mg/m"><fmt:message key="ExprKreatinin"/></option>
+				<option value="more"><fmt:message key="ExprMore"/></option>
+			</optgroup>
+			<fmt:message key="ExprOptgroup3" var="ExprOptgroup3"/>
+			<optgroup label="${ExprOptgroup3 }">
+				<option value="optgrpoup3" unit="years"><fmt:message key="ExprExpressionAgeYear"/></option>
+				<option value="optgrpoup3" unit="months"><fmt:message key="ExprExpressionAgeMonth"/></option>
+				<option value="optgrpoup3" unit=""><fmt:message key="ExprExpressionCycleNr"/></option>
+				<option value="more"><fmt:message key="ExprMore"/></option>
+			</optgroup>
+		</form:select>
+		
+		<script	type="text/javascript">
+			function check(value){
+				//alert("Value: "+value);
+				if (value.value == "optgrpoup1" || value.value == "optgrpoup2" || value.value == "optgrpoup3") {
+					//document.getElementById("falls2").innerHTML = document.getElementById("opt2").innerHTML;
+					document.getElementById("unit").innerHTML = value.getAttribute("unit");
+					document.getElementById("fallsField").value="???";
+				} else if (value.value == "more") {
+					document.getElementById("fallsField").value="mehr Werte holen";
+				}
+				//dojo.byId("inputNotice").value=dijit.byId("editor").getValue();
+			}
+		</script>
+	</c:when>
+</c:choose>
+</jsp:root>

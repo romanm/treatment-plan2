@@ -1,0 +1,56 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+
+<form:form id="f2" modelAttribute="patientSchema">
+	<div class="dialog-header" ><fmt:message>ui_diagnose</fmt:message>:</div>
+	<form:input id="inputDiagnose" path="diagnose" cssStyle="width:250px"/>
+	<div class="dialog-header" ><fmt:message>ui_diagnose_extended</fmt:message>:</div>
+	<div id="htmlEditor" > ${patientSchema.notice} </div>
+	<form:hidden id="inputNotice" path="notice" />
+	
+	<script type="text/javascript"><![CDATA[
+		var inputDiagnoseListe = ${patientSchema.jsonDiagnose};
+		//htmlEditor3("6em");
+		htmlEditor4("6em",false);
+		Spring.addDecoration(new Spring.ElementDecoration({
+			elementId : "inputDiagnose", widgetType : "dijit.form.ComboBox",
+			widgetAttrs :
+			{
+				store : new dojo.data.ItemFileReadStore( {data :inputDiagnoseListe}),
+				//store : jsonDrugStore,
+				searchAttr : "name",
+				autocomplete : true,
+				required : true,
+				//focusOnLoad: true,
+				trim : true,
+				invalidMessage : "Diagnose"
+		}	}
+		));
+		dojo.addOnLoad(function(){
+			dijitFocus("inputDiagnose");
+		});
+	]]></script>
+	<div class="footspace"></div>
+	<input type="submit" name="_eventId_save"	value="${ui_button_save}"/>
+	<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}"/>
+
+<c:if test="${not empty patientSchema.seekDzL }">
+	<div class="scroll">
+	<c:forEach items="${patientSchema.seekDzL}" var="dz" varStatus="stat">
+		<div>${stat.count }.
+		<a href="#" onclick="dojo.byId('inputDiagnose').value='${dz.diagnose}';">${dz.diagnose}</a></div>
+	</c:forEach>
+	</div>
+</c:if>
+</form:form>
+
+</jsp:root>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0" xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:expr="urn:jsptagdir:/WEB-INF/tags/expr"
+>
+<jsp:directive.attribute name="ifT" type="com.qwit.domain.Tree" required="true" 
+	description="The if expr tree object"/>
+<c:choose>
+	<c:when test="${not empty schemaMtl.patientMtl }">
+	<!-- 
+		<mtl:if ifT="${neT}" />
+		<br/>
+	 -->
+		<spring:eval var="isRuleNotValid" expression="docMtl.isRuleNotValid(ifT)" />
+		<c:choose>
+			<c:when test="${isRuleNotValid }">
+				Rule not valid.
+			</c:when>
+			<c:otherwise>
+				<spring:eval var="isTsRule" expression="docMtl.isTsRule(ifT)" scope="request" />
+				<expr:ifUse ifT="${ifT}" />
+			</c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:otherwise>
+		<spring:eval var="ruleStateT" expression="jxp.ruleState(ifT,schemaMtl)" />
+		<mtl:if ifT="${ifT}" ruleStateT="${ruleStateT}" />
+		<c:out value=" " />
+	</c:otherwise>
+</c:choose>
+</jsp:root>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+>
+<jsp:directive.attribute name="nextDateId"/>
+<jsp:directive.attribute name="timestamp" type="java.sql.Timestamp"/>
+
+<c:if test="${not empty schemaMtl}">
+	<c:set var="cyclusDuration" value="${schemaMtl.schemaC.duration }" />
+	<!--
+	<c:set var="cyclusDuration" value="${schemaMtl.schemaC.duration*schemaMtl.appNr +1 }" />
+	<spring:eval var="bdate" expression="jxp.dateAddDay(schemaMtl.beginCalendar.time, cyclusDuration)" />
+	Wiederholung: Tag +${cyclusDuration+1} =
+	-->
+	<spring:eval var="nextCycleCalendar" expression="schemaMtl.getBeginCalendar().plusDays(cyclusDuration)" />
+	<spring:eval var="bdate" expression="nextCycleCalendar.toDate()" />
+	<c:if test="${not empty timestamp }"> 
+		<c:set var="bdate" value="${timestamp}" />
+	</c:if>
+	<!-- 
+	Wiederholung: Tag +${cyclusDuration} =
+	<c:set var="delayDays" value="0" />
+	<spring:eval var="dayDelayIP" expression="jxp.var('delayedDay')
+		.jxpip(schemaMtl.getPschemaT(), 'childTs[mtlO/ivariable=$delayedDay]/childTs[mtlO/ivalue!=0]')" />
+	<c:forEach var="dayDelayP" items="${dayDelayIP}">
+		<c:set var="delayDays" value="${delayDays + dayDelayP.value.mtlO.ivalue}" />
+	</c:forEach>
+	 -->
+	<spring:eval var="delayDays" expression="schemaMtl.getDelayDays(jxp)" />	
+	Wiederholung
+	<span class="b">
+	Tag ${cyclusDuration+1} =
+	<span id="${nextDateId}">
+		<c:if test="${0!=delayDays}">
+			<spring:eval var="bdate" expression="nextCycleCalendar.plusDays(delayDays).toDate()" />
+		</c:if>
+		<!-- 
+		<fmt:formatDate value="${bdate}" dateStyle="medium" />
+		 -->
+		<fmt:formatDate value="${bdate}" dateStyle="long" />
+		<c:if test="${0!=delayDays}">
+			<sup class="red">+ ${delayDays} </sup> 
+		</c:if>
+	</span>
+	</span>
+</c:if>
+</jsp:root>

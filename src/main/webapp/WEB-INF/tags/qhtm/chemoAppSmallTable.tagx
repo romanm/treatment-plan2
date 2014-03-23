@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:expr="urn:jsptagdir:/WEB-INF/tags/expr"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<c:set var="dddM" value="${schemaMtl.drugDoseDaysM}" />
+<spring:eval var="todayDate" expression="T(java.util.Calendar).getInstance().getTime()"/>
+<fmt:formatDate var="todayYearDay" value="${todayDate}" pattern="D"/>
+<c:set var="modDayInterval" value="2" />
+
+<table>
+<thead>
+<!-- 
+<tr class="dotted ">
+<tr class="dotted planday">
+ -->
+<tr class="dotted boboDo" style="vertical-align: top;">
+	<th >Substanz
+		<c:if test="${not empty applicationDurationT}">
+			<div class="rightNormal small">
+			<c:out value="App #"/>
+			<c:choose>
+				<c:when test="${not empty sesApplicationNr and sesApplicationNr>0 }">
+					<c:out value="${sesApplicationNr}"/>
+				</c:when>
+				<c:otherwise><c:out value="*"/></c:otherwise>
+			</c:choose>
+			<a href="schema-${owsSession.schemaPart}-${docMtl.docT.id }?applicationNr=0" class="${sesApplicationNr>0?'n':'b' }">
+				<c:out value="/"/>
+				<fmt:formatNumber pattern="#" value="${applicationDuration }"/>
+			</a>
+			</div>
+		</c:if>
+	</th>
+	<th style="width:30px"><fmt:message key="ui_dose"/>
+		<c:out value=" "/>
+		<span class="small">[mg/m²]</span>
+	</th>
+	<th style="width:30px">
+	<div class="taLeft">
+		<fmt:message key="ui_dose"/>
+		<c:out value=" "/>
+	</div>
+	<div class="b rightNormal small">
+		<fmt:message var="ui_doseCalculated" key="ui_doseCalculated"/>
+		<sup class="notb small" title="${ui_doseCalculated }">abs</sup>
+		<span class="b">[mg]</span>
+	</div>
+	</th>
+	<c:set var="dayDelay" value="0"/>
+	<c:forEach items="${schemaMtl.weekDayS}" var="d" varStatus="stat" >
+		<spring:eval var="dayDelayP" expression="jxp.jxp(schemaMtl.getPschemaT())
+		.var('delayedDay').var('day',d).getPointer(
+			'childTs[mtlO/ivariable=$delayedDay and mtlO/ivalue=$day]/childTs[1]')" />
+			<!-- 
+		<fmt:formatNumber var="appNr" pattern="#" value="${d / applicationDuration + 1}" />
+			 -->
+		<c:if test="${not empty applicationDuration}">
+			<spring:eval var="appNr" expression="d / applicationDuration +1" />
+		</c:if>
+		<th id="dayNr_${d}" class="select cmDayDelay">
+			<div class="nowrap">
+				<div class="floatRight">${d}</div>
+				<span class="small ${sesApplicationNr==appNr?'b':'n' }">
+					<a href="schema-${owsSession.schemaPart}-${docMtl.docT.id }?applicationNr=${appNr}" >${appNr}#</a>
+				</span>
+			</div>
+				<c:if test="${'dose'==dayDelayP.value.tabName}">
+				PROBMEMM2
+				</c:if>
+				<c:if test="${not empty dayDelayP.value and 'ivariable'==dayDelayP.value.tabName}">
+					<c:set var="dayDelay" value="${0+dayDelayP.value.mtlO.ivalue}"/>
+				</c:if>
+			<c:set var="pd" value="${d+dayDelay}"/>
+			<spring:eval var="ddt" 
+				expression="schemaMtl.getBeginCalendar().plusDays(pd - (pd>0?1:0))" />
+			<spring:eval var="dd" 
+				expression="ddt.toDate()" />
+			<div style="clear: both;">
+				<c:choose>
+					<c:when test="${ddt.monthOfYear!=ddtOld.monthOfYear or stat.last }">
+						<fmt:formatDate value="${dd}" pattern="dd.MM"/>
+					</c:when>
+					<c:otherwise>
+						<fmt:formatDate value="${dd}" pattern="dd"/>
+					</c:otherwise>
+				</c:choose>
+				<c:if test="${'dose'==dayDelayP.value.tabName}">
+				PROBMEMM3
+				</c:if>
+				<c:if test="${not empty dayDelayP.value and 'ivariable'==dayDelayP.value.tabName}">
+					<sup class="red">+
+						${dayDelayP.value.mtlO.ivalue }
+					</sup>
+				</c:if>
+			</div>
+			<c:set var="ddtOld" value="${ddt}" />
+		</th>
+	</c:forEach>
+	<th><spring:message code="uiApp"/> / <spring:message code="uiTempo"/></th>
+	<th><spring:message code="ui_therapyDays"/></th>
+</tr>
+</thead>
+
+<tbody>
+<c:forEach items="${schemaMtl.docT.childTs}" var="drugT">
+	<c:if test="${'drug'==drugT.tabName }">
+		<spring:eval var="doseT" expression="jxp.getDose(drugT)" />
+		<spring:eval var="appT" expression="jxp.getApp(drugT)" />
+		<tr>
+			<td><mtl:drug drugT="${drugT}"/></td>
+			<td class="taCenter">
+				<owsui:ajs editT="${doseT}"  action="chemoDoseMod"> <mtl:doseValue doseT="${doseT}"/> </owsui:ajs>
+			<!--
+				<spring:eval var="containsM2" expression="docMtl.getDoseO(doseT).getUnit().contains('m2') or docMtl.getDoseO(doseT).getUnit().contains('m²')" />
+			-->
+				<spring:eval var="doseOM2" expression="docMtl.getDoseO(doseT)" />
+				<c:if test="${not empty doseOM2}">
+					<spring:eval var="containsM2" expression="doseOM2.getUnit().contains('m²')" />
+					<c:if test="${not containsM2}"> ${doseT.mtlO.unit} </c:if>
+				</c:if>
+			</td>
+			<td>
+				<c:choose>
+					<c:when test="${empty patientMtl }"> <c:out value="###" /> </c:when>
+					<c:otherwise>
+						<mtl:chemo1DoseMod doseT="${doseT}" />
+					</c:otherwise>
+				</c:choose>
+			</td>
+						<c:forEach items="${schemaMtl.weekDayS}" var="d" varStatus="stat" >
+				<c:set var="drugDayAppS" value="${schemaMtl.schemaWeekPlan.drugDayAppS[drugT.id][d]}" />
+				<c:forEach var="ts" items="${drugDayAppS}">
+					<c:set var="editClass" value="${ts.nr==docMtl.tsNr?'red':'' }"/>
+				</c:forEach>
+				<td class="${empty drugDayAppS?'bcGrey':editClass }">
+				<c:forEach var="ts" items="${drugDayAppS}">
+					<c:choose>
+						<c:when test="${not empty ts.begin}"/>
+						<c:otherwise>
+					<fmt:formatDate var="yearDay" value="${ts}" pattern="D"/>
+					<spring:eval var="taskTsNr" expression="docMtl.getTsNrInTask(ts)" />
+					<spring:eval var="doseAllModP" expression="jxp.var('ref',doseT.getId())
+					.jxp(schemaMtl.getPschemaT()).getPointer('childTs/childTs[ref=$ref]')" />
+					<spring:eval var="doseModP" expression="jxp.var('taskTsNr').var('ttNr',taskTsNr)
+					.var('ref',doseT.getId()).jxp(schemaMtl.getPschemaT()).getPointer(
+			'childTs/childTs[ref=$ref and childTs/mtlO[ivariable=$taskTsNr]/ivalue=$ttNr]')" />
+					<c:set var="doseText">
+						<c:choose>
+							<c:when test="${empty patientMtl }"> <c:out value="###" /> </c:when>
+							<c:when test="${'dose'==doseModP.value.tabName}"> 
+PROBLEMM
+ </c:when>
+							<c:when test="${not empty doseModP.value.mtlO.ivalue or not empty doseAllModP.value.mtlO.ivalue}">
+							<span class="nowrap">
+								<qhtm:chemoDoseMod ts="${ts}" view="calcDoseProc" notMeal="${true}" />
+							</span>
+							<!--
+							${doseModP.value.mtlO.ivalue}%
+							-->
+							</c:when>
+							<c:when test="${(yearDay-todayYearDay) lt modDayInterval}">
+								100%
+							</c:when>
+							<!-- 
+							<c:otherwise>###</c:otherwise>
+							 -->
+							<c:otherwise>
+								100%
+							</c:otherwise>
+						</c:choose>
+					</c:set>
+					<c:if test="${not empty applicationDuration}">
+						<spring:eval var="thisApp" expression="d / applicationDuration +1" />
+						<!-- 
+						<fmt:formatNumber var="thisApp" value="${d / applicationDuration +1}" pattern="#"/>
+						 -->
+					</c:if>
+					<c:choose>
+						<c:when test="${empty schemaMtl.patientMtl}">
+							${doseText}
+						</c:when>
+						<c:when test="${sesApplicationNr==thisApp}">
+						<!--
+							<owsui:ajs editT="${doseT}" ts="${ts}" action="chemoDoseMod">${doseText}</owsui:ajs>
+							
+							<qhtm:aSmod doseT="${doseT}" ts="${ts}" >
+								${doseText}
+							</qhtm:aSmod>
+						-->
+						<a href="javascript:void(0);" onclick="linkOtherDrug(${doseT.id},${ts.nr})">
+							${doseText}
+						</a>
+						</c:when>
+						<c:otherwise> ${doseText} </c:otherwise>
+					</c:choose>
+					<c:out value="${not empty ts.beyond?'…':''}"/>
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+				</td>
+			</c:forEach>
+			<td>
+				<mtl:doseApp doseT="${doseT}"/>
+				<owsui:editAppApp appT="${appT}" />
+			</td>
+			<td>
+			<spring:eval var="dayPs" expression="jxp.var('day')
+			.jxpip(drugT,'childTs[tabName=$day]')" />
+			<c:forEach var="dayP" items="${dayPs}" varStatus="stat">
+				<c:if test="${not stat.first}"><c:out value="; " /></c:if>
+				${dayP.value.mtlO.abs }
+			</c:forEach>
+			</td>
+		</tr>
+	</c:if>
+</c:forEach>
+</tbody>
+</table>
+
+</jsp:root>

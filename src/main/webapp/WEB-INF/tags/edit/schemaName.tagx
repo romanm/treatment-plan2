@@ -1,0 +1,22 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+>
+
+<fmt:message key="ui_title_dialogEditSchemaName" />
+<table>
+	<tr><th>Name</th><th>Duration</th></tr>
+	<tr><td>
+		<form:input path="schemaC.task" cssStyle="width:160px" />
+	</td><td>
+		<form:input path="schemaC.duration" cssStyle="width:60px" />
+	</td></tr>
+	<tr><td>
+		<form:radiobutton path="schemaC.outpatient" value="" label="nicht angegeben" /><br/>
+		<form:radiobutton path="schemaC.outpatient" value="n" label="stationär" /><br/>
+		<form:radiobutton path="schemaC.outpatient" value="y" label="ambulant" /><br/>
+	</td></tr>
+</table>
+<input type="submit" name="_eventId_editDuration" value="${ui_button_OK }" class="small"/>
+
+</jsp:root>

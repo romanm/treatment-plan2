@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<!-- 
+c:if test="${'labor'==schemaMtl.editNodeT.mtlO.type }">
+ -->
+<c:if test="${'labor'==docMtl.editNodeT.mtlO.type }">
+	<c:set var="labChain" value="${fn:substringBefore(docMtl.editNodeT.mtlO.notice, docMtl.noticeLaborExtraDivider)}" />
+	<ul id="labChain1">
+		<li><qhtm:checkboxLab value="cbc" labChain="${labChain}"/></li>
+		<li><qhtm:checkboxLab value="cbcDiff" labChain="${labChain}"/></li>
+		<li><qhtm:checkboxLab value="electrolyte" labChain="${labChain}"/></li>
+		<li><qhtm:checkboxLab value="electrolyteMg" labChain="${labChain}"/></li>
+		<li><qhtm:checkboxLab value="lft" labChain="${labChain}"/></li>
+		<li><qhtm:checkboxLab value="aki" labChain="${labChain}"/></li>
+		<li><qhtm:checkboxLab value="tumorMarker" labChain="${labChain}"/></li>
+		<li><qhtm:checkboxLab value="week3" labChain="${labChain}" font="i"/></li>
+		<li><qhtm:checkboxLab value="week1" labChain="${labChain}" font="i"/></li>
+		<li><qhtm:checkboxLab value="forApp" labChain="${labChain}" font="i"/></li>
+		<li><qhtm:checkboxLab value="forBegin" labChain="${labChain}" font="i"/></li>
+	</ul>
+</c:if>
+${fn:length(list) }
+<div class="scroll">
+<table class="usedDose" width="100%"><tbody>
+<!-- 
+<table class="usedDose" width="100%"><tbody class="scroll3">
+ -->
+<c:forEach var="notice" items="${list}">
+<tr><td title="${notice.cnt}" class="${notice.idclass==schemaMtl.editNodeT.idClass?'used':'' }">
+	<c:choose>
+		<c:when test="${notice.idclass==schemaMtl.editNodeT.idClass}">
+			<mtl:notice noticeM="${notice}" />
+		</c:when>
+		<c:otherwise>
+		<a href="?${urlFlow}&amp;_eventId=newIdClass&amp;newIdClass=${notice.idclass}">
+			<mtl:notice noticeM="${notice}" withType="${true}"/>
+		</a>
+		</c:otherwise>
+	</c:choose>
+</td></tr>
+</c:forEach>
+</tbody></table>
+</div>
+</jsp:root>

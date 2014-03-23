@@ -1,0 +1,39 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="doseT"	type="com.qwit.domain.Tree"	required="true"/>
+<jsp:directive.attribute name="ts"	type="com.qwit.domain.Ts" required="true"/>
+
+<c:if test="${not empty ts}">
+	<spring:eval var="malInDay" expression="schemaMtl.malInDay(ts)" />
+</c:if>
+<c:choose>
+	<c:when test="${not fn:contains(doseT.mtlO.unit,'/')}">
+		<td colspan="2" style="background-color: #CCCCCC;" ></td>
+	</c:when>
+	<c:otherwise>
+		<c:set var="title"><mtl:doseTitle ts="${ts}" /></c:set>
+		<qhtm:tag name="td" prefix="td_" tree="${doseT}" title="${title}">
+			<mtl:malDefDoseValue ts="${ts}" />
+		</qhtm:tag>
+		<td>
+			<c:choose>
+				<c:when test="${doseT.mtlO.pro=='day' and malInDay>0 }">
+					<fmt:formatNumber pattern="#.#">${schemaMtl.calcDoseR[doseT]/malInDay}</fmt:formatNumber>
+				</c:when>
+				<c:otherwise>
+					${schemaMtl.calcDoseR[doseT]}
+					<c:set var="cunit"><mtl:doseUnit doseT="${doseT}" calculated="true"/></c:set>
+					<c:if test="${cunit!='mg'}">${cunit}</c:if>
+				</c:otherwise>
+			</c:choose>
+		</td>
+	</c:otherwise>
+</c:choose>
+</jsp:root>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:joda="http://www.joda.org/joda/time/tags"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:view="urn:jsptagdir:/WEB-INF/tags/view"
+>
+
+<spring:eval var="beginDT" expression="T(org.joda.time.DateTime).now()" />
+<c:if test="${not empty patientMtl}">
+	<c:set var="beginDT" value="${schemaMtl.beginCalendar }" />
+</c:if>
+
+<view:month anyDayOfMonthDT="${beginDT}">
+	<c:choose>
+		<c:when test="${dayOfMonthDT==beginDT}">
+			<b><joda:format value="${dayOfMonthDT}" pattern="d" /></b>
+		</c:when>
+		<c:otherwise>
+			<joda:format value="${dayOfMonthDT}" pattern="d" />
+		</c:otherwise>
+	</c:choose>
+</view:month>
+
+</jsp:root>

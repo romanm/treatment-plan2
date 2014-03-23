@@ -1,0 +1,12 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+	<jsp:directive.attribute name="folderT" type="com.qwit.domain.Tree" required="true" description="Folder tree"/>
+
+	<c:if test="${'drug'!=folderT.parentT.mtlO.folder }">
+		<mtl:folder4docRRecursiv folderT="${folderT.parentT}" />
+	</c:if>
+	<mtl:folder4doc folderT="${folderT}" />
+</jsp:root>

@@ -1,0 +1,153 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+
+<mtl:inFolder />
+	<sql:query var="drugs" dataSource="${owsDbSource}" scope="session" >
+	SELECT count(drug),drug,min(iddrug) AS iddrug
+	FROM tree t1,drug,(SELECT t2.id FROM tree t1,tree t2 
+	where t1.did=?<sql:param value="${userMtl.targetF.id}"/>
+	and t2.iddoc=t1.id and t2.id=t2.idclass and t2.id!=t1.id) t2
+	where t2.id=t1.did and t1.idclass=iddrug
+	group by drug
+	order by drug
+	</sql:query>
+	<c:set var="drugsHtml">
+		<c:forEach var="rowDrug" items="${drugs.rows}" varStatus="stat">
+			<spring:url var="hrefDrug" value="?${urlFlow}">
+				<spring:param name="iddrug"	value="${rowDrug.iddrug }"/>
+				<spring:param name="part"	value="${part }"/>
+			</spring:url>
+			<c:choose>
+				<c:when test="${rowDrug.iddrug==param.iddrug }">
+					<c:set var="myDrug" value="${rowDrug}" />
+					<div class="b"><a href="${hrefDrug}">${rowDrug.drug}</a></div>
+				</c:when>
+				<c:otherwise>
+					<div><a href="${hrefDrug}">${rowDrug.drug}</a></div>
+				</c:otherwise>
+			</c:choose>
+		</c:forEach>
+	</c:set>
+	<c:if test="${not empty myDrug.iddrug }">
+		<c:set var="iddr" value="${myDrug.iddrug }" />
+		<spring:eval var="idDrug" expression="T(java.lang.Integer).parseInt(iddr)" scope="session"/>
+		<sql:query var="doses" dataSource="${owsDbSource}" scope="session" >
+		SELECT * FROM dose where iddose in (
+		SELECT iddose FROM tree t1,tree t2, tree t3, tree t4,dose
+		where t1.did=?<sql:param value="${userMtl.targetF.id}"/>
+		and t2.iddoc=t1.id and t2.id=t2.idclass and t2.id!=t1.id
+		and t3.iddoc=t2.id and t3.idclass=?<sql:param value="${idDrug}"/>
+		and t4.did=t3.id and t4.idclass=iddose
+		group by iddose)
+		order by value desc
+		</sql:query>
+		<c:set var="drugDoseHtml">
+			<c:forEach var="rowDose" items="${doses.rows}" varStatus="stat">
+				<spring:url var="hrefDose" value="?${urlFlow}">
+					<spring:param name="part"	value="${part }"/>
+					<spring:param name="iddrug"	value="${myDrug.iddrug }"/>
+					<spring:param name="iddose"	value="${rowDose.iddose }"/>
+				</spring:url>
+				<c:set var="doseHtml"> 
+				<fmt:formatNumber pattern="##.###" value="${rowDose.value }"/>
+				${rowDose.unit}<fmt:message key="mtl_dose_pro_${rowDose.pro}"/>
+				${rowDose.app}</c:set>
+				<c:choose>
+					<c:when test="${rowDose.iddose==param.iddose }">
+						<c:set var="myDoseHtml" value="${doseHtml}" />
+						<div class="b"><a href="${hrefDose}">${doseHtml}</a></div>
+					</c:when>
+					<c:otherwise>
+						<div><a href="${hrefDose}">${doseHtml}</a></div>
+					</c:otherwise>
+				</c:choose>
+			</c:forEach>
+		</c:set>
+		<sql:query var="ddNotices" dataSource="${owsDbSource}" scope="session" >
+SELECT * FROM notice where idnotice in (
+SELECT idnotice FROM tree t1,tree t2, tree t3, tree t4, tree t5,notice
+where t1.did=?<sql:param value="${userMtl.targetF.id}"/>
+and t2.iddoc=t1.id and t2.id=t2.idclass and t2.id!=t1.id
+and t3.iddoc=t2.id and t3.idclass=?<sql:param value="${idDrug}"/>
+and t4.did=t3.id 
+and t5.did=t4.id and t5.idclass=idnotice
+group by idnotice)
+order by notice
+		</sql:query>
+		<c:set var="ddNoticeHtml">
+			<c:forEach var="rowNotice" items="${ddNotices.rows}" varStatus="stat">
+				<div>
+					${rowNotice.notice}
+				</div>
+			</c:forEach>
+		</c:set>
+	</c:if>
+	<c:choose>
+		<c:when test="${not empty param.iddose }">
+			<sql:query var="tasks" dataSource="${owsDbSource}" scope="session" >
+SELECT * FROM tree t1, tree t2,task
+,(SELECT t2.id FROM tree t1,tree t2 
+	where t1.did=?<sql:param value="${userMtl.targetF.id}"/>
+	and t2.iddoc=t1.id and t2.id=t2.idclass and t2.id!=t1.id) t3
+where t1.id=t2.did and t1.idclass=?<sql:param value="${idDrug}"/>
+and t2.idclass=${param.iddose}
+and t3.id=t1.iddoc and t3.id=idtask
+order by task
+			</sql:query>
+		</c:when>
+		<c:when test="${not empty param.iddrug }">
+			<sql:query var="tasks" dataSource="${owsDbSource}" scope="session" >
+SELECT * FROM tree t1, task
+,(SELECT t2.id FROM tree t1,tree t2 
+	where t1.did=?<sql:param value="${userMtl.targetF.id}"/>
+	and t2.iddoc=t1.id and t2.id=t2.idclass and t2.id!=t1.id) t3
+where t1.idclass=?<sql:param value="${idDrug}"/>
+and t3.id=t1.iddoc and t3.id=idtask
+order by task
+			</sql:query>
+		</c:when>
+	</c:choose>
+
+	<div style="float:inherit;"/>
+	<div style="float: right;">
+		<table>
+			<tr class="bottomlinie">
+				<th><fmt:message key="ui_schemata"/></th>
+			</tr>
+			<tr><td>
+			<c:forEach var="rowTask" items="${tasks.rows}" varStatus="stat">
+				<div>
+					<a href="schema=${rowTask.idtask}">${rowTask.task}</a>
+				</div>
+			</c:forEach>
+			</td></tr>
+		</table>
+	</div>
+	
+	<table>
+		<tr class="bottomlinie">
+			<th><fmt:message key="ui_drugs"/></th>
+			<th><fmt:message key="ui_dose"/></th>
+			<th><fmt:message key="ui_day"/></th>
+		</tr>
+		<tr class="bottomlinie">
+			<th>${myDrug.drug}</th>
+			<th>${myDoseHtml}</th>
+		</tr>
+		<tr><td rowspan="3">${drugsHtml}</td><td>${drugDoseHtml}</td></tr>
+		<tr class="bottomlinie" >
+			<th colspan="2" style="height: 1.4em;" ><fmt:message key="ui_notice"/></th>
+		</tr>
+		<tr>
+			<td colspan="2">${ddNoticeHtml}</td>
+		</tr>
+	</table>
+
+</jsp:root>

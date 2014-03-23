@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+
+<spring:eval var="aucDoseP" expression="jxp.var('dose').var('AUC')
+			.jxp(docMtl.docT).getPointer('childTs/childTs[tabName=$dose][mtlO/unit=$AUC]')" />
+
+<c:if test="${not empty aucDoseP.value }">
+	<owsui:titlePane id="auc_${id}" mtitle="ui_dialogTitle_AUC" >
+		<edit:lastGfr/>
+		<c:set var="doseT" value="${aucDoseP.value }" />
+		<mtl:drug drugT="${doseT.parentT}"/>
+		<c:out value=" " />
+		<mtl:doseValue doseT="${doseT}"/>
+		<c:out value=" " />
+		<mtl:doseUnit doseT="${doseT}"/>
+		<c:out value=" " />
+
+		<div>
+		<!-- 
+			Neue Labor für AUC Dosis
+		 -->
+		 Labordaten für AUC-Berechnung aktualisieren: 
+			<br/>
+			<ul>
+				<li>
+					<a href="schemaflow?a=creatinineLabor2auc&amp;id=${docMtl.docT.id }">
+						<fmt:message  key="mtl_labor_Creatinine"/>
+					</a>
+				
+				</li>
+				<li>
+					<a href="schemaflow?a=gfrLabor2auc&amp;id=${docMtl.docT.id }">
+						GFR
+					</a>
+				</li>
+			</ul>
+			<!-- 
+			<a href="schemaflow?a=creatinineLabor2auc&amp;id=${docMtl.docT.id }">
+			<fmt:message  key="mtl_labor_Creatinine"/>
+			</a>
+			<c:out value=" oder " />
+			<a href="schemaflow?a=gfrLabor2auc&amp;id=${docMtl.docT.id }">
+			GFR
+			</a>
+			 -->
+		</div>
+	<hr/>
+	</owsui:titlePane>
+</c:if>
+</jsp:root>

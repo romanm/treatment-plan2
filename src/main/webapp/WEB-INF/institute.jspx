@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:sql="http://java.sun.com/jsp/jstl/sql"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+	xmlns:view="urn:jsptagdir:/WEB-INF/tags/view"
+>
+
+<div id="headline"><fmt:message key="uiInstitute"/></div>
+<div id="content">
+	<form:form id="f1" modelAttribute="instituteMtl">
+		<h2>
+			<a href="institute=${docMtl.docT.id}">
+				${instituteMtl.docT.mtlO.institute }
+			</a>
+		</h2>
+		<c:choose>
+			<c:when test="${empty pageContext.request.userPrincipal.name}">
+			Zuerst Anmelden
+			</c:when>
+			<c:when test="${empty instituteMtl.docT }">
+			Wählen Sie Ihre Abteilung
+<sql:query var="myStations" dataSource="${owsDbSource}" scope="session" >
+SELECT institute.* FROM tree t1,institute,tree t2
+where t2.idclass in (SELECT iddoc FROM tree t1, owuser
+WHERE t1.idclass=idowuser AND owuser=?<sql:param value="${pageContext.request.userPrincipal.name}"/>)
+and t1.id=idinstitute and t1.id=t2.did
+</sql:query>
+<c:forEach var="row" items="${myStations.rows}" varStatus="stat">
+	<div><a href="institute=${row.idinstitute }">${row.institute }</a></div>
+</c:forEach>
+			</c:when>
+			<c:when test="${'userAccess'==stationPart}"><mtl:userAccess/></c:when>
+			<c:when test="${'colleagues'==stationPart }"><view:colleagues/></c:when>
+			<c:when test="${'instituteUsedTrade'==stationPart }"><view:instituteUsedTrade/></c:when>
+			<c:when test="${'archivPatient'==stationPart }"><view:archivPatient/></c:when>
+			<c:otherwise><view:chronoPlan/></c:otherwise>
+		</c:choose>
+
+		<mtl:form1hidden />
+
+		<c:choose>
+			<c:when test="${'instituteUsedTrade'==stationPart }"/>
+			<c:otherwise>
+	<spring:eval 	var="neSignatureBlockP"
+					expression="jxp.jxp(docMtl.getDocT()).var('signatureBlock').getPointer(
+								'childTs[mtlO/type=$signatureBlock]')" />
+	<c:set var="noticeT" value="${neSignatureBlockP.value}"/>
+
+	<c:choose>
+		<c:when test="${not empty noticeT}">
+			<owsui:editNotice noticeT="${noticeT}"/>
+		</c:when>
+		<c:when test="${'signatureBlockNotice'==currentSWFState}">
+				<div id="htmlEditor">${noticeT}</div>
+				<form:hidden id="inputNotice" path="editNoticeC.notice"/>
+				<form:errors path="*" cssClass="note"/>
+				<input type="submit" name="_eventId_save"	value="${ui_button_save}" id="bdSave"/>
+				<input type="button" onclick="cancelReload();" value="${ui_button_cancel}" />
+			<script type="text/javascript">htmlEditor2("200px");</script>
+		</c:when>
+		<c:otherwise>
+			<qhtm:a idt="${dcoT.idt}" action="signatureBlockNotice" >
+				create a signature block
+			</qhtm:a>
+		</c:otherwise>
+	</c:choose>
+</c:otherwise>
+		</c:choose>
+</form:form>
+	
+		
+</div>
+<div id="sidebar" >
+	<owsui:docToolbar />
+	<edit:panel />
+
+	<h2><fmt:message key="ui_title_views" /></h2>
+	<ul>
+		<li><qhtm:aView part="chronoPlan"><fmt:message key="ui_menuItemLink_chronoPlan" /></qhtm:aView></li>
+		<li><qhtm:aView part="colleagues"><fmt:message key="ui_menuItemLink_colleagues" /></qhtm:aView></li>
+		<li><qhtm:aView part="userAccess"><fmt:message key="ui_userAccess" /></qhtm:aView></li>
+		<li><qhtm:aView part="instituteUsedTrade"><fmt:message key="ui_instituteUsedTrade" /></qhtm:aView></li>
+		<li><qhtm:aView part="archivPatient"><fmt:message key="ui_archivPatient" /></qhtm:aView></li>
+	</ul>
+	
+</div>
+</jsp:root>

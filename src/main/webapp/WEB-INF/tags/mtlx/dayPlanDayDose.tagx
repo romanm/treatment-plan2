@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="ts" type="com.qwit.domain.Ts" required="true" description="The ts object"/>
+
+<c:set var="drugT" value="${ts.timesT.parentT.parentT}" />
+<spring:eval var="doseT" expression="jxp.getDose(drugT)"/>
+<qhtm:tag name="td" prefix="td${ts.nr}_" tree="${drugT}" ts="${ts}">
+	<qhtm:a idt="${drugT.id}"><mtl:drug drugT="${drugT}"/></qhtm:a>
+	<c:if test="${fn:contains(doseT.mtlO.unit,'/')}">
+		<c:set var="title"><mtl:doseTitle ts="${ts}" /></c:set>
+		<c:out value=" " />
+		<c:set var="malDefDose"><mtl:malDefDoseValue ts="${ts}" withUnit="${true}"/></c:set>
+		<!--Dosis (für verrechnete Dosis)-->
+		<span class="small" title="${title}">(${fn:trim(malDefDose)})</span>
+	</c:if>
+	<c:if test="${fn:contains(doseT.mtlO.unit,'AUC')}">
+		<c:set var="title"><mtl:doseTitle ts="${ts}" /></c:set>
+		<c:out value=" " />
+		<c:set var="malDefDose"><mtl:malDefDoseValue ts="${ts}" withUnit="${true}"/></c:set>
+		<!--Dosis (für verrechnete Dosis)-->
+		<span class="small" title="${title}">(${fn:trim(malDefDose)})</span>
+	</c:if>
+	<qhtm:dddNEnr drugT="${drugT}" />
+	<!-- 
+	<spring:eval var="dayT" expression="jxp.child(drugT, 'day',1)" />
+	<qhtm:subNEnr parentT="${doseT}" />
+	<c:out value=" " />
+	<qhtm:subNEnr parentT="${dayT}" />
+	 -->
+	<qhtm:tabletGabe drugT="${drugT}" />
+</qhtm:tag>
+<qhtm:tag name="td" prefix="dv${ts.nr}_" tree="${doseT}" ts="${ts}">
+	<c:choose>
+		<c:when test="${fn:contains(ts.timesT.mtlO.abs,'=')}">
+		<!-- 
+			<mtl:doseMealValue doseT="${doseT}" timesT="${ts.timesT}"/>
+		 -->
+			<mtl:chemoDoseMod ts="${ts}"/>
+		</c:when>
+		<c:otherwise>
+			<!--
+			<mtl:doseModValue drugT="${drugT}" day="${ts.cday}" ts="${ts}"/>
+			-->
+			<mtl:chemoDoseMod ts="${ts}"/>
+		</c:otherwise>
+	</c:choose>
+</qhtm:tag>
+<qhtm:tag name="td" prefix="du${ts.nr}_" tree="${doseT}" ts="${ts}">
+	<mtl:doseUnit doseT="${doseT}" ts="${ts}" calculated="${true}" />
+</qhtm:tag>
+<td>
+	<mtl:doseApp doseT="${doseT}"/>
+	<owsui:editDrugAppApp drugT="${drugT}" />
+	<!-- 
+	<spring:eval var="appT" expression="jxp.getApp(drugT)" />
+	<c:if test="${not empty appT}">
+		<owsui:editAppApp appT="${appT}" />
+	</c:if>
+	 -->
+</td>
+</jsp:root>

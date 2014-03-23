@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+	<jsp:directive.attribute name="tree"	type="com.qwit.domain.Tree"/>
+	<jsp:directive.attribute name="withType"	type="java.lang.Boolean"/>
+
+<c:choose>
+	<c:when test="${empty tree }">Ein Element</c:when>
+	<!-- 
+	<c:when test="${empty tree.tabName }"><fmt:message key="ui_empty" /></c:when>
+	 -->
+	<c:when test="${0==tree.id}"><fmt:message key="ui_empty" /></c:when>
+	<c:when test="${'day'==tree.tabName }">		<mtl:day dayT="${tree}"/></c:when>
+	<c:when test="${'times'==tree.tabName }">	<mtl:times timesT="${tree}" /></c:when>
+	<c:when test="${'drug'==tree.tabName }">	<mtl:supportRqmDrug drugT="${tree}" withType="${true}"/></c:when>
+	<c:when test="${'labor'==tree.tabName }">	<mtl:drug drugT="${tree}" /></c:when>
+	<c:when test="${'dose'==tree.tabName }">
+		<mtl:doseValue doseT="${tree}"/>
+		<c:out value="" />
+		<mtl:doseUnit doseT="${tree}"/>
+		<c:out value=" " />
+		<mtl:doseApp doseT="${tree}"/>
+		<c:if test="${'pc'==tree.mtlO.type}">
+		(not Definition Dose)
+		</c:if>
+	</c:when>
+	<c:when test="${'notice'==tree.tabName }">
+		<mtl:notice noticeT="${tree}" withType="${withType}"/>
+		(id=${tree.mtlO.id })
+	</c:when>
+	<c:otherwise>Ein Element</c:otherwise>
+</c:choose>
+</jsp:root>

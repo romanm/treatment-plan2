@@ -1,0 +1,30 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+>
+
+<jsp:directive.attribute name="id" />
+<jsp:directive.attribute name="title" />
+<jsp:directive.attribute name="note" />
+<jsp:directive.attribute name="selected" />
+
+
+<c:if test="${empty selected}">
+	<c:set var="selected" value="false" /> 
+</c:if>
+	
+	<c:set var="title"><fmt:message>ui_${id}</fmt:message></c:set>
+	
+	<div id="${id}AccoPanel" title="${title}">
+		<c:if test="${not empty note}">
+			<p>
+				${note}
+			</p>
+		</c:if>
+		<jsp:doBody />
+	</div>
+	<script type="text/javascript">
+		createAccordionPane('${id}AccoPanel', ${selected}, '${title}');
+	</script>
+	
+</jsp:root>

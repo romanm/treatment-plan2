@@ -1,0 +1,24 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:form="http://www.springframework.org/tags/form"
+>
+<form:input id="inputDrug" path="editDrugC.drug" cssStyle="width:180px"/>
+<script type="text/javascript"><![CDATA[
+	Spring.addDecoration(new Spring.ElementDecoration({
+		elementId : "inputDrug", widgetType : "dijit.form.ComboBox",
+		widgetAttrs :{
+			store : new dojo.data.ItemFileReadStore( {data :drugsListe}),
+			//store : jsonDrugStore,
+			searchAttr : "name",
+			autocomplete : true,
+			required : true,
+			//focusOnLoad: true,
+			trim : true,
+			invalidMessage : "Medikament Name"
+	}	}
+	));
+	dojo.addOnLoad(function(){
+		dijitFocus("inputDrug");
+	});
+]]></script>
+
+</jsp:root>

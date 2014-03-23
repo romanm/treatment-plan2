@@ -1,0 +1,84 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:s="http://www.springframework.org/tags"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<!-- 
+	xmlns:dialog="http://imsel.imise.uni-leipzig.de/jsp/dialog" 
+<div id="headline">
+	<mtl:breadcrumb docT="${drugMtl.docT}" docMtl="${drugMtl}" />
+</div>
+ -->
+
+<mtl:breadcrumbDrug />
+
+<div id="content">
+	<form:form id="f1" modelAttribute="drugMtl">
+<qhtm:tag name="h2" prefix="dd_" tree="${drugMtl.docT}">
+	<a href="drug=${drugMtl.docT.id}">${drugMtl.docT.mtlO.drug}</a>
+</qhtm:tag>
+	<!-- 
+	<h2><a href="drug=${drugMtl.docT.id}">${drugMtl.docT.mtlO.drug}</a></h2>
+	<h2><a href="drug?id=${drugMtl.docT.id}&amp;part=${owsSession.drugPart}">${drugMtl.docT.mtlO.drug}</a></h2>
+	 -->
+
+	<table>
+		<c:set var="trade">
+			<c:forEach items="${drugMtl.tradeL}" var="tradeT" varStatus="stat">
+				<c:if test="${tradeT.mtlO.type!='a'}">
+				<span class="select trade" id="t_${tradeT.id}">
+					${tradeT.mtlO.drug}<c:if test="${fn:length(drugMtl.tradeL)>stat.count}">, </c:if>
+				</span>
+				</c:if>
+			</c:forEach>
+		</c:set>
+		<tr>
+			<th><h3><fmt:message key="trade_name" /></h3></th>
+			<td>${fn:substring(trade,0,fn:length(trade))}</td>
+		<c:set var="aliasName">
+			<c:forEach items="${drugMtl.tradeL}" var="tradeT" varStatus="stat">
+				<c:if test="${tradeT.mtlO.type=='a'}">
+					${tradeT.mtlO.drug}<c:if test="${fn:length(drugMtl.tradeL)>stat.count}">, </c:if>
+				</c:if>
+			</c:forEach>
+		</c:set>
+		<c:if test="${not empty aliasName}">
+			<th><h3><fmt:message key="alias_name" /></h3></th>
+			<td>${fn:substring(aliasName,0,fn:length(aliasName))}</td>
+		</c:if>
+		</tr>
+	</table>
+		<c:choose>
+			<c:when test="${'usage'==drugPart}"><mtl:drugUsage/></c:when>
+			<c:otherwise><mtl:drugFront/></c:otherwise>
+		</c:choose>
+		<!-- render notice & their Types -->
+		<mtl:form1hidden />
+	</form:form>
+</div>
+
+<div id="sidebar" >
+	<owsui:docToolbar />
+	<!-- 
+	<mtl:nextSave />
+	 -->
+	<edit:panel />
+	<c:set var="viewsHead"><fmt:message key="ui_title_views" /></c:set>
+	<owsui:sidebarUl head="${viewsHead}">
+		<li>
+			<qhtm:aView part="front" level="drug" noFlow="true"><fmt:message key="ui_partView_drugFront" /></qhtm:aView>
+		</li>
+		<li>
+			<qhtm:aView part="usage" level="drug" noFlow="true"><fmt:message key="ui_partView_drugUsage" /></qhtm:aView>
+		</li>
+		<li><a href="xml=${drugMtl.docT.id}">XML</a></li>
+	</owsui:sidebarUl>
+</div>
+
+</jsp:root>

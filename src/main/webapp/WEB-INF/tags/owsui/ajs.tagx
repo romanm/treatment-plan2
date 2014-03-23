@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+>
+<jsp:directive.attribute name="editT"	type="com.qwit.domain.Tree" required="true"
+	description="The tree object to edit"/>
+<jsp:directive.attribute name="ts"		type="com.qwit.domain.Ts"
+	description="Ts for ts specific link"/>
+<jsp:directive.attribute name="action"
+	description="Spring web flow event"/>
+<jsp:directive.attribute name="cssClass"/>
+
+<c:set var="id" value="${docMtl.docT.id}" />
+<c:if test="${not empty explorerMtl }">
+	<c:set var="id" value="${explorerMtl.folderO.id}" />
+</c:if>
+<c:set var="hasCss" value="${not empty cssClass and fn:length(cssClass)>0}" />
+<c:choose>
+	<c:when test="${editSperre}">
+		<jsp:doBody/></c:when>
+	<c:when test="${empty pageContext.request.userPrincipal.name}">
+		<jsp:doBody/></c:when>
+	<c:when test="${not isAdmin and docMtl.rightWriteYes>docMtl.accessRight}">
+		<jsp:doBody/>
+	</c:when>
+	<c:when test="${empty flowExecutionUrl}">
+		<spring:url var="href" value="${flow}?">
+			<spring:param name="id"	value="${id}"/>
+			<spring:param name="idt"	value="${editT.id}"/>
+			<c:if test="${not empty ts }">
+				<spring:param name="tsNr"	value="${ts.nr}"/>
+			</c:if>
+			<c:if test="${not empty action }">
+				<spring:param name="a"	value="${action}"/>
+			</c:if>
+		</spring:url>
+		<c:choose>
+			<c:when test="${hasCss}">
+				<a href="${href}" class="${cssClass}"><jsp:doBody/></a>
+			</c:when>
+			<c:otherwise><a href="${href}"><jsp:doBody/></a></c:otherwise>
+		</c:choose>
+	</c:when>
+	<c:otherwise>
+		<c:choose>
+			<c:when test="${'modDay'==action}">
+				<c:set var="onclick" value="dojo.byId('action').value='modDay';dojo.byId('modDay').value='${modDay}';" />
+			</c:when>
+			<c:when test="${not empty action}">
+				<c:set var="onclick" value="dojo.byId('action').value='${action}';" />
+			</c:when>
+		</c:choose>
+		<c:if test="${not empty ts}">
+			<c:set var="onclick" value="${onclick}dojo.byId('tsNr').value=${ts.nr};" />
+		</c:if>
+		<jsp:directive.attribute name="editStep" />
+		<c:if test="${empty editStep }">
+			<c:set var="editStep" value="editStep" />
+		</c:if>
+		<c:set var="onclick" value="${onclick}dojo.byId('idt').value=${editT.id};dojo.byId('${editStep}').click();" />
+		
+		<c:choose>
+			<c:when test="${hasCss}">
+				<a id="ajs_${id}" href="javascript:void(0);" onclick="${onclick}" class="${cssClass}">
+					<jsp:doBody/></a>
+			</c:when>
+			<c:otherwise>
+				<a id="ajs_${id}" href="javascript:void(0);" onclick="${onclick}"><jsp:doBody/></a>
+			</c:otherwise>
+		</c:choose>
+	</c:otherwise>
+</c:choose>
+
+
+</jsp:root>

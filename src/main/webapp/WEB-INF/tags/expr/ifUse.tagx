@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:expr="urn:jsptagdir:/WEB-INF/tags/expr"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="ifT" type="com.qwit.domain.Tree" required="true" 
+		description="The if tree object"/>
+
+<c:if test="${not empty processTs }">
+	<spring:eval var="isRuleTs" expression="docMtl.isRuleForTs(ifT,processTs,jxp)" />
+</c:if>
+<c:if test="${not isTsRule or isRuleTs}">
+	${ifHtml}
+	<expr:logicExprUse logicT="${ifT.childTs[0]}" />
+	<c:out value=" " />
+	<c:set var="thenT"	value="${ifT.childTs[1]}" />
+	<expr:ifThenElseUse thenElseT="${thenT}" />
+	
+	<c:set var="elseT"	value="${ifT.childTs[2]}" />
+	<c:if test="${'else'==elseT.mtlO.expr}">
+	<spring:eval var="isElseIf" expression="docMtl.isElseIf(elseT)" />
+		<c:choose>
+		<!-- 
+			c:when test="${'expr'==elseT.childTs[0].tabName and 'if'==elseT.childTs[0].mtlO.expr}">
+		 -->
+			<c:when test="${isElseIf}">
+			<!-- 
+				<b><fmt:message key="mtl_expr_expr_else" /></b>
+			 -->
+			<c:out value=", " />
+				<c:set var="elseIfT"	value="${elseT.childTs[0]}" />
+				<expr:ifUse ifT="${elseIfT}" />
+			</c:when>
+			<c:otherwise>
+				<expr:ifThenElseUse thenElseT="${elseT}" />
+			</c:otherwise>
+		</c:choose>
+	</c:if>
+</c:if>
+
+</jsp:root>

@@ -1,0 +1,25 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+	<jsp:directive.attribute name="thId" type="java.lang.Integer" required="true" description="id"/>
+	<thead>
+		<qhtm:theadPatient colspan="9"/>
+		<tr class="dotted">
+			<th class="select schema" id="th_${thId}"><jsp:doBody/></th>
+			<th colspan="2">Dosis</th>
+			<th>Mod.%</th><th colspan="2">app.Dosis</th>
+			<th><spring:message code="uiApp"/> / <spring:message code="uiTempo"/></th>
+			<th>
+				<div class="rightNormal small">
+					<fmt:formatNumber pattern="#" value="${schemaMtl.docT.mtlO.duration/7 }" />w
+				</div>
+				Tag
+			</th>
+			<th><spring:message code="ui_times"/></th>
+			<th>#</th>
+		</tr>
+	</thead>
+</jsp:root>

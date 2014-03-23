@@ -1,0 +1,36 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<div><fmt:message key="ui_changePassword_description" /> </div>
+<br />
+<table>
+	<tr><td><label for="old_pass"><fmt:message key="ui_oldPassword" /></label></td>
+		<td><form:input type="password" path="oldPass" /></td>
+		<td><form:errors path="oldPass" cssClass="note" /></td>
+	</tr>
+	<tr><td><label for="new_pass1"><fmt:message key="ui_newPassword" /></label> </td>
+		<td><form:input type="password" path="newPass" /></td>
+		<td><form:errors path="newPass" cssClass="note" /></td>
+	</tr>
+	<tr><td><label for="new_pass2"><fmt:message key="ui_retypePassword" /></label></td>
+		<td><form:input type="password" path="newPassRetyped" /></td>
+		<td><form:errors path="newPassRetyped" cssClass="note" /></td>
+	</tr>
+	<tr><td></td>
+		<td>
+			<c:set var="s">	
+				<fmt:message key="ui_change" />
+			</c:set>
+			<input type="submit" id="changePassword" value="${s}"  name="_eventId_save"/>
+		</td>
+	</tr>
+</table>
+
+</jsp:root>

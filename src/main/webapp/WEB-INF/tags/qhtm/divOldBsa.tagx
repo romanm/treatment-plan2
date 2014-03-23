@@ -1,0 +1,56 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+
+<div><span class="b"><spring:message code="ui_age" /> ${patientMtl.ageYear}</span>,
+	<c:choose>
+		<c:when test="${empty patientMtl}">
+			<spring:message code="ui_mtlHeight" /> ? <spring:message code="ui_mtlCm" />, 
+			<spring:message code="ui_mtlWeight" /> ? 
+			<spring:message code="ui_mtlKg" />, 
+			<spring:message code="ui_BSA" /> ? 
+			<spring:message code="ui_squareMeter" />
+		</c:when>
+		<c:when test="${empty patientMtl.weight or empty patientMtl.height}">
+			<qhtm:a  idt="${patientMtl.docT.id}" action="bsaDialog">
+				<spring:message code="ui_mtlHeight" /> ? <spring:message code="ui_mtlCm" />, 
+				<spring:message code="ui_mtlWeight" /> ? 
+				<spring:message code="ui_mtlKg" />, 
+				<spring:message code="ui_BSA" /> ? 
+				<spring:message code="ui_squareMeter" />
+			</qhtm:a>
+		</c:when>
+		<c:otherwise>
+			<qhtm:a idt="${patientMtl.docT.id}" action="bsaDialog">
+				<spring:message code="ui_mtlHeight" /> ${patientMtl.height}
+				<spring:message code="ui_mtlCm" />,
+				<spring:message code="ui_mtlWeight" /> 
+				${patientMtl.weight}
+				<spring:message code="ui_mtlKg" />
+				<!-- 
+				<c:if test="${'aibw'==patientMtl.bsaType}">
+					AIBW
+					<b>
+						<fmt:formatNumber pattern="##.##" value="${patientMtl.aibw}"/>
+					</b>
+					<c:out value=" " />
+					<spring:message code="ui_mtlKg" />
+				</c:if>
+				 -->
+				,
+				(BMI 
+				<fmt:formatNumber pattern="##.##" value="${patientMtl.bmi}"/>)
+<!-- BMI old way to calculate
+${patientMtl.weight/((patientMtl.height/100)*(patientMtl.height/100))} 
+ -->
+			</qhtm:a>
+			<mtl:bsa />
+		</c:otherwise>
+	</c:choose>
+</div>
+</jsp:root>

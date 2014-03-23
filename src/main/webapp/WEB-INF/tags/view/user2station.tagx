@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:sql	="http://java.sun.com/jsp/jstl/sql"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:view="urn:jsptagdir:/WEB-INF/tags/view"
+>
+
+<h1>Hinzufügen Benutzer zu Abteilung</h1>
+
+<sql:query var="stations" dataSource="${owsDbSource}" scope="session" >
+	SELECT * FROM institute
+</sql:query>
+<sql:query var="users" dataSource="${owsDbSource}" scope="session" >
+	SELECT * FROM owuser,contactperson,tree
+	where did=idcontactperson and id=idowuser
+	order by idowuser desc
+</sql:query>
+
+<table>
+	<tr>
+	<th>
+	Benutzern
+	</th>
+	<th>
+	Abteilungen
+	</th>
+	</tr>
+	<tr><td>
+	<c:forEach var="userRow" items="${users.rows}" varStatus="stat">
+		<div id="u_${userRow.idcontactperson}" class="select ">
+			${userRow.title}
+			${userRow.contactperson}
+			${userRow.forename}
+			<div class="floatRight">
+				<a href="user=${userRow.idcontactperson}?part=userCommon" target="_blank">link</a>
+			</div>
+		</div>
+	</c:forEach>
+	</td>
+	<td>
+	<c:forEach var="stationRow" items="${stations.rows}" varStatus="stat">
+		<div id="s_${stationRow.idinstitute}" class="select">
+			${stationRow.institute}
+			<div class="floatRight">
+				<a href="institute?id=${stationRow.idinstitute}" target="_blank">link</a>
+			</div>
+		</div>
+	</c:forEach>
+	</td>
+	</tr>
+</table>
+</jsp:root>

@@ -1,0 +1,6 @@
+<div xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+id="tb_${id}" style="float: left;">
+<jsp:directive.attribute name="id" required="true" description="id"/>
+<script type="text/javascript">toolbarSeparator("tb_${id}");</script>
+</div>

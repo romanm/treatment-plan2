@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:expr="urn:jsptagdir:/WEB-INF/tags/expr"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="forBeginT" type="com.qwit.domain.Tree"/>
+<fmt:message var="forBegin" key="mtl_expr_value_${forBeginT.mtlO.value }" />
+<c:choose>
+	<c:when test="${docMtl.idt==forBeginT.id}">
+		${forBegin}
+	</c:when>
+	<c:otherwise>
+		<qhtm:a idt="${forBeginT.id}">
+			${forBegin}
+		</qhtm:a>
+	</c:otherwise>
+</c:choose>
+
+<c:forEach var="drugT" items="${forBeginT.childTs }" >
+	<owsui:editSchemaTask taskT="${drugT}"/>
+</c:forEach>
+
+</jsp:root>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<!-- 
+<edit:linkBoard />
+ -->
+<c:set var="innerTask" value="${docMtl.editNodeT.parentT}" />
+
+<c:if test="${!(empty part or 'ed'==owsSession.schemaPart) }">
+	<owsui:editSchemaTask taskT="${docMtl.editNodeT}"/>
+</c:if>
+
+<!-- 
+<c:if test="${not empty docMtl.editNodeT.idClass}">
+	<edit:usedDose/>
+</c:if>
+ -->
+<div>
+Hinzufüge neues 
+<c:set var="drugT" value="${docMtl.editNodeT}" />
+<a href="javascript:void(0);" onclick="dojo.byId('idt').value=${drugT.id};dojo.byId('action').value='newAdditionalDrug';dojo.byId('editStep').click();">
+	<spring:message code="uiDrugDrug"/>
+</a>
+</div>
+
+<c:if test="${fn:length(docMtl.usedDose.drugDrugList)>0}">
+<div>
+	<spring:message code="uiDrugDrug"/><br />
+	<select size="4" style="width:200px">
+		<c:forEach items="${docMtl.usedDose.drugDrugList}" var="drugM">
+			<option>${drugM.drug}</option>
+		</c:forEach>
+	</select>
+</div>
+</c:if>
+
+<c:if test="${'task'==innerTask.tabName }">
+	<fmt:message key="taskGroup"/>
+	<select id="sInnerTask">
+		<option value="taskChemo"><fmt:message key="uiChemoTherapy"/></option>
+		<option value="taskSupport" selected="${innerTask.mtlO.task == 'support'?'selected':''}" >
+			<fmt:message key="tag_task_support"/></option>
+		<option value="taskPremedication" selected="${innerTask.mtlO.task == 'taskPremedication'?'selected':''}" >
+			<fmt:message key="tag_task_taskPremedication"/></option>
+		<option value="taskHomeTablet" selected="${innerTask.mtlO.task == 'taskHomeTablet'?'selected':''}" >
+			<fmt:message key="uiHomeTablet"/></option>
+		<option value="taskCyclePlane" selected="${innerTask.mtlO.task == 'taskCyclePlane'?'selected':''}" >
+			<fmt:message key="uiCyclePlane"/></option>
+	</select>
+	
+	<fmt:message key="uiChange" var="uiChange"/>
+	<input type="button" class="next" value="${uiChange}"
+		onclick="dojo.byId('action').value=dojo.byId('sInnerTask').value;dojo.byId('editStep').click();"/>
+</c:if>
+
+</jsp:root>

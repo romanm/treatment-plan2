@@ -1,0 +1,37 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<jsp:directive.attribute name="tabletGabeDivT" type="com.qwit.domain.Tree" required="true"
+	description="The tree object"/>
+	<c:set var="tabletGabeSum" value="0" scope="request"/>
+	<c:set var="quantity" value="0"/>
+	<c:forEach var="tableT" items="${tabletGabeDivT.childTs}" varStatus="stat">
+		<c:forEach var="quantityT" items="${tableT.childTs}">
+			<c:choose>
+				<c:when test="${'tQuantity'==quantityT.mtlO.ivariable}">
+					<c:set var="quantity" value="${quantityT.mtlO.ivalue}"/>
+					<c:set var="tabletGabeSum" value="${tabletGabeSum+tableT.mtlO.value*quantity}" scope="request"/>
+				</c:when>
+				<!-- ¼ ½ ¾ -->
+				<c:when test="${'tdQuantity'==quantityT.mtlO.ivariable}">
+					<c:set var="quantity" value="${quantity}${
+					2==tableT.mtlO.portion?
+						(1==quantityT.mtlO.ivalue?'½':''):
+						(1==quantityT.mtlO.ivalue?'¼':(2==quantityT.mtlO.ivalue?'½':'¾'))
+					}" />
+					<c:set var="tabletGabeSum" value="${tabletGabeSum+tableT.mtlO.value/tableT.mtlO.portion*quantity}" scope="request"/>
+				</c:when>
+			</c:choose>
+		</c:forEach>
+		<fmt:formatNumber var="value" pattern="##.###">${tableT.mtlO.value}</fmt:formatNumber>
+		<c:set var="tg" 
+		value="${tg}${stat.count>1?'+':''}${quantity}*${value}${stat.last?tableT.mtlO.unit:''}" />
+		<c:set var="quantity" value="0"/>
+	</c:forEach>
+	<span class="small" title="${tabletGabeSum }">${tg}</span>
+</jsp:root>

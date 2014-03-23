@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<c:set var="drugT" value="${docMtl.editNodeT.parentT}" />
+<spring:eval var="doseT" expression="jxp.child(drugT,'dose',1)" />
+
+<mtl:drug drugT="${drugT}"/>
+<br/>
+
+<form:form id="f2" modelAttribute="patientSchema">
+	<fmt:message key="ui_chemoDoseMod" />
+	<c:if test="${not empty patientSchema.tsNr}">
+		<c:set var="modDay" value=" Gabe ${patientSchema.tsNr } " />
+		<span title="#${schemaMtl.modDoseTs.nr}">${modDay}</span>
+	</c:if>
+	|
+	<fmt:message var="allDay" key="ui_allDay" />
+	<span class="small">
+	<form:checkbox path="allDay" label="${allDay}" />
+	<!-- 
+	<form:checkbox path="allDay" value="false" label="${allDay}" />
+	 -->
+	</span>
+	
+	<table>
+		<tr class="small" align="center"><th>
+			<mtl:doseUnit doseT="${doseT}"/>
+			</th><th>%</th><th>
+			<mtl:doseUnit doseT="${doseT}" calculated="true"/>
+		</th></tr>
+		<tr>
+			<td>
+			<!-- 
+				<form:input path="doseDef" id="doseValue" cssStyle="width:80px" />
+			 -->
+				<form:input path="doseDeff" id="doseValue" cssStyle="width:80px" />
+				<form:hidden path="doseDef100" />
+			</td>
+			<td><form:input path="doseProc" cssStyle="width:60px"  />
+			</td>
+			<td>
+			<!-- 
+				<form:input path="doseCalc" cssStyle="width:80px" />
+			 -->
+				<form:input path="doseCalcf" cssStyle="width:80px" />
+				<form:hidden path="doseCalc100" />
+			</td>
+		</tr>
+		<tr>
+			<c:set var="cl" value="${'def'==patientSchema.doseModType?'dosemodtype':'' }" />
+			<td id="doseDefc" class="${cl}">${patientSchema.doseDef}</td>
+			
+			<c:set var="cl" value="${'proc'==patientSchema.doseModType?'dosemodtype':'' }" />
+			<td id="doseProcc" class="${cl}">${patientSchema.doseProc}</td>
+			
+			<c:set var="cl" value="${'calc'==patientSchema.doseModType?'dosemodtype':'' }" />
+			<td id="doseCalcc" class="${cl}">${patientSchema.doseCalc}</td>
+		</tr>
+	</table>
+	<input type="checkbox" id="chooseFloatInt" value="" onclick="validateElement('doseValue');" />
+	<label for="chooseFloatInt" ><fmt:message key="uiChooseFloatInt"/></label>
+	<br/>
+	<form:hidden path="doseModType" />
+<fmt:message key="uiNecessaryJustification"/>
+<div id="htmlEditor">${patientSchema.notice}</div>
+<form:hidden id="inputNotice" path="notice"/>
+
+<input type="submit" name="_eventId_save"	value="${ui_button_OK}"/>
+<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}"/>
+<edit:formGeneralHidden />
+
+<div class="small" >
+	<a href="#">Andere begründung</a>
+</div>
+
+<!-- 
+		elementId : "doseDef", widgetType : "dijit.form.ValidationTextBox",
+		elementId : "doseCalc", widgetType : "dijit.form.ValidationTextBox",
+ -->
+<script	type="text/javascript">
+	Spring.addDecoration(new Spring.ElementDecoration({
+		elementId : "doseValue", widgetType : "dijit.form.ValidationTextBox",
+		widgetAttrs : { required : true
+			, onChange : function(){setDoseModType('def');}
+			, regExp : "\\d{1,5}"
+		, invalidMessage : "${uiDoseInvalid}"}}));
+	Spring.addDecoration(new Spring.ElementDecoration({
+		elementId : "doseProc", widgetType : "dijit.form.ValidationTextBox",
+		widgetAttrs : { required : true
+			, onChange : function(){setDoseModType('proc');}
+			, regExp : "[1-9][0-9]|1[0-4][0-9]|150" 
+		, invalidMessage : "<fmt:message key="uiDoseProcentInvalid"/>"}}));
+	Spring.addDecoration(new Spring.ElementDecoration({
+		elementId : "doseCalcf", widgetType : "dijit.form.ValidationTextBox",
+		widgetAttrs : { required : true
+			, onChange : function(){setDoseModType('calc');}
+			, regExp : "\\d{1,5}" 
+		, invalidMessage : "<fmt:message key="uiDoseInvalid"/>"}}));
+	//htmlEditor3("6em");
+	htmlEditor4("6em",false);
+	function setDoseModType(doseModType){
+		console.log("setDoseModType doseModType = "+doseModType);
+		var fieldId="dose"+doseModType.substring(0,1).toUpperCase()+doseModType.substring(1);
+		if("def"==doseModType)
+			fieldId="doseValue";
+		console.log("fieldId = "+fieldId);
+//		dojo.removeClass(dojo.byId("doseDef"),	"dosemodtype");
+		dojo.removeClass(dojo.byId("doseValue"),	"dosemodtype");
+		dojo.removeClass(dojo.byId("doseProc"),		"dosemodtype");
+		dojo.removeClass(dojo.byId("doseCalcf"),	"dosemodtype");
+		//dojo.removeClass(dojo.byId("doseCalc"),	"dosemodtype");
+		dojo.addClass(dojo.byId(fieldId), "dosemodtype");
+		dojo.byId("doseModType").value=doseModType;
+		console.log("dojo.byId(doseModType).value = "+dojo.byId("doseModType").value);
+		var dp=100;
+		if("proc"==doseModType){
+			dojo.byId("doseDefc").innerHTML=dojo.byId("doseDef100").value*dojo.byId("doseProc").value/100;
+			console.log(dojo.byId("doseCalc100").value+"*"+dojo.byId("doseProc").value+"/"+100);
+			dojo.byId("doseCalcc").innerHTML=dojo.byId("doseCalc100").value*dojo.byId("doseProc").value/100;
+			dp=dojo.byId("doseProc").value;
+		}else if("def"==doseModType){
+			var dp=dojo.byId("doseDef").value*100/dojo.byId("doseDef100").value;
+			dp=Math.round(dp*100)/100;
+			dojo.byId("doseCalcc").innerHTML=dojo.byId("doseCalc100").value*dojo.byId("doseProc").value/100;
+		}else if("calc"==doseModType){
+			var dp=dojo.byId("doseCalc").value*100/dojo.byId("doseCalc100").value;
+			dp=Math.round(dp*100)/100;
+			dojo.byId("doseDefc").innerHTML=dojo.byId("doseDef100").value*dojo.byId("doseProc").value/100;
+		}
+		dojo.byId("doseProcc").innerHTML=dp;
+	}
+	dojo.addOnLoad(function(){
+		console.log("chemo dose mod on load");
+		setupChooseFloatIntCheckbox();
+		dijitFocus("doseProc");
+		dojo.byId("doseModType").value="proc";
+	});
+</script>
+</form:form>
+
+</jsp:root>

@@ -1,0 +1,21 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+	<jsp:directive.attribute name="folderT" type="com.qwit.domain.Tree" required="true" description="Folder tree"/>
+	<!-- 
+	<c:set var="folderName" value="${folderT.mtlO.folder}" />
+	<spring:url var="urlFolder" value="${explorer_url}" >
+		<spring:param name="folder" value="${folderName}" />
+		<spring:param name="id" value="${folderT.id}" />
+		<spring:param name="search" />
+	</spring:url>
+		<a href="${urlFolder}">
+	 -->
+	${rsaquo}
+	<div style="display:inline;padding-left: 1.5em" class="dijitTreeIcon dijitFolderOpened">
+		<a href="${explorer_url}=${folderT.id}">${folderT.mtlO.folder}</a>
+	</div>
+
+</jsp:root>

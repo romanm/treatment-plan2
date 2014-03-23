@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:view="urn:jsptagdir:/WEB-INF/tags/view"
+>
+
+<h1>Copy Patienten.</h1>
+<div>
+	<a href="${flow}?id=${docMtl.docT.id}&amp;a=copyPatienten"> 
+		Copy Patienten.
+	</a>
+	Copy takes >= 5 sec.
+</div>
+${patientCopyMap.cntCopiedPatient }+${patientCopyMap.cntNotCopiedPatient }=
+${patientCopyMap.cntCopiedPatient + patientCopyMap.cntNotCopiedPatient }
+
+<c:if test="${not empty patientCopyMap.copiedPatientHistoryMapList }">
+<spring:eval var="copiedPatientHistoryKeySet" expression="patientCopyMap.get('copiedPatientHistoryMapList').keySet()" />
+<table>
+<c:forEach var="copiedPatientId" items="${copiedPatientHistoryKeySet }">
+	<view:trCopyPatient patientM="${patientCopyMap.copyPatientenMap[patientCopyMap.t2s[copiedPatientId]]}" />
+</c:forEach>
+</table>
+<hr/>
+</c:if>
+
+<table>
+<!-- 
+${docMtl.cntCopiedPatient }+${docMtl.cntNotCopiedPatient }=
+${docMtl.cntCopiedPatient + docMtl.cntNotCopiedPatient }
+<c:forEach var="patientM" items="${docMtl.copyPatientenList }">
+ -->
+<c:forEach var="patientM" items="${patientCopyMap.stPatientenList }">
+	<view:trCopyPatient patientM="${patientM}" />
+	<c:if test="${patientM.ids == patientCopyMap.sourcePatientMtl.docT.id }">
+		<tr>
+			<td colspan="4">
+<c:forEach var="phT" items="${patientCopyMap.sourcePatientMtl.docT.childTs}">
+	<div>
+		<c:choose>
+			<c:when test="${phT.tabName=='finding'}">
+				<mtl:message prefix="mtl_finding_" key="${phT.mtlO.finding}" />
+				<mtl:value varT="${phT}" />
+			</c:when>
+			<!-- 
+			<c:otherwise>
+		${phT.tabName}
+		${phT.id}
+			</c:otherwise>
+			 -->
+		</c:choose>
+		<c:out value=" ${phT.history.mdate }" />
+		<c:out value=" ${phT.sort }" />
+	</div>
+</c:forEach>
+			</td>
+		</tr>
+	</c:if>
+</c:forEach>
+</table>
+</jsp:root>

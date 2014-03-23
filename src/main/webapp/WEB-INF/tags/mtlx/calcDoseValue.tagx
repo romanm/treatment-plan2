@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0"
+	xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="doseT" type="com.qwit.domain.Tree" required="true" description="The dose tree object"/>
+
+<c:choose>
+	<c:when test="${not empty schemaMtl.chemoPcDoseC and schemaMtl.idt==doseT.id}">
+		<c:set var="title" value="mod"/>
+		<c:if test="${not empty schemaMtl.calcDoseR[doseT]}">
+			<c:set var="procent"><fmt:formatNumber pattern="#.#">${schemaMtl.calcDoseR[doseT] *100 / schemaMtl.calcDose[doseT] -100}</fmt:formatNumber></c:set>
+			<c:set var="title"><fmt:formatNumber pattern="##.###">${schemaMtl.calcDose[doseT]}</fmt:formatNumber> (${procent}%)</c:set>
+		</c:if>
+		<form:input id="chemoPcDoseValue" path="chemoPcDoseC.value" cssStyle="width:80px" title="${title}"/>
+		<script	type="text/javascript">
+			Spring.addDecoration(new Spring.ElementDecoration({
+				elementId : "chemoPcDoseValue", widgetType : "dijit.form.ValidationTextBox",
+				widgetAttrs : { required : true
+					, onChange : function(){setDoseModType('pc');}
+					, regExp : "\\d{1,5}" 
+				, invalidMessage : "<fmt:message key="uiDoseInvalid"/>"}}));
+		</script>
+	</c:when>
+	<c:when test="${empty schemaMtl.patientMtl and not empty docMtl.calcDoseR[doseT]}"
+		>${docMtl.calcDoseR[doseT]}</c:when>
+	<c:when test="${empty schemaMtl.patientMtl}">?____</c:when>
+	<c:otherwise>
+		<mtl:calcDoseValueText doseT="${doseT}"/>
+	</c:otherwise>
+</c:choose>
+</jsp:root>

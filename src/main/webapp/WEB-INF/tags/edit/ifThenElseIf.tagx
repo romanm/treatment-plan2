@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+<c:set var="ifT"		value="${docMtl.editIfT}" />
+<c:set var="thenT"		value="${ifT.childTs[1]}" />
+<c:set var="elseT"		value="${ifT.childTs[2]}" />
+<c:if test="${'expr'==elseT.childTs[0].tabName and 'if'==elseT.childTs[0].mtlO.expr}">
+	<c:set var="elseIfT"	value="${elseT.childTs[0]}" />
+</c:if>
+
+<c:set var="editIsIf"	value="${
+ifT.childTs[0]==docMtl.editNodeT
+or ifT.childTs[0]==docMtl.editNodeT.parentT
+}" />
+<c:set var="editIsThen"		value="${'then'==docMtl.editNodeT.mtlO.expr}" />
+<c:set var="editIsElse"		value="${'else'==docMtl.editNodeT.mtlO.expr}" />
+<c:set var="editIsElseIf"	value="${
+'if'==ifT.mtlO.expr
+and 'expr'==ifT.parentT.tabName
+and 'else'==ifT.parentT.mtlO.expr
+}" />
+<c:set var="elseIf"><fmt:message key="mtl_expr_expr_else" />, <fmt:message key="mtl_expr_expr_if" /></c:set>
+<table class="small">
+	<tr class="dotted">
+		<jsp:element name="th">
+			<jsp:attribute name="class" >${editIsIf?'edited':''}</jsp:attribute>
+			<c:choose>
+				<c:when test="${editIsIf}"> <fmt:message key="mtl_expr_expr_if" /> </c:when>
+				<c:otherwise>
+					<qhtm:a idt="${ifT.childTs[0].id}"> <fmt:message key="mtl_expr_expr_if" /> </qhtm:a>
+				</c:otherwise>
+			</c:choose>
+		</jsp:element>
+		<jsp:element name="th">
+			<jsp:attribute name="class" >${editIsThen?'edited':''}</jsp:attribute>
+			<c:choose>
+				<c:when test="${editIsThen}"> <fmt:message key="mtl_expr_expr_then" /> </c:when>
+				<c:otherwise>
+					<qhtm:a idt="${thenT.id}"> <fmt:message key="mtl_expr_expr_then" /> </qhtm:a>
+				</c:otherwise>
+			</c:choose>
+		</jsp:element>
+		<jsp:element name="th">
+			<jsp:attribute name="class" >${editIsElse?'edited':''}</jsp:attribute>
+			<c:choose>
+			<!-- 
+				<c:when test="${editIsElse or editIsElseIf or not empty elseIfT}">
+					<fmt:message key="mtl_expr_expr_else" /> </c:when>
+			 -->
+				<c:when test="${empty elseT}"> 
+					<qhtm:a idt="${ifT.id}" action="newIfElse">
+						<fmt:message key="mtl_expr_expr_else" /> 
+					</qhtm:a>
+				</c:when>
+				<c:otherwise>
+					<qhtm:a idt="${elseT.id}"> <fmt:message key="mtl_expr_expr_else" /> </qhtm:a>
+				</c:otherwise>
+			</c:choose>
+		</jsp:element>
+		<th/>
+		<jsp:element name="th">
+			<jsp:attribute name="class" >${editIsElseIf?'edited':''}</jsp:attribute>
+			<c:choose>
+				<c:when test="${editIsElseIf}"> ${elseIf} </c:when>
+				<c:when test="${empty elseIfT}">
+					<qhtm:a idt="${ifT.id}" action="newElseIf">
+						${elseIf} 
+					</qhtm:a>
+				</c:when>
+				<c:otherwise>
+					<qhtm:a idt="${elseIfT.childTs[0].id}"> ${elseIf} </qhtm:a>
+				</c:otherwise>
+			</c:choose>
+		</jsp:element>
+	</tr>
+</table>
+</jsp:root>

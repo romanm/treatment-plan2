@@ -1,0 +1,88 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+	<c:choose>
+		<c:when test="${not empty param.idt}">
+			<c:set var="idt" value="${param.idt}" />
+			<spring:eval var="taskO" expression="userMtl.idClassMtlO(idt)" />
+			<a href="user">Meine Dokumenten Status</a>
+			<h3>
+				Status von Dokument
+				<a href="${schema_url}?id=${taskO.id}">${taskO.task}</a>
+			</h3>
+			<!-- 
+			<edit:docStatus />
+			 -->
+		</c:when>
+		<c:otherwise>
+	<h3>Alle meine Dokumentenstatus</h3>
+	<table>
+		<thead>
+			<tr><th>Dokument</th><th>Status</th><th>Kommentar</th><th>Kopie</th><th>Datum</th></tr>
+		</thead>
+		<tbody>
+		<!--
+		<spring:eval var="pvariables" expression="jxp.childs(userMtl.docT, 'pvariable')" />
+		-->
+		<c:forEach var="pvariable" items="${pvariables}">
+			<c:set var="pvT" value="${pvariable.value}" />
+			<c:forEach var="tree" items="${pvT.childTs}">
+				<c:choose>
+					<c:when test="${tree.tabName=='task'}">
+						<c:set var="taskT" value="${tree}" />
+					</c:when>
+					<c:when test="${tree.tabName=='notice'}">
+						<c:set var="noticeT" value="${tree}" />
+					</c:when>
+				</c:choose>
+			</c:forEach>
+			<tr>
+				<qhtm:tag name="td" prefix="ta_" tree="${pvT}">
+					<a href="schema?id=${taskT.mtlO.id}">${taskT.mtlO.task}</a>
+				</qhtm:tag>
+				<c:set var="statusClass" ><mtl:statusClass docStatus="${pvT.mtlO.pvalue}" /></c:set>
+				<td class="${statusClass}">
+					<fmt:message key="pv_infostatus_${pvT.mtlO.pvalue}" />
+				</td>
+				<td>
+				<!-- 
+				<owsui:editNotice noticeT="${noticeT}" />
+				 -->
+				<mtl:notice noticeT="${noticeT}" />
+				</td>
+				<td><a href="schema?id=${taskT.id}">Kopie</a></td>
+				<qhtm:tag name="td" prefix="ds_" tree="${pvT}" >
+					<fmt:formatDate value="${pvT.history.mdate}" type="both" dateStyle="short" timeStyle="short" />
+				</qhtm:tag>
+				<td><a href="?id=${docMtl.docT.id}&amp;idt=${taskT.idClass}"><c:out value="+" /></a></td>
+			</tr>
+		</c:forEach>
+		</tbody>
+	</table>
+		</c:otherwise>
+	</c:choose>
+	
+	<br />
+	<h3> <fmt:message key="ui_loginname" /> </h3>
+	<table>
+		<thead><tr><th>Logins</th><th>Zeilen pro Tabelle</th><th>Sprache</th></tr></thead>
+		<tbody>
+		<spring:eval var="owusers" expression="jxp.childs(userMtl.docT, 'owuser')" />
+		<c:forEach var="owuser" items="${owusers}">
+			<tr>
+				<td>${owuser.value.mtlO.owuser}</td>
+				<td>${owuser.value.mtlO.tabsize}</td>
+				<td>${owuser.value.mtlO.lang}</td>
+			</tr>
+		</c:forEach>
+		</tbody>
+	</table>
+</jsp:root>

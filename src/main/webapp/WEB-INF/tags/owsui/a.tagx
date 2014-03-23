@@ -1,0 +1,38 @@
+<jsp:root version="2.0"
+	xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:spring="http://www.springframework.org/tags" 
+>
+<jsp:directive.attribute name="editT" type="com.qwit.domain.Tree" required="true" description="The tree object to edit"/>
+<jsp:directive.attribute name="event" description="Spring web flow event"/>
+<jsp:directive.attribute name="action" description="Spring web flow event"/>
+
+<c:if test="${empty event }">
+	<c:set var="event" value="editStep" />
+</c:if>
+<c:if test="${empty action }">
+	<c:set var="action" value="editStep" />
+</c:if>
+
+<c:choose>
+	<c:when test="${empty flowExecutionUrl}">
+		<spring:url var="href" value="${flow}?">
+			<spring:param name="id"	value="${param.id}"/>
+			<spring:param name="idt"	value="${editT.id}"/>
+			<spring:param name="idc"	value="${editT.id}"/>
+			<spring:param name="a"	value="${action}"/>
+		</spring:url>
+	</c:when>
+	<c:otherwise>
+		<spring:url var="href" value="?${urlFlow}">
+			<spring:param name="idt"	value="${editT.id}"/>
+			<spring:param name="idc"	value="${editT.id}"/>
+			<spring:param name="_eventId"	value="${event}"/>
+			<spring:param name="a"	value="${action}"/>
+		</spring:url>
+		
+	</c:otherwise>
+</c:choose>
+<a href="${href}"><jsp:doBody/></a>
+
+</jsp:root>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" 
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions" 
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:expr="urn:jsptagdir:/WEB-INF/tags/expr"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+>
+
+<jsp:directive.attribute name="ifT" type="com.qwit.domain.Tree" required="true" description="The if tree object"/>
+<jsp:directive.attribute name="ruleStateT" type="com.qwit.domain.Tree" />
+
+<expr:ifLogicalExpr	ifT="${ifT}" />
+
+<mtl:ifThenExpr			tree="${ifT.childTs[1]}" />
+<c:set var="elseT"		value="${ifT.childTs[2]}" />
+<c:choose>
+	<c:when test="${'expr'==elseT.childTs[0].tabName and 'if'==elseT.childTs[0].mtlO.expr}">
+		<qhtm:tag name="span" prefix="ex_" tree="${elseT}">
+			<!-- 
+			<b><fmt:message key="mtl_expr_expr_else" /></b>
+			 -->
+			<c:out value=" , " />
+		</qhtm:tag>
+		<c:set var="elseIfT"	value="${elseT.childTs[0]}" />
+		<spring:eval var="ruleStateT" expression="jxp.ruleState(elseIfT,schemaMtl)" />
+		<mtl:if ifT="${elseIfT}" ruleStateT="${ruleStateT}" />
+	</c:when>
+	<c:when test="${'else'==elseT.mtlO.expr}">
+		<mtl:ifThenExpr tree="${elseT}" />
+	</c:when>
+</c:choose>
+
+</jsp:root>

@@ -1,0 +1,78 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<select id="refTimes" size="7" name="ref" style="width:200px" onchange="relSMH()">
+	<fmt:message key="uiTherapyStartTime" var="uiTherapyStartTime"/>
+	<c:choose>
+		<c:when test="${docMtl.editNodeT.ref==docMtl.docT.id}">
+	<option id="ro${docMtl.docT.id}"  value="${docMtl.docT.id}" tsnr="b" selected="">${uiTherapyStartTime }</option>
+		</c:when>
+		<c:otherwise>
+	<option id="ro${docMtl.docT.id}"  value="${docMtl.docT.id}" tsnr="b">${uiTherapyStartTime }</option>
+		</c:otherwise>
+	</c:choose>
+	<fmt:message key="uiChemoTherapy" var="uiChemoTherapy"/>
+	<spring:eval var="drugsTimesPs" expression="jxp.var('drug').var('times').jxpip(docMtl.getDocT(),
+		'childTs[tabName=$drug]/childTs/childTs[tabName=$times]')" />
+	<optgroup label="${uiChemoTherapy}">
+		<c:forEach var="timesP" items="${drugsTimesPs}">
+			<spring:eval var="refLoop" expression="docMtl.refLoop(timesP.getValue())" />
+			<c:set var="id" value="${timesP.value.id}"/>
+			<!-- 
+			<c:choose>
+				<c:when test="${'plan'==part }">
+					<spring:eval var="timesNr" expression="docMtl.getTimesTs(timesP.value,1).getNr()" />
+				</c:when>
+				<c:otherwise>
+					<c:set var="timesNr" value="${docMtl.timesNr[timesP.value]}"/>
+				</c:otherwise>
+			</c:choose>
+			 -->
+			<c:set var="timesNr" value="${docMtl.timesNr[timesP.value]}"/>
+			<c:set var="inner">[${timesNr}]<mtl:drug drugT="${timesP.value.parentT.parentT}"/></c:set>
+			<c:choose>
+				<c:when test="${refLoop}">
+		<option id="ro${id}" value="${id}" tsnr="${timesNr}" disabled="disabled" >${inner}</option>
+				</c:when>
+				<c:when test="${docMtl.editNodeT.ref==id}">
+		<option id="ro${id}" value="${id}" tsnr="${timesNr}" selected="">${inner}</option>
+				</c:when>
+				<c:otherwise>
+		<option id="ro${id}" value="${id}" tsnr="${timesNr}">${inner}</option>
+				</c:otherwise>
+			</c:choose>
+		</c:forEach>
+	</optgroup>
+	<spring:eval var="drugsTimesPs" expression="jxp.var('drug').var('times').jxpip(docMtl.getDocT(),
+		'childTs/childTs[tabName=$drug]/childTs/childTs[tabName=$times]')" />
+	<optgroup label="nicht ${uiChemoTherapy}">
+		<c:forEach var="timesP" items="${drugsTimesPs}">
+			<spring:eval var="refLoop" expression="docMtl.refLoop(timesP.getValue())" />
+			<c:set var="id" value="${timesP.value.id}"/>
+			<c:set var="timesNr" value="${docMtl.timesNr[timesP.value]}"/>
+			<c:set var="inner">[${timesNr}]<mtl:drug drugT="${timesP.value.parentT.parentT}"/></c:set>
+			<c:choose>
+				<c:when test="${refLoop}">
+		<option id="ro${id}" value="${id}" tsnr="${timesNr}" disabled="disabled" >${inner}</option>
+				</c:when>
+				<c:when test="${docMtl.editNodeT.ref==id}">
+		<option id="ro${id}" value="${id}" tsnr="${timesNr}" selected="">${inner}</option>
+				</c:when>
+				<c:otherwise>
+		<option id="ro${id}" value="${id}" tsnr="${timesNr}">${inner}</option>
+				</c:otherwise>
+			</c:choose>
+		</c:forEach>
+	</optgroup>
+</select>
+
+</jsp:root>

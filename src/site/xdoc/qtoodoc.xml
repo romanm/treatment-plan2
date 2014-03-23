@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+	<properties>
+		<author>Roman Mishchenko</author>
+		<title>Quality to oncology therapy.</title>
+	</properties>
+	<meta name="keyword" content="therapy, chemotherapy, drug" />
+	<body>
+		<section name="Idee und Konzept">
+			<p>
+				Detaillierte beschreibung von Qtoo finden sie auf die 
+				<a href="docbook/qtoodoc.html">Thechnische Dokumentation</a> Seite und 
+				<a href="apidocs">JavaDoc</a> Seite. 
+			</p>
+		</section>
+	</body>
+</document>

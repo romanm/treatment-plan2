@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:expr="urn:jsptagdir:/WEB-INF/tags/expr"
+>
+<jsp:directive.attribute name="ts" type="com.qwit.domain.Ts" required="true" />
+<c:set var="processTs" value="${ts}" scope="request"/>
+
+<c:set var="drugT" value="${ts.timesT.parentT.parentT}" />
+<c:choose>
+	<c:when test="${drugT.tabName=='labor'}">
+<tr><td></td>
+	<td><mtl:message prefix="finding_" key="${drugT.mtlO.labor}"/></td>
+</tr>
+	</c:when>
+	<c:when test="${drugT.tabName=='finding'}">
+<tr><td></td>
+	<td><mtl:message prefix="finding_" key="${drugT.mtlO.finding}"/></td>
+</tr>
+	</c:when>
+	<c:when test="${drugT.tabName=='drug'}">
+		<tr class="group ${drugT.parentT.id==docMtl.docT.id?' b':''}">
+			<td>
+			<mtl:tsDay ts="${ts}" />
+			</td>
+			<mtl:dayPlanDayDose ts="${ts}"/>
+			<td>...........</td>
+			<td><a name="ts_${ts.nr}">${ts.nr}</a></td>
+		</tr>
+		<c:forEach var="ddrugT" items="${drugT.childTs}">
+		<spring:eval var="ruleCancel" expression="docMtl.ruleCancel(ddrugT,ts,jxp)" />
+		<c:choose>
+			<c:when test="${ruleCancel}"/>
+			<c:when test="${ddrugT.tabName=='drug'}">
+				<tr><td></td>
+					<spring:eval var="doseT" expression="jxp.getDose(ddrugT)"/>
+					<qhtm:tag name="td" prefix="td${ts.nr}_" tree="${ddrugT}">
+						+ 
+						<qhtm:a idt="${ddrugT.id}"><mtl:drug drugT="${ddrugT}"/></qhtm:a>
+								<c:if test="${fn:contains(doseT.mtlO.unit,'/')}">
+									<c:set var="dv">
+										<mtl:doseValue doseT="${doseT}" />
+									</c:set>
+									<span class="small">(${fn:trim(dv)} ${doseT.mtlO.unit})</span>
+								</c:if>
+								<qhtm:dddNEnr drugT="${ddrugT}" />
+						<!-- 
+						<qhtm:subNEnr parentT="${doseT}" />
+						 -->
+					</qhtm:tag>
+					<qhtm:tag name="td" prefix="dv${ts.nr}_" tree="${doseT}">
+						<qhtm:a idt="${doseT.id}"><mtl:doseValue doseT="${doseT}" calculated="${true}"/></qhtm:a>
+						<!-- 
+						<sup>${docMtl.neNr[doseT]}</sup>
+						 -->
+					</qhtm:tag>
+					<qhtm:tag name="td" prefix="du${ts.nr}_" tree="${doseT}">
+						<mtl:doseUnit doseT="${doseT}" calculated="${true}"/>
+					</qhtm:tag>
+					<td></td>
+				</tr>
+			</c:when>
+		</c:choose>
+		</c:forEach>
+		<!--  
+		.jxpip(drugT,'childTs[childTs/tabName=$notice or childTs/tabName=$expr]')" />
+		 -->
+		<c:if test="${owsSession.drugNotice}">
+			<spring:eval var="neForPS" expression="jxp.var('notice').var('expr')
+				.jxpip(drugT,'childTs[childTs/tabName=$notice or childTs/tabName=$expr]
+				|childTs/childTs[childTs/tabName=$notice or childTs/tabName=$expr]')" />
+			<spring:eval var="hasNextForNE" expression="neForPS.hasNext()" />
+			<c:if test="${hasNextForNE or not empty docMtl.grule[drugT]}">
+				<tr><td></td><td colspan="5">
+					<c:forEach items="${neForPS}" var="neForP">
+						<mtl:ne forT="${neForP.value}"/>
+					</c:forEach>
+					<c:forEach var="gRuleT" items="${docMtl.grule[drugT]}">
+						<div class="small">
+							<expr:ifView ifT="${gRuleT }" />
+						</div>
+					</c:forEach>
+				</td></tr>
+			</c:if>
+		</c:if>
+	</c:when>
+</c:choose>
+</jsp:root>

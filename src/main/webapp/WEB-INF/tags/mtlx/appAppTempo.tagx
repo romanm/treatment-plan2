@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+<jsp:directive.attribute name="appT"	type="com.qwit.domain.Tree" required="true" 
+	description="The app tree object"/>
+
+<c:if test="${not empty currTs and not empty schemaMtl.patientMtl and 'patient'!=appT.docT.tabName }">
+	<spring:eval var="appP" expression="jxp
+		.var('refTasks',docMtl.getDocT().getId())
+		.var('refTask',appT.getParentT().getId())
+		.var('tTsNr',docMtl.getTaskTsNr(currTs))
+		.var('taskTsNr').var('app').jxp(schemaMtl.getPatientMtl().getDocT())
+		.getPointer(
+'childTs[ref=$refTasks]/childTs[ref=$refTask]/childTs[childTs/mtlO[ivariable=$taskTsNr]/ivalue=$tTsNr]/childTs[tabName=$app]')" />
+	<c:set var="modAppT" value="${appP.value}" />
+</c:if>
+<c:choose>
+	<c:when test="${not empty modAppT }">
+		<span class="green"><mtl:appAppTempo appT="${modAppT}"/></span>
+	</c:when>
+	<c:otherwise>
+<span id="dhm0_${appT.id}">
+	<c:if test="${appT.mtlO.appapp==0}">
+		<c:choose>
+			<c:when test="${appT.mtlO.unit=='h'}"	>KI</c:when>
+			<c:when test="${appT.mtlO.unit=='min'}"	>Bolus</c:when>
+			<c:when test="${appT.mtlO.unit=='d'}"	>Kontinuierlich</c:when>
+		</c:choose>
+	</c:if>
+</span>
+<span id="dhm1App_${appT.id}">
+	<c:choose>
+		<c:when test="${appT.mtlO.appapp>0}">
+			<c:set var="min" value="${appT.mtlO.appapp}" />
+			<c:if test="${min>60 and 'min'==appT.mtlO.unit }">
+				<fmt:formatNumber pattern="##h">${(min - min mod 60) / 60 }</fmt:formatNumber>
+				<c:set var="min" value="${min mod 60}" />
+			</c:if>
+			<fmt:formatNumber pattern="##">${min}</fmt:formatNumber>
+			<c:if test="${dayInfusionBeginTs.cday!=currTs.cday}">
+				<c:set var="dayInfusionBeginTs" value="${currTs}" scope="request" />
+			</c:if>
+			<c:set var="dayInfusionEndTs" value="${currTs}" scope="request" />
+		</c:when>
+		<c:when test="${not empty appT.mtlO.unit}" />
+		<c:otherwise>Dauer?</c:otherwise>
+	</c:choose>
+</span>
+<span id="dhm1Unit_${appT.id}">
+	<c:if test="${appT.mtlO.appapp>0}">${appT.mtlO.unit}</c:if>
+</span>
+	</c:otherwise>
+</c:choose>
+
+</jsp:root>

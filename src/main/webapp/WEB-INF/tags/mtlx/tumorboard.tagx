@@ -1,0 +1,114 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags" 
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<h2><a href="tumorboard?id=${patientMtl.tuboId}">
+	<fmt:message key="ui_tumorboard"/>: 
+	<mtl:patientName bsa="no"/>
+</a></h2>
+
+<!-- 
+${docMtl.docT.id }
+ -->
+<spring:eval var="tuboT" expression="jxp.var('ref',patientMtl.getTuboId())
+	.jxp(patientMtl.getDocT()).getPointer('childTs[ref=$ref]').getValue()" scope="request"/>
+<table class="tumorboard">
+	<tr><th><fmt:message key="ui_tumorboard_registration"/></th>
+	<td>
+	</td></tr>
+	<tr><th><fmt:message key="ui_tumorboard_place"/></th>
+	<td>
+	</td>
+	</tr>
+	<tr><th colspan="2">
+		<owsui:a editT="${tuboT}" action="newDiagnose" >
+			<fmt:message key="ui_tumorboard_diagnose"/>
+		</owsui:a>
+	</th></tr>
+	<spring:eval var="diagnoseIP" expression="jxp.var('diagnose').jxpip(patientMtl.getDocT(),
+		'childTs[tabName=$diagnose]')" />
+	<c:forEach var="diagnoseP" items="${diagnoseIP}">
+		<tr><td class="small">
+			<c:choose>
+				<c:when test="${empty diagnoseP.value.mtlO }">
+					new
+				</c:when>
+			</c:choose>
+			<c:set var="userMap" value="${patientMtl.userM[diagnoseP.value.history.idauthor]}" />
+			<span title="${userMap.forename } ${userMap.contactperson }">
+				<fmt:formatDate value="${diagnoseP.value.history.mdate}"
+					type="both" dateStyle="short" timeStyle="short" />
+			</span>
+		</td>
+		<qhtm:tag name="td" prefix="d_" tree="${diagnoseP.value}">
+			${diagnoseP.value.mtlO.diagnose }
+			<c:forEach var="dsNodeT" items="${diagnoseP.value.childTs}">
+				<c:choose>
+					<c:when test="${'tnm'==dsNodeT.tabName }" />
+					<c:when test="${'notice'==dsNodeT.tabName }">
+						${dsNodeT.mtlO.notice }
+					</c:when>
+				</c:choose>
+			</c:forEach>
+		</qhtm:tag>
+		</tr>
+	</c:forEach>
+	<tr><td colspan="2">
+	</td></tr>
+	<tr><th colspan="2"><fmt:message key="ui_tumorboard_finding"/></th></tr>
+	
+	<qhtm:tumorboardTr checkitem="Kurzanamnese" msgKey="ui_tumorboard_tinyAnamnese"/>
+	<qhtm:tumorboardTr checkitem="Relev. Begleiterkrankungen" msgKey="ui_tumorboard_diagnose2"/>
+	
+	<tr><td><fmt:message key="ui_tumorboard_ECOG"/></td>
+	<td>
+	</td></tr>
+	
+	<qhtm:tumorboardTr checkitem="TumorMarker" msgKey="ui_tumorboard_tumorMarker"/>
+	<qhtm:tumorboardTr checkitem="CT- Befunde" msgKey="ui_tumorboard_findingCT"/>
+	<qhtm:tumorboardTr checkitem="Sonstige Befunde" msgKey="ui_tumorboard_finding2"/>
+	
+	<tr><th><fmt:message key="ui_tumorboard_question"/></th><td>
+		<spring:eval var="checkitemT" expression="jxp.var('tubo_question')
+			.jxp(tuboT).getPointer('childTs[mtlO/pvalue=$tubo_question]').getValue()" />
+		${checkitemT.childTs[0].mtlO.pvariable }
+	</td>
+	</tr>
+
+	<spring:eval var="tubo_recommT" expression="jxp.var('tubo_recomm')
+		.jxp(tuboT).getPointer('childTs[mtlO/type=$tubo_recomm]').getValue()" />
+	<tr><td colspan="2" class="tubo_recomm">
+		<b><fmt:message key="ui_tumorboard_recommendations"/></b>
+		<spring:eval var="ofDateT" expression="jxp.var('ofDate')
+			.jxp(tuboT).getPointer('childTs[mtlO/pvariable=$ofDate]').getValue()"
+			scope="request" />
+		<span class="small">
+			vom 
+			<fmt:formatDate value="${ofDateT.history.mdate}" type="both" dateStyle="short" timeStyle="short" />
+		</span>
+		<div><owsui:editNotice noticeT="${tubo_recommT.childTs[0]}"/></div>
+	</td>
+	</tr>
+	<tr><th><fmt:message key="ui_tumorboard_specialists"/></th>
+	<td>
+	</td>
+	</tr>
+	<tr class="small"><th><fmt:message key="ui_tumorboard_notes"/></th>
+	<td>
+	Tumor Board findet statt im 	Demoraum, Radiologie, UG, Haus 20
+	<br/>
+	<b>Jeder</b> Patient des Kooperativen Darmzentrums wird im Tumor Board besprochen.
+	<br/>
+Externe Kooperationspartner sind herzlich eingeladen.
+	</td>
+	</tr>
+</table>
+
+</jsp:root>

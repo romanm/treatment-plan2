@@ -1,0 +1,45 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+<jsp:directive.attribute name="editT" type="com.qwit.domain.Tree" required="true" />
+<jsp:directive.attribute name="idSuffix"/>
+<span id="html_${idSuffix}">
+	<c:choose>
+		<c:when test="${'pvariable'==editT.tabName and '%'==editT.mtlO.unit}">
+			${editT.mtlO.pvalue}%
+		</c:when>
+		<c:when test="${'labor'==editT.tabName}">
+			<mtl:laborUnit laborO="${editT.mtlO}"/>
+		</c:when>
+		<c:when test="${'day'==editT.tabName}">
+			<owsui:editDayHidden dayT="${editT}"/>
+		</c:when>
+		<c:when test="${'app'==editT.tabName}">
+		app
+		</c:when>
+		<c:when test="${'dose'==editT.tabName}">
+			<mtl:doseValue	doseT="${editT}"/>
+			<mtl:doseUnit	doseT="${editT}"/>
+			<mtl:doseApp	doseT="${editT}"/>
+		</c:when>
+		<c:when test="${'expr'==editT.tabName}">
+			<fmt:message key="mtl_expr_value_${editT.mtlO.value}"/>
+		</c:when>
+		<c:otherwise>?____</c:otherwise>
+	</c:choose>
+</span>
+<form:hidden path="typeOfDialog" />
+<form:hidden path="editExpr1Id" id="hidden_${idSuffix}"/>
+<!-- 
+<c:if test="${'then'==docMtl.editNodeT.mtlO.expr}">
+	<form:hidden path="editPvC.pvalue" id="hidden_inputProcent" />
+</c:if>
+ -->
+
+</jsp:root>

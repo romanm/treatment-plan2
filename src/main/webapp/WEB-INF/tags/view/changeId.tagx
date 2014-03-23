@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<fieldset><legend>ID prüfen</legend>
+	<form action="checkid">
+		<div>
+		ID:
+			<INPUT name="checkid" id="checkid" value="${owsSession.targetIdClass }" style="width:75px;"/>
+		</div>
+		<script	type="text/javascript"><![CDATA[
+		Spring.addDecoration(new Spring.ElementDecoration({
+			elementId : "checkid", widgetType : "dijit.form.ValidationTextBox",
+			widgetAttrs : { required : true
+				, regExp : "\\d{1,8}"
+			, invalidMessage : "${uiDoseInvalid}"}
+		}));
+		]]></script>
+		<br/>
+		<!-- 
+		<button type="submit" name="_eventId_save" ><img src="${Save16gif}" alt="Save"/> ${ui_button_save}</button>
+		 -->
+		<button type="submit">${ui_button_OK}</button>
+		<input type="submit" value="${ui_button_cancel}" />
+		<input type="hidden" name="iddoc" value="${docMtl.docT.id }" />
+	</form>
+	<!-- 
+	<c:if test="${null!=owsSession.targetT }">
+	 -->
+	<c:if test="${empty owsSession.targetT }">
+		<fieldset class="note">
+			<legend >id:${owsSession.targetIdClass }</legend>
+			<h2>???</h2>
+		</fieldset>
+		
+	</c:if>
+	<c:if test="${not empty owsSession.targetT }">
+		<fieldset class="note">
+			<legend class="select" id="c_${chooseT.id}" >id:${owsSession.targetT.id }</legend>
+			<c:choose>
+				<c:when test="${'patient'==owsSession.targetT.tabName }">
+					Patient:
+					<a href="patient=${owsSession.targetT.id}" target="_blank">
+						<mtl:patient patientO="${owsSession.targetT.mtlO}"/>
+					</a>
+				</c:when>
+				<c:when test="${'dose'==owsSession.targetT.tabName }">
+					<fmt:message key="ui_dose" />:
+					<b>
+						<mtl:doseValue doseT="${owsSession.targetT}"/>
+						<mtl:doseUnit doseT="${owsSession.targetT}"/>
+					</b>
+					von
+					<mtl:drug drugT="${owsSession.targetT.parentT}"/>
+					in
+					
+				</c:when>
+				<c:when test="${'folder'==owsSession.targetT.tabName }">
+					Verzeichnis: ${owsSession.targetT.mtlO.folder }
+				</c:when>
+				<c:otherwise>
+					${owsSession.targetT }
+					${owsSession.targetT.docT }
+				</c:otherwise>
+			</c:choose>
+			<br/><br/><br/><br/><br/>
+			<div>
+				<a href="changeNextId?iddoc=${docMtl.docT.id}&amp;checkid=${owsSession.targetT.id}">
+				Change to next id.
+				</a>
+			</div>
+		</fieldset>
+	</c:if>
+</fieldset>
+<div>
+ID ändern
+</div>
+</jsp:root>

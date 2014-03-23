@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:sql	="http://java.sun.com/jsp/jstl/sql"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:tiles="http://tiles.apache.org/tags-tiles"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+	>
+
+<div id="headline">
+	<fmt:message key="ui_breadcrumbIndex" />
+</div>
+<div id="content">
+	<h1><a href="tumorboardhome"><spring:message code="ui_tumorboard"/></a></h1>
+	<!-- 
+	${requestScope['javax.servlet.include.request_uri'] }	11111
+	${requestScope['javax.servlet.include.servlet_path'] }	11111
+	${requestScope['javax.servlet.forward.path_info'] }	11111
+	${requestScope['org.springframework.web.servlet.HandlerMapping.pathWithinHandlerMapping'] }	11111
+	${requestScope['org.joda.time.DateTime'] }	11111
+	${requestScope}
+	 -->
+	<!-- 
+	<jsp:useBean id="todayDate2" class="org.joda.time.DateTime" />
+	${todayDate2}
+	${todayDate2.chronology}
+	${todayDate2.dayOfMonth }-
+	${todayDate2.monthOfYear }-
+	${todayDate2.year }:
+	${todayDate2.hourOfDay}:
+	${todayDate2.minuteOfHour}
+	 -->
+	<jsp:useBean id="todayDate" class="java.util.Date" />
+	<div style="float: right;"><fmt:formatDate value="${todayDate }" type="both" dateStyle="full" timeStyle="short" /></div>
+	<c:set var="year_rows" value="${fn:length(tumorboard_years.rows)}" />
+	<table>
+		<tr><th><spring:message code="ui_tumorboard_year"/>:</th>
+		<sql:query var="tumorboard_years" dataSource="${owsDbSource}" scope="session" >
+			SELECT y.y as year, count(*) AS cnt FROM (
+			SELECT date_part('year',mdate) AS y FROM tree t1,task,tree t2,history h2
+			WHERE t1.idclass=idtask AND type='tubo'
+			AND t2.did=t1.id AND t2.id=h2.idhistory
+			) y GROUP BY y.y ORDER BY y.y desc
+		</sql:query>
+		<c:choose>
+			<c:when  test="${not empty param.year}">
+				<c:set var="session_year" value="${param.year}" scope="session" />
+			</c:when>
+			<c:when  test="${empty session_year}">
+				<fmt:formatDate var="today_year" value="${todayDate}" pattern="yyyy" />
+				<c:set var="session_year" value="${today_year}" scope="session" />
+			</c:when>
+		</c:choose>
+		<c:forEach var="row" items="${tumorboard_years.rows}" varStatus="stat">
+			<td>
+				<fmt:formatNumber var="row_year" value="${row.year}" pattern="####" />
+				<a href="tumorboardhome?year=${row_year}" class="${session_year==row_year?'b':''}">${row_year}</a>
+				<span class="small"><c:out value=" (${row.cnt})"/></span>
+			</td>
+		</c:forEach>
+		</tr>
+	</table>
+	<table>
+		<tr><th><spring:message code="ui_tumorboard_month"/>:</th>
+			<sql:query var="tumorboard_month" dataSource="${owsDbSource}" scope="session" >
+				SELECT m.m as month, count(*) AS cnt FROM (
+				SELECT date_part('month',mdate) AS m FROM tree t1,task,tree t2,history h2
+				WHERE t1.idclass=idtask AND type='tubo'
+				AND t2.did=t1.id AND t2.id=h2.idhistory
+				AND date_part('year',mdate)=${session_year}
+				) m GROUP BY m.m ORDER BY m.m desc
+			</sql:query>
+			<c:choose>
+				<c:when  test="${not empty param.month}">
+					<c:set var="p_m" value="${param.month}" />
+					<spring:eval var="session_month" expression="T(java.lang.Integer).parseInt(p_m)" scope="session"/>
+				</c:when>
+				<c:when  test="${empty session_month}">
+					<fmt:formatDate var="today_month" value="${todayDate }" pattern="MM" />
+					<spring:eval var="session_month" expression="T(java.lang.Integer).parseInt(today_month)" scope="session"/>
+				</c:when>
+			</c:choose>
+			<c:forEach var="row" items="${tumorboard_month.rows}" varStatus="stat">
+				<td>
+					<fmt:formatNumber var="row_month" value="${row.month}" pattern="##" />
+					<a href="tumorboardhome?month=${row_month}" class="${session_month==row_month?'b':''}">${row_month}
+						<span class="small"><c:out value=" (${row.cnt})"/></span>
+					</a>
+				</td>
+			</c:forEach>
+		</tr>
+	</table>
+	<table>
+		<tr><th><spring:message code="ui_tumorboard_day"/>:</th>
+			<sql:query var="tumorboard_day" dataSource="${owsDbSource}" scope="session" >
+				SELECT d.d as day, count(*) AS cnt FROM (
+				SELECT date_part('day',mdate) AS d FROM tree t1,task,tree t2,history h2,pvariable
+				WHERE t2.did=t1.id AND t2.id=h2.idhistory AND t2.idclass=idpvariable AND pvariable='ofDate'
+				AND t1.idclass=idtask AND type='tubo'
+				AND date_part('year',mdate)=${session_year} AND date_part('month',mdate)=${session_month}
+				) d GROUP BY d.d ORDER BY d.d desc
+			</sql:query>
+			<c:choose>
+				<c:when  test="${not empty param.day}">
+					<c:set var="p_day" value="${param.day}" />
+					<spring:eval var="session_day" expression="T(java.lang.Integer).parseInt(p_day)" scope="session"/>
+				</c:when>
+				<c:when  test="${empty session_day}">
+					<fmt:formatDate var="today_day" value="${todayDate }" pattern="dd" />
+					<spring:eval var="session_day" expression="T(java.lang.Integer).parseInt(today_day)" scope="session"/>
+				</c:when>
+			</c:choose>
+			<c:forEach var="row" items="${tumorboard_day.rows}" varStatus="stat">
+				<td>
+					<fmt:formatNumber var="row_day" value="${row.day}" pattern="##" />
+					<a href="tumorboardhome?day=${row_day}" class="${session_day==row_day?'b':''}">${row_day}
+						<span class="small"><c:out value=" (${row.cnt})"/></span>
+					</a>
+				</td>
+			</c:forEach>
+		</tr>
+	</table>
+	<hr/>
+	<mtl:tumorboardDay/>
+</div>
+<div id="sidebar" >
+	<h2><fmt:message>ui_title_dialog</fmt:message></h2>
+	Nächste Tumorboard
+	<fmt:formatDate value="${owsSession.tumorboardDate.time }" dateStyle="short" />
+	<fmt:formatDate value="${owsSession.tumorboardDate.time }" pattern=", EEEE: kk:mm" />
+	<br/>
+	<c:choose>
+		<c:when test="${fn:contains(flowExecutionUrl,'tubonewpatient')}">
+			<b>
+				<fmt:message key="ui_tumorboard_register">
+					<fmt:param><mtl:patient patientO="${docMtl.patientO}" /></fmt:param>
+				</fmt:message>
+			</b>
+		</c:when>
+		<c:otherwise>
+			<a href="tubonewpatient?id=9931&amp;search=">
+				<fmt:message key="ui_tumorboard_register"><fmt:param value=" " /></fmt:message>
+			</a>
+		</c:otherwise>
+	</c:choose>
+	<br/>
+	<tiles:insertAttribute name="dialog" />
+</div>
+</jsp:root>

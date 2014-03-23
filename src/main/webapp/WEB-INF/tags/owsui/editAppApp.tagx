@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root version="2.0" xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core" 
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+>
+<jsp:directive.attribute name="appT" type="com.qwit.domain.Tree" required="true" description="The dose tree object"/>
+<c:if test="${not empty appT }">
+<qhtm:tag name="span" prefix="sp_" tree="${appT}">
+	<c:choose>
+		<c:when test="${docMtl.idt==appT.id}">
+			<mtl:appAppTempo appT="${appT}"/>
+			<form:hidden id="appapp0" path="editAppC.appapp"/>
+			<form:hidden id="appUnit" path="editAppC.unit"/>
+		</c:when>
+		<c:when test="${'expr'==appT.parentT.tabName}">
+			<mtl:appAppTempo appT="${appT}"/>
+		</c:when>
+		<c:otherwise>
+			<qhtm:a idt="${appT.id}"><mtl:appAppTempo appT="${appT}"/></qhtm:a>
+		</c:otherwise>
+	</c:choose>
+</qhtm:tag>
+</c:if>
+
+</jsp:root>

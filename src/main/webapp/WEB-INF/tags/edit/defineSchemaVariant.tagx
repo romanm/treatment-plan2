@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:edit="urn:jsptagdir:/WEB-INF/tags/edit"
+>
+
+<spring:eval var="defTaskP" expression="jxp.var('definition').var('task')
+	.jxpip(conceptMtl.getDocT(),'childTs[tabName=$definition]/childTs[tabName=$task]')" />
+<c:set var="sizeNotUsed" value="0" />
+<c:set var="sizeUsed" value="0" />
+<c:forEach var="defTask" items="${defTaskP}">
+	<c:set var="tu" value="${docMtl.idClass2TreeMS[defTask.value.idClass] }" />
+	<c:if test="${fn:length(tu)>1}">
+		<c:set var="sizeUsed" value="${sizeUsed+1}" />
+		<c:set var="asVariantOption">${asVariantOption}
+			<option value="${defTask.value.id}">${defTask.value.mtlO.task }</option>
+		</c:set>
+	</c:if>
+	<c:if test="${fn:length(tu)==1}">
+		<c:set var="sizeNotUsed" value="${sizeNotUsed+1}" />
+		<c:set var="toVariantOption">${toVariantOption}
+			<option value="${defTask.value.id}">${defTask.value.mtlO.task }</option>
+		</c:set>
+	</c:if>
+</c:forEach>
+
+<form:form id="f2" modelAttribute="conceptMtl">
+	<b>Schema:</b>
+	<c:forEach var="defTask" items="${docMtl.definitionSchemaL}">
+		<div class="select">
+			<input id="to_${defTask.id}" name="idt" type="radio" value="${defTask.id}" />
+			<c:out value=" " />
+			<label for="to_${defTask.id}">${defTask.mtlO.task }</label>
+		</div>
+	</c:forEach>
+	<!-- 
+	<form:select path="idt" size="${sizeNotUsed+1}">
+		<option></option>
+		${toVariantOption}
+	</form:select>
+	 -->
+	<b>ist Variante von:</b>
+	<c:forEach var="defTask" items="${docMtl.definitionSchemaL}">
+		<div class="select">
+			<input id="tv_${defTask.id}" name="ids" type="radio" value="${defTask.id}" />
+			<c:out value=" " />
+			<label for="tv_${defTask.id}">${defTask.mtlO.task }</label>
+		</div>
+	</c:forEach>
+	<div class="select">
+		<input id="tv_1" name="ids" type="radio" value="1" />
+		<c:out value=" " />
+		<label for="tv_1">Ist keine Variante</label>
+	</div>
+	<!-- 
+	<form:select path="ids" size="${sizeUsed+1}">
+		<option></option>
+		${asVariantOption}
+	</form:select>
+	 -->
+	<br/>
+	<input type="submit" name="_eventId_save"	value="${ui_button_OK}"/>
+	<input type="submit" name="_eventId_cancel"	value="${ui_button_cancel}"/>
+</form:form>
+
+</jsp:root>

@@ -1,0 +1,44 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:form="http://www.springframework.org/tags/form"
+	xmlns:qhtm="urn:jsptagdir:/WEB-INF/tags/qhtm"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+>
+	<jsp:directive.attribute name="maxDoseExprT"	type="com.qwit.domain.Tree"	required="true" />
+	<jsp:directive.attribute name="maxDoseDoseT"	type="com.qwit.domain.Tree"	required="true" />
+
+<!-- 
+<c:choose>
+<!-
+	<c:when test="${not empty docMtl.editDoseC and docMtl.idt==maxDoseDoseT.id}">
+ ->
+	<c:when test="${not empty docMtl.editDoseC and docMtl.idt==maxDoseExprT.id}">
+		<form:input id="doseValue" path="editDoseC.value" cssStyle="width:80px" />
+		<form:select path="editDoseC.unit">
+			<form:option value="mg" />
+			<form:option value="mg/m²" />
+			<form:option value="ml" />
+		</form:select>
+	</c:when>
+	<c:otherwise>
+	<!-
+		<qhtm:a idt="${maxDoseDoseT.id}" action="maxDoseValue">
+		<qhtm:a idt="${maxDoseDoseT.id}" action="summeDoseExpr">
+	 ->
+	</c:otherwise>
+</c:choose>
+ -->
+		<qhtm:a idt="${maxDoseExprT.parentT.id}" action="summeDoseExpr">
+			<c:choose>
+				<c:when test="${empty maxDoseDoseT or maxDoseDoseT.mtlO.value==0}">###</c:when>
+				<c:otherwise>
+					<fmt:formatNumber pattern="##.###">${maxDoseDoseT.mtlO.value}</fmt:formatNumber>
+				</c:otherwise>
+			</c:choose>
+			${maxDoseDoseT.mtlO.unit}
+		</qhtm:a>
+</jsp:root>

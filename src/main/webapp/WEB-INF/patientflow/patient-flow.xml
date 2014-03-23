@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+	http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<secured attributes="ROLE_USER" />
+	<persistence-context />
+
+	<var name="formUtil"		class="com.qwit.util.FormUtil" />
+	<var name="patientSchema"	class="com.qwit.model.PatientSchema" />
+	<input name="id"			type="int" required="true" />
+
+	<on-start>
+		<evaluate	expression="documentService.setFlushModeCommit()" />
+		<evaluate	expression="documentService.makePatientMtl(id)"	result="flowScope.patientMtl" />
+	</on-start>
+
+	<action-state	id="handleAction">
+		<on-entry>
+			<evaluate	expression="patientHistoryService.handleActionEntry(patientMtl)"/>
+		</on-entry>
+		<evaluate	expression="handleAction.handleAction(patientMtl)"/>
+		<transition on="deleteNode"			to="confirmDeleteNode"/>
+		<transition on="patientDiagnose"	to="patientDiagnose"/>
+		<!-- 
+		<transition on="moveStation"		to="moveStation" />
+		 -->
+		<transition on="moveStation"		to="moveStationConfirm" />
+		<transition on="archivPatient"		to="archivPatient" />
+		<!--transition on="moveStation"		to="moveStation" /-->
+		<transition on="bsaDialog"			to="bsaDialog"/>
+		<transition on="editCycle"			to="editCycle"/>
+		<transition on="editPatient"		to="editPatient"/>
+		<transition on="success"			to="cancel" />
+	</action-state>
+	
+	<view-state id="editPatient" view="patientxViewAndEdit" model="patientSchema">
+		<binder>
+			<binding property="patientO.patient" />
+			<binding property="patientO.forename" />
+			<binding property="patientO.sex" />
+			<binding property="dateDay" />
+			<binding property="dateMonth" />
+			<binding property="dateYear" />
+			<binding property="patientO.insurance" />
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.editPatientEntry(patientSchema,patientMtl)" />
+		</on-entry>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.editPatientSave(patientSchema,patientMtl)" />
+		</transition>
+	</view-state>
+
+	<!-- old depricated -->
+	<view-state id="bsaDialogOld" view="patientxViewAndEdit" model="patientMtl">
+		<binder>
+			<!-- Bsa -->
+			<binding property="weightKg" />
+			<binding property="heightCm" />
+			<binding property="bsaType" />
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.bsaDialogEntry(patientSchema,patientMtl)" />
+		</on-entry>
+		<transition on="calculation">
+			<evaluate expression="patientSchemaService.bsaDialogCalc(patientSchema,patientMtl)" />
+		</transition>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.bsaDialogSave(patientSchema,patientMtl)" />
+		</transition>
+		<!-- 
+		<transition on="bsaSave"	to="bsaSave">
+			<set name="formUtil.viewState"	value="'bsaSave'" />
+			<evaluate expression="schemaMtl.patientMtl.reviseBsa()" />
+			<evaluate expression="schemaMtl.calcDose()" />
+		</transition>
+		 -->
+	</view-state>
+	
+	<view-state id="bsaDialog" view="patientxViewAndEdit" model="patientMtl">
+		<binder>
+			<!-- Bsa -->
+			<binding property="weight" />
+			<binding property="height" />
+			<binding property="bsaType" />
+		</binder>
+		<on-render>
+			<evaluate result="viewScope.ctt" expression="'content'" />
+			<render fragments="dialogs, #{ctt}" /> 
+		</on-render>
+		<transition on="viewBsaFormula">
+			<evaluate expression="patientMtl.setViewBsaFormula()" />
+			<evaluate expression="patientMtl.calcBsa()" />
+		</transition>
+		<transition on="calculation" to="bsaDialog">
+			<evaluate expression="patientMtl.calcBsa()" />
+		</transition>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.bsaDialogSave(patientMtl)" />
+		</transition>	
+	</view-state>
+	
+	<view-state id="patientxViewAndEdit" model="patientMtl">
+		<transition on="cancelFlow" to="cancel"/>
+	</view-state>
+
+	<view-state id="confirmDeleteNode" model="patientMtl">
+		<on-entry>
+			<evaluate expression="formUtil.logline('--------patientHistoryDeleteNode-----on-entry---'+patientMtl.getAction())" />
+			<evaluate expression="deleteService.confirm(patientMtl)"/>
+		</on-entry>
+		<transition on="save" to="save">
+			<evaluate expression="deleteService.deletePatientHistory(patientMtl)"/>
+		</transition>
+	</view-state>
+	
+	<view-state id="patientDiagnose" view="patientxViewAndEdit" model="patientSchema">
+		<binder>
+			<binding property="notice" />
+			<binding property="diagnose" />
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.patientDiagnoseEntry(patientSchema,patientMtl)" />
+		</on-entry>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.patientDiagnoseSave(patientSchema,patientMtl)" />
+		</transition>
+		<on-exit>
+			<evaluate expression="patientSchemaService.patientDiagnoseExit(patientSchema,patientMtl)" />
+		</on-exit>
+	</view-state>
+
+	<view-state id="moveStation" view="patientxViewAndEdit" model="patientMtl">
+		<binder>
+			<binding property="idMovestation"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.patientMoveStationEntry(patientMtl)" />
+		</on-entry>
+		<transition on="ok"	to="moveStationConfirm" >
+			<evaluate expression="formUtil.logline('--------moveStation-----ok---'+patientMtl.getAction())" />
+			<evaluate expression="patientSchemaService.patientMoveStationConfirm(patientMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="moveStationConfirm" view="patientxViewAndEdit" model="patientMtl">
+		<binder>
+			<binding property="idMovestation"/>
+		</binder>
+		<on-entry>
+			<evaluate expression="patientSchemaService.patientMoveStationEntry(patientMtl)" />
+		</on-entry>
+		<transition on="save"	to="save" >
+			<evaluate expression="patientSchemaService.patientMoveStationSave(patientMtl)" />
+		</transition>
+	</view-state>
+
+	<view-state id="archivPatient" view="patientxViewAndEdit" model="patientMtl">
+		<transition on="save"	to="toFolder" >
+			<evaluate expression="patientSchemaService.archivPatientSave(patientMtl)" />
+		</transition>
+	</view-state>
+
+	<end-state id="save"		view="externalRedirect:/patient=#{id}"	commit="true" />
+	<end-state id="toFolder"	view="externalRedirect:/explorer=#{patientMtl.docT.parentT.id}"	commit="true" />
+	<end-state id="cancel"		view="externalRedirect:/patient=#{id}"/>
+	<end-state id="editCycle"	view="externalRedirect:/schemaflow?id=#{requestParameters.idt}&amp;idt=#{id}&amp;a=beginDateCycleNrUpdate"/>
+
+	<global-transitions>
+		<transition on="editStep"	to="handleAction" >
+			<evaluate expression="patientHistoryService.editStep(patientMtl)" />
+		</transition>
+		<transition on="cancel"		to="patientxViewAndEdit" >
+		</transition>
+		<!--
+		<transition on-exception="org.springframework.webflow.execution.ActionExecutionException" to="save">
+			<evaluate expression="formUtil.logerror(patientMtl.action+'...actionExecutionException...')" />
+			<set name="flashScope.actionExecutionException" value="'actionExecutionException_'+patientMtl.action" />
+		</transition>
+		-->
+	</global-transitions>
+
+</flow>

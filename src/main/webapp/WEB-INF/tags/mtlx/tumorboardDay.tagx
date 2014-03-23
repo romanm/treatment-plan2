@@ -1,0 +1,33 @@
+<jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
+	xmlns:c		="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn	="http://java.sun.com/jsp/jstl/functions"
+	xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+	xmlns:sql	="http://java.sun.com/jsp/jstl/sql"
+	xmlns:spring="http://www.springframework.org/tags"
+	xmlns:mtl="urn:jsptagdir:/WEB-INF/tags/mtlx"
+	xmlns:owsui="urn:jsptagdir:/WEB-INF/tags/owsui"
+	>
+
+	<sql:query var="tumorboard_task" dataSource="${owsDbSource}" scope="session" >
+		SELECT patient.*,t1.id AS tuboId, t3.tab_name,t3.id,t1.*,mdate 
+		FROM tree t1,task,tree t2,history h2,pvariable,tree t3,patient
+		WHERE t2.did=t1.id AND t2.id=h2.idhistory AND t2.idclass=idpvariable AND pvariable='ofDate'
+		AND t1.idclass=idtask AND type='tubo'
+		AND date_part('year',mdate)=${session_year} AND date_part('month',mdate)=${session_month} AND date_part('day',mdate)=${session_day}
+		AND t3.id=t1.did AND t3.idclass=idpatient
+	</sql:query>
+	<!-- 
+	${requestScope}
+	<spring:eval expression="requestScope.resolveContextualObject('a')" />
+	 -->
+	
+	<c:forEach var="row" items="${tumorboard_task.rows}" varStatus="stat">
+		<div>
+			<a href="tumorboard?id=${row.tuboId}"
+			class="${tuboT.id==row.tuboId?'b':''}"
+			>${row.patient}</a>
+			${row.mdate }
+		</div>
+	</c:forEach>
+
+</jsp:root>
